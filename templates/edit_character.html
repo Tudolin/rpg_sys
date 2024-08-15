@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Personagem{% endblock %}
+
+{% block content %}
+    <h1>Editar Personagem</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">Nome:</label>
+            <input type="text" id="name" name="name" class="form-control" value="{{ character['name'] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="class_id">Classe:</label>
+            <select id="class_id" name="class_id" class="form-control">
+                {% for class in classes %}
+                    <option value="{{ class._id }}" {% if class._id == character['class_id'] %}selected{% endif %}>
+                        {{ class.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="race_id">Raça:</label>
+            <select id="race_id" name="race_id" class="form-control">
+                {% for race in races %}
+                    <option value="{{ race._id }}" {% if race._id == character['race_id'] %}selected{% endif %}>
+                        {{ race.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="forca">Força:</label>
+            <input type="number" id="forca" name="forca" class="form-control" value="{{ character['forca'] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="destreza">Destreza:</label>
+            <input type="number" id="destreza" name="destreza" class="form-control" value="{{ character['destreza'] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="constituicao">Constituição:</label>
+            <input type="number" id="constituicao" name="constituicao" class="form-control" value="{{ character['constituicao'] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="inteligencia">Inteligência:</label>
+            <input type="number" id="inteligencia" name="inteligencia" class="form-control" value="{{ character['inteligencia'] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="sabedoria">Sabedoria:</label>
+            <input type="number" id="sabedoria" name="sabedoria" class="form-control" value="{{ character['sabedoria'] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="carisma">Carisma:</label>
+            <input type="number" id="carisma" name="carisma" class="form-control" value="{{ character['carisma'] }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="img_url">Foto do Personagem:</label>
+            <div class="mb-3">
+                <img src="{{ url_for('static', filename=character['img_url']) }}" alt="{{ character['name'] }}" width="100" height="100">
+            </div>
+            <input type="file" id="img_url" name="img_url" class="form-control" accept="image/*">
+            <small class="form-text text-muted">Escolha uma nova imagem para substituir a atual (opcional).</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}
