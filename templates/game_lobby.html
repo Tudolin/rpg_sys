@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Lobby do Jogo - {{ session_name }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
+<div class="game-lobby-container">
+    <div class="board-center">
+        <img src="/static/images/rpg_board.jpeg" alt="Tabuleiro" class="game-board">
+    </div>
+
+    <div class="player-info">
+        <div class="character-frame">
+            <img src="{{ character['img_url'] }}" alt="{{ character['name'] }}" class="character-portrait">
+        </div>
+        <div class="stats-container">
+            <h2>{{ character['name'] }}</h2>
+            <p><strong>Classe:</strong> {{ character['class_name'] }}</p>
+            <p><strong>Raça:</strong> {{ character['race_name'] }}</p>
+
+            <div class="attributes">
+                <div class="attribute" id="attr-forca">
+                    <img src="/static/icons/forca.png" alt="Força">
+                    <span>{{ character['forca'] }}</span>
+                </div>
+                <div class="attribute" id="attr-destreza">
+                    <img src="/static/icons/destreza.png" alt="Destreza">
+                    <span>{{ character['destreza'] }}</span>
+                </div>
+                <div class="attribute" id="attr-constituicao">
+                    <img src="/static/icons/constituicao.png" alt="Constituição">
+                    <span>{{ character['constituicao'] }}</span>
+                </div>
+                <div class="attribute" id="attr-inteligencia">
+                    <img src="/static/icons/inteligencia.png" alt="Inteligência">
+                    <span>{{ character['inteligencia'] }}</span>
+                </div>
+                <div class="attribute" id="attr-sabedoria">
+                    <img src="/static/icons/sabedoria.png" alt="Sabedoria">
+                    <span>{{ character['sabedoria'] }}</span>
+                </div>
+                <div class="attribute" id="attr-carisma">
+                    <img src="/static/icons/carisma.png" alt="Carisma">
+                    <span>{{ character['carisma'] }}</span>
+                </div>
+            </div>
+            
+            <div class="health-mana-bars">
+                <div class="health-bar" data-health="{{ character['hp'] }}">
+                    <div class="health-fill"></div>
+                </div>
+                <div class="mana-bar" data-mana="{{ character['mana'] }}">
+                    <div class="mana-fill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="other-players">
+        <h3>Jogadores na Sessão</h3>
+        <ul>
+            {% for char in other_characters %}
+                <li class="other-player" data-player-id="{{ char['_id'] }}">
+                    <div class="character-frame-small">
+                        <img src="{{ char['img_url'] }}" alt="{{ char['name'] }}" class="character-portrait-small">
+                    </div>
+                    <div class="player-stats">
+                        <p>{{ char['name'] }}</p>
+                        <p>Classe: {{ char['class_name'] }}</p>
+                        <p>Raça: {{ char['race_name'] }}</p>
+                        <p>HP: {{ char['hp'] }}</p>
+                        <p>Mana: {{ char['mana'] }}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Barra inferior -->
+    <div class="bottom-bar">
+        <div class="bottom-bar-icon" id="profile-button">
+            <img src="{{ character['img_url'] }}" alt="Perfil" class="bottom-bar-icon-img">
+            <span>Perfil</span>
+        </div>
+    </div>
+
+    <!-- Popups -->
+    <div id="profile-popup" class="popup">
+        <div class="popup-content">
+            <span class="close-button">&times;</span>
+            <h2>{{ character['name'] }}</h2>
+            <p><strong>Classe:</strong> {{ character['class_name'] }}</p>
+            <p><strong>Raça:</strong> {{ character['race_name'] }}</p>
+            <div class="attributes">
+                <p><strong>Atributos:</strong></p>
+                <ul>
+                    <li>Força: {{ character['forca'] }}</li>
+                    <li>Destreza: {{ character['destreza'] }}</li>
+                    <li>Constituição: {{ character['constituicao'] }}</li>
+                    <li>Inteligência: {{ character['inteligencia'] }}</li>
+                    <li>Sabedoria: {{ character['sabedoria'] }}</li>
+                    <li>Carisma: {{ character['carisma'] }}</li>
+                </ul>
+            </div>
+            <div class="skills">
+                <p><strong>Habilidades:</strong></p>
+                <ul>
+                    {% for habilidade in character['class_habilidades'] %}
+                        <li>{{ habilidade }}</li>
+                    {% endfor %}
+                    {% for habilidade in character['race_habilidades'] %}
+                        <li>{{ habilidade }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="other-player-popup" class="popup">
+        <div class="popup-content">
+            <span class="close-button">&times;</span>
+            <div id="other-player-details">
+                <!-- Detalhes do jogador clicado serão carregados via JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+{% endblock %}

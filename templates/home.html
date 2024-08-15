@@ -3,42 +3,50 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-    <h1>Bem-vindo, {{ session['username'] }}</h1>
-    <h2>Seus Personagens</h2>
+    <h1 class="text-center">Bem-vindo, {{ session['username'] }}</h1>
+    <h2 class="text-center mb-5">Seus Personagens</h2>
     <ul class="list-unstyled">
         {% for char in characters %}
-            <li class="media my-4">
-                <img src="{{ char['img_url'] }}" class="mr-3" alt="{{ char['name'] }}" width="100" height="100">
+            <li class="media my-4 p-3 rounded shadow-sm bg-light">
+                <img src="{{ char['img_url'] }}" class="mr-3 rounded-circle border" alt="{{ char['name'] }}" width="120" height="120">
                 <div class="media-body">
-                    <h5 class="mt-0 mb-1">{{ char['name'] }}</h5>
-                    <p>Classe: {{ char['class'] }}</p>
-                    <p>Raça: {{ char['race'] }}</p>
-                    <p>HP: {{ char['hp'] }}</p>
-                    <p>Ataque: {{ char['ataque'] }}</p>
-                    <p>Defesa: {{ char['defesa'] }}</p>
-                    <p>Força: {{ char['forca'] }}</p>
-                    <p>Destreza: {{ char['destreza'] }}</p>
-                    <p>Constituição: {{ char['constituicao'] }}</p>
-                    <p>Inteligência: {{ char['inteligencia'] }}</p>
-                    <p>Sabedoria: {{ char['sabedoria'] }}</p>
-                    <p>Carisma: {{ char['carisma'] }}</p>
-                    <p><strong>Habilidades de Classe:</strong></p>
-                    <ul>
-                        {% for habilidade in char['class_habilidades'] %}
-                            <li>{{ habilidade }}</li>
+                    <h5 class="mt-0 mb-2">{{ char['name'] }}</h5>
+                    <p><strong>Classe:</strong> {{ char['class_name'] }}</p>
+                    <p><strong>Raça:</strong> {{ char['race_name'] }}</p>
+                    <p><strong>HP:</strong> {{ char['hp'] }}</p>
+                    <p><strong>Ataque:</strong> {{ char['ataque'] }}</p>
+                    <p><strong>Defesa:</strong> {{ char['defesa'] }}</p>
+                    <p><strong>Reflexo:</strong> {{ char['reflexo'] }}</p>
+                    <p><strong>Fortitude:</strong> {{ char['fortitude'] }}</p>
+                    <p><strong>Vontade:</strong> {{ char['vontade'] }}</p>
+                    <p><strong>Força:</strong> {{ char['forca'] }}</p>
+                    <p><strong>Destreza:</strong> {{ char['destreza'] }}</p>
+                    <p><strong>Constituição:</strong> {{ char['constituicao'] }}</p>
+                    <p><strong>Inteligência:</strong> {{ char['inteligencia'] }}</p>
+                    <p><strong>Sabedoria:</strong> {{ char['sabedoria'] }}</p>
+                    <p><strong>Carisma:</strong> {{ char['carisma'] }}</p>
+                    <p><strong>Habilidades:</strong></p>
+                    <ul class="list-inline">
+                        {% for habilidade in char['habilidades'] %}
+                            <li class="list-inline-item badge badge-primary">{{ habilidade }}</li>
                         {% endfor %}
                     </ul>
-                    <p><strong>Habilidades Inatas:</strong></p>
-                    <ul>
-                        {% for habilidade in char['race_habilidades'] %}
-                            <li>{{ habilidade }}</li>
+                    <p><strong>Perícias:</strong></p>
+                    <ul class="list-inline">
+                        {% for pericia, valor in char['pericias'].items() %}
+                            <li class="list-inline-item badge badge-success">{{ pericia }}: +{{ valor }}</li>
                         {% endfor %}
                     </ul>
-                    <a href="{{ url_for('edit_character_route', character_id=char['_id']) }}" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="{{ url_for('delete_character_route', character_id=char['_id']) }}" class="btn btn-danger btn-sm">Excluir</a>
+                    <div class="mt-3">
+                        <a href="{{ url_for('edit_character_route', character_id=char['_id']) }}" class="btn btn-warning btn-sm mr-2">Editar</a>
+                        <a href="{{ url_for('delete_character_route', character_id=char['_id']) }}" class="btn btn-danger btn-sm">Excluir</a>
+                    </div>
                 </div>
             </li>
         {% endfor %}
     </ul>
-    <a href="{{ url_for('create_character_route') }}" class="btn btn-primary">Criar Personagem</a>
+    <div class="text-center mt-5">
+        <a href="{{ url_for('create_character_route') }}" class="btn btn-primary btn-lg">Criar Personagem</a>
+        <a href="{{ url_for('sessions') }}" class="btn btn-secondary btn-lg ml-3">Se juntar a uma Sessão</a>
+    </div>
 {% endblock %}

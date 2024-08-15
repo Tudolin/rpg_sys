@@ -10,7 +10,13 @@ def get_class_by_id(db, class_id):
 def get_race_by_id(db, race_id):
     return db['races.races'].find_one({"_id": ObjectId(race_id)})
 
-def create_character(db, user_id, name, class_id, race_id, img_url, forca, destreza, constituicao, inteligencia, sabedoria, carisma, origem):
+def get_class_by_id(db, class_id):
+    return db['classes.classes'].find_one({"_id": ObjectId(class_id)})
+
+def get_race_by_id(db, race_id):
+    return db['races.races'].find_one({"_id": ObjectId(race_id)})
+
+def create_character(db, user_id, name, class_id, race_id, img_url, forca, destreza, constituicao, inteligencia, sabedoria, carisma, origem, reflexo, fortitude, vontade, pericias_selecionadas):
     selected_class = get_class_by_id(db, class_id)
     selected_race = get_race_by_id(db, race_id)
 
@@ -24,8 +30,28 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
 
     # Calcula HP e outras características baseadas em atributos e classe
     hp = selected_class['hp'] + constituicao
-    ataque = selected_class['forca'] + forca  # Exemplo, ajuste conforme necessário
-    defesa = selected_class['defense'] + destreza  # Exemplo, ajuste conforme necessário
+    ataque = selected_class['forca'] + forca
+    defesa = selected_class['defense'] + destreza
+
+    # Adiciona as habilidades herdadas da classe e da raça
+    habilidades = []
+    habilidades.extend(selected_class.get('habilidades_classe', []))
+    habilidades.extend(selected_race.get('habilidades_inatas', []))
+
+    # Processa as perícias selecionadas
+    pericias = {}
+    for pericia in pericias_selecionadas:
+        pericias[pericia] = 4  # Adiciona +4 ao atributo de cada perícia selecionada
+
+    # Adiciona perícias herdadas da classe
+    if 'pericias_classe' in selected_class:
+        for pericia, valor in selected_class['pericias_classe'].items():
+            pericias[pericia] = valor
+
+    # Adiciona perícias herdadas da raça
+    if 'pericias_raca' in selected_race:
+        for pericia, valor in selected_race['pericias_raca'].items():
+            pericias[pericia] = valor
 
     character = {
         "user_id": ObjectId(user_id),
@@ -42,10 +68,16 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
         "hp": hp,
         "ataque": ataque,
         "defesa": defesa,
+        "reflexo": reflexo,
+        "fortitude": fortitude,
+        "vontade": vontade,
+        "habilidades": habilidades,
+        "pericias": pericias,
         "origem": origem
     }
 
     db.chars.insert_one(character)
+
 
 def delete_character(db, character_id):
     db.chars.delete_one({"_id": ObjectId(character_id)})
@@ -67,21 +99,16 @@ def get_characters_by_user(db, user_id):
     enriched_characters = []
 
     for char in characters:
-        # Recupera a classe e raça com base nos IDs
         char_class = get_class_by_id(db, char['class_id'])
         char_race = get_race_by_id(db, char['race_id'])
 
-        # Adiciona os nomes da classe e raça ao personagem
-        char['class'] = char_class['name'] if char_class else "Classe desconhecida"
-        char['race'] = char_race['name'] if char_race else "Raça desconhecida"
-
-        # Adiciona as habilidades da classe e raça
-        char['class_habilidades'] = char_class['habilidades_classe'].keys() if char_class else []
-        char['race_habilidades'] = char_race['habilidades_inatas'].keys() if char_race else []
+        char['class_name'] = char_class['name'] if char_class else "Classe Desconhecida"
+        char['race_name'] = char_race['name'] if char_race else "Raça Desconhecida"
+        char['class_habilidades'] = char_class['habilidades_classe'] if char_class else []
+        char['race_habilidades'] = char_race['habilidades_inatas'] if char_race else []
 
         enriched_characters.append(char)
 
     return enriched_characters
 
 
-    return enriched_characters
