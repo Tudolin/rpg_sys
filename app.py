@@ -37,13 +37,14 @@ def login():
         user = collection.find_one({'username': username, 'password': password})
         if user:
             session['logged_in'] = True
-            session['userId'] = user['userId']
+            session['userId'] = str(user['_id'])  # Certifique-se de que o ID do usuário está sendo armazenado como string
             session['username'] = user['username']
             return redirect(url_for('home'))
         else:
             return render_template('login.html', error='Credenciais inválidas')
 
     return render_template('login.html')
+
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -138,6 +139,14 @@ def edit_character_route(character_id):
         name = request.form['name']
         class_id = request.form['class_id']
         race_id = request.form['race_id']
+        
+        # Atualizando os atributos
+        forca = int(request.form['forca'])
+        destreza = int(request.form['destreza'])
+        constituicao = int(request.form['constituicao'])
+        inteligencia = int(request.form['inteligencia'])
+        sabedoria = int(request.form['sabedoria'])
+        carisma = int(request.form['carisma'])
 
         # Processa o upload da nova imagem, se for o caso
         if 'img_url' in request.files and request.files['img_url'].filename != '':
@@ -152,12 +161,31 @@ def edit_character_route(character_id):
         else:
             img_url = character['img_url']
 
-        update_character(db, character_id, name, class_id, race_id, img_url)
+        # Atualizando o personagem no banco de dados
+        update_data = {
+            "name": name,
+            "class_id": ObjectId(class_id),
+            "race_id": ObjectId(race_id),
+            "forca": forca,
+            "destreza": destreza,
+            "constituicao": constituicao,
+            "inteligencia": inteligencia,
+            "sabedoria": sabedoria,
+            "carisma": carisma,
+            "img_url": img_url
+        }
+
+        db.chars.update_one(
+            {"_id": ObjectId(character_id)},
+            {"$set": update_data}
+        )
         return redirect(url_for('home'))
 
+    # Carregando as classes e raças para o formulário de edição
     classes = db.classes.find()
     races = db.races.find()
     return render_template('edit_character.html', character=character, classes=classes, races=races)
+
 
 @app.route('/delete_character/<character_id>')
 def delete_character_route(character_id):
@@ -184,21 +212,29 @@ def sessions():
 @app.route('/join_session/<session_id>', methods=['GET', 'POST'])
 def join_session(session_id):
     if not session.get('logged_in'):
+        app.logger.info('Usuário não está logado, redirecionando para login.')
         return redirect(url_for('login'))
+
+    app.logger.info('Usuário está logado. ID: %s', session['userId'])
+
+    # Carregue os personagens do usuário atual
+    characters = get_characters_by_user(db, session['userId'])
+
+    # Carregar o nome da sessão
+    session_data = db.sessions.find_one({"_id": ObjectId(session_id)})
+    session_name = session_data.get('name', 'Sessão Desconhecida') if session_data else 'Sessão Desconhecida'
 
     if request.method == 'POST':
         character_id = request.form['character_id']
+        # Lógica para adicionar o personagem à sessão
         add_character_to_session(db, session_id, character_id)
-        
-        # Atualiza a sessão Flask para refletir a sessão do jogo
-        session['game_session_id'] = session_id
-        session['character_id'] = character_id
-        
+        session['game_session_id'] = session_id  # Certifique-se de que o ID da sessão do jogo é armazenado na sessão
         return redirect(url_for('game_lobby'))
 
-    characters = list(get_characters_by_user(db, session['userId']))
-    session_data = get_session_by_id(db, session_id)
-    return render_template('join_session.html', session=session_data, characters=characters)
+    return render_template('join_session.html', characters=characters, session_name=session_name)
+
+
+
 
 @app.route('/game_lobby')
 def game_lobby():
@@ -208,6 +244,9 @@ def game_lobby():
     session_data = get_session_by_id(db, session['game_session_id'])
     character = db.chars.find_one({"user_id": ObjectId(session['userId'])})
 
+    if not character:
+        return redirect(url_for('home'))
+
     # Buscando informações de classe e raça
     class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
     race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
@@ -215,22 +254,34 @@ def game_lobby():
     # Adicionando as informações de classe e raça ao personagem do usuário
     character['class_name'] = class_info['name'] if class_info else "Classe Desconhecida"
     character['race_name'] = race_info['name'] if race_info else "Raça Desconhecida"
-    character['class_habilidades'] = class_info['habilidades_classe'] if class_info else []
-    character['race_habilidades'] = race_info['habilidades_inatas'] if race_info else []
+    character['habilidades'] = class_info.get('habilidades_classe', {}).copy() if class_info else {}
+    character['habilidades'].update(race_info.get('habilidades_inatas', {})) if race_info else {}
+
+    # Formatando habilidades para exibição
+    habilidades_formatadas = [f"{nome}: {descricao}" for nome, descricao in character['habilidades'].items()]
+    character['habilidades'] = habilidades_formatadas
+
+    # Perícias
+    character['pericias'] = character.get('pericias', {})
 
     # Carregando os personagens dos outros jogadores
     other_characters = []
-    for char_id in session_data['characters']:
+    for char_id in session_data.get('characters', []):
         if str(char_id) != str(character['_id']):
             char = db.chars.find_one({"_id": ObjectId(char_id)})
             if char:
                 char_class = db['classes.classes'].find_one({"_id": ObjectId(char['class_id'])})
                 char_race = db['races.races'].find_one({"_id": ObjectId(char['race_id'])})
-
+                
                 char['class_name'] = char_class['name'] if char_class else "Classe Desconhecida"
                 char['race_name'] = char_race['name'] if char_race else "Raça Desconhecida"
-                char['class_habilidades'] = char_class['habilidades_classe'] if char_class else []
-                char['race_habilidades'] = char_race['habilidades_inatas'] if char_race else []
+                char['habilidades'] = char_class.get('habilidades_classe', {}).copy() if char_class else {}
+                char['habilidades'].update(char_race.get('habilidades_inatas', {})) if char_race else {}
+                
+                # Formatando habilidades para exibição
+                char['habilidades'] = [f"{nome}: {descricao}" for nome, descricao in char['habilidades'].items()]
+                char['pericias'] = char.get('pericias', {})
+                
                 other_characters.append(char)
 
     return render_template('game_lobby.html', character=character, other_characters=other_characters, session_name=session_data['name'])

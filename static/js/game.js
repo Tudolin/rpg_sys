@@ -12,9 +12,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 const detailsContainer = document.querySelector("#profile-popup .popup-content");
 
-                // Verifique se class_habilidades e race_habilidades são arrays
-                const classHabilidades = Array.isArray(data.class_habilidades) ? data.class_habilidades : [];
-                const raceHabilidades = Array.isArray(data.race_habilidades) ? data.race_habilidades : [];
+                // Habilidades
+                const habilidades = data.habilidades ? Object.entries(data.habilidades) : [];
+                // Perícias
+                const pericias = data.pericias ? Object.entries(data.pericias) : [];
 
                 detailsContainer.innerHTML = `
                     <span class="close-button">&times;</span>
@@ -35,8 +36,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     <div class="skills">
                         <p><strong>Habilidades:</strong></p>
                         <ul>
-                            ${classHabilidades.map(hab => `<li>${hab}</li>`).join('')}
-                            ${raceHabilidades.map(hab => `<li>${hab}</li>`).join('')}
+                            ${habilidades.map(([nome, descricao]) => `<li>${nome}: ${descricao}</li>`).join('')}
+                        </ul>
+                        <p><strong>Perícias:</strong></p>
+                        <ul>
+                            ${pericias.map(([nome, valor]) => `<li>${nome}: +${valor}</li>`).join('')}
                         </ul>
                     </div>
                 `;
@@ -69,9 +73,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     const otherPlayerPopup = document.getElementById("other-player-popup");
                     const detailsContainer = document.getElementById("other-player-details");
 
-                    // Verifique se class_habilidades e race_habilidades são arrays
-                    const classHabilidades = Array.isArray(data.class_habilidades) ? data.class_habilidades : [];
-                    const raceHabilidades = Array.isArray(data.race_habilidades) ? data.race_habilidades : [];
+                    // Habilidades
+                    const habilidades = data.habilidades ? Object.entries(data.habilidades) : [];
+                    // Perícias
+                    const pericias = data.pericias ? Object.entries(data.pericias) : [];
 
                     detailsContainer.innerHTML = `
                         <h2>${data.name}</h2>
@@ -91,8 +96,11 @@ document.addEventListener("DOMContentLoaded", function() {
                         <div class="skills">
                             <p><strong>Habilidades:</strong></p>
                             <ul>
-                                ${classHabilidades.map(hab => `<li>${hab}</li>`).join('')}
-                                ${raceHabilidades.map(hab => `<li>${hab}</li>`).join('')}
+                                ${habilidades.map(([nome, descricao]) => `<li>${nome}: ${descricao}</li>`).join('')}
+                            </ul>
+                            <p><strong>Perícias:</strong></p>
+                            <ul>
+                                ${pericias.map(([nome, valor]) => `<li>${nome}: +${valor}</li>`).join('')}
                             </ul>
                         </div>
                     `;

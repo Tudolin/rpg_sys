@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
 <div class="game-lobby-container">
     <div class="board-center">
-        <img src="/static/images/rpg_board.jpeg" alt="Tabuleiro" class="game-board">
+        <img src="/static/images/rpg_board.jpg" alt="Tabuleiro" class="game-board">
     </div>
 
     <div class="player-info">
@@ -105,11 +105,14 @@
             <div class="skills">
                 <p><strong>Habilidades:</strong></p>
                 <ul>
-                    {% for habilidade in character['class_habilidades'] %}
+                    {% for habilidade in character['habilidades'] %}
                         <li>{{ habilidade }}</li>
                     {% endfor %}
-                    {% for habilidade in character['race_habilidades'] %}
-                        <li>{{ habilidade }}</li>
+                </ul>
+                <p><strong>Perícias:</strong></p>
+                <ul>
+                    {% for pericia, valor in character['pericias'].items() %}
+                        <li>{{ pericia }}: +{{ valor }}</li>
                     {% endfor %}
                 </ul>
             </div>

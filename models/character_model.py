@@ -34,9 +34,15 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
     defesa = selected_class['defense'] + destreza
 
     # Adiciona as habilidades herdadas da classe e da raça
-    habilidades = []
-    habilidades.extend(selected_class.get('habilidades_classe', []))
-    habilidades.extend(selected_race.get('habilidades_inatas', []))
+    habilidades = {}
+
+    # Adiciona habilidades da classe
+    for habilidade, descricao in selected_class.get('habilidades_classe', {}).items():
+        habilidades[habilidade] = descricao
+
+    # Adiciona habilidades da raça
+    for habilidade, descricao in selected_race.get('habilidades_inatas', {}).items():
+        habilidades[habilidade] = descricao
 
     # Processa as perícias selecionadas
     pericias = {}
@@ -79,6 +85,7 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
     db.chars.insert_one(character)
 
 
+
 def delete_character(db, character_id):
     db.chars.delete_one({"_id": ObjectId(character_id)})
 
@@ -104,11 +111,9 @@ def get_characters_by_user(db, user_id):
 
         char['class_name'] = char_class['name'] if char_class else "Classe Desconhecida"
         char['race_name'] = char_race['name'] if char_race else "Raça Desconhecida"
-        char['class_habilidades'] = char_class['habilidades_classe'] if char_class else []
-        char['race_habilidades'] = char_race['habilidades_inatas'] if char_race else []
-
         enriched_characters.append(char)
 
     return enriched_characters
+
 
 

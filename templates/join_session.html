@@ -3,17 +3,19 @@
 {% block title %}Entrar na Sessão{% endblock %}
 
 {% block content %}
-    <h1>Entrar na Sessão: {{ session['name'] }}</h1>
+    <h1 class="text-center mb-4">Entrar na Sessão: {{ session_name }}</h1>
 
-    <form method="POST">
+    <form method="POST" class="mx-auto" style="max-width: 600px;">
         <div class="form-group">
-            <label for="character_id">Selecione um Personagem:</label>
-            <select name="character_id" class="form-control">
+            <label for="character_id"><strong>Selecione um Personagem:</strong></label>
+            <select name="character_id" id="character_id" class="form-control custom-select">
                 {% for char in characters %}
-                    <option value="{{ char['_id'] }}">{{ char['name'] }} - Classe: {{ char['class'] }} - Raça: {{ char['race'] }}</option>
+                    <option value="{{ char['_id'] }}">
+                        {{ char['name'] }} - Classe: {{ char['class_name'] }} - Raça: {{ char['race_name'] }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
-        <button type="submit" class="btn btn-success">Entrar na Sessão</button>
+        <button type="submit" class="btn btn-success btn-lg btn-block mt-4">Entrar na Sessão</button>
     </form>
 {% endblock %}
