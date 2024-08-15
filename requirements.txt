@@ -1,0 +1,6 @@
+Werkzeug==3.0.3
+Flask==3.0.3
+gunicorn==20.1.0
+fuzzywuzzy==0.18.0
+certifi==2024.7.4
+pymongo==4.8.0
