@@ -1,3 +1,27 @@
+body {
+    font-family: 'Cinzel', serif;
+    color: #e0e0e0;
+    background-color: #101010;
+}
+
+.stats-container h2 {
+    font-size: 26px;
+    color: #fff;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.stats-container p {
+    font-size: 18px;
+    color: #ccc;
+    text-align: center;
+}
+
+.attribute span {
+    font-size: 16px;
+    color: #fff;
+}
+
 .game-lobby-container {
     display: flex;
     flex-direction: column;
@@ -26,17 +50,12 @@
     border-radius: 15px;
 }
 
-.player-info {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.8);
+.player-info, .other-players, .popup-content {
+    border: 2px solid #660000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.85);
     padding: 20px;
     border-radius: 15px;
-    text-align: center;
-    box-shadow: 0px 0px 15px #000;
-    z-index: 2;
 }
 
 .character-frame {
@@ -46,6 +65,37 @@
     background: url('/static/images/character_frame.png') no-repeat center center;
     background-size: contain;
     border-radius: 50%;
+}
+
+.health-ball {
+    width: 100px;
+    height: 100px;
+    background-color: #1a1a1a;
+    border-radius: 50%;
+    border: 5px solid #660000;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.health-fill {
+    background: radial-gradient(circle, #ff0000 0%, #990000 100%);
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    transition: height 0.5s ease-in-out;
+    border-radius: 50%;
+}
+
+.health-text {
+    position: absolute;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 1;
 }
 
 .character-portrait {
@@ -86,32 +136,6 @@
     display: flex;
     justify-content: space-around;
     margin-top: 20px;
-}
-
-.health-bar, .mana-bar {
-    width: 40px;
-    height: 150px;
-    background-color: #333;
-    border-radius: 20px;
-    overflow: hidden;
-    position: relative;
-    transition: height 0.5s ease-in-out;
-}
-
-.health-fill {
-    background-color: red;
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    transition: height 0.5s ease-in-out;
-}
-
-.mana-fill {
-    background-color: blue;
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    transition: height 0.5s ease-in-out;
 }
 
 .other-players {
@@ -204,13 +228,34 @@
 }
 
 .popup-content {
-    background-color: #333;
-    margin: 15% auto;
+    background-color: #1a1a1a;
+    margin: 10% auto;
     padding: 20px;
-    border: 1px solid #888;
-    width: 60%;
+    border: 1px solid #660000;
+    width: 50%;
     color: white;
     border-radius: 10px;
+}
+
+.popup-content h2 {
+    text-align: center;
+    font-size: 28px;
+    color: #ffcc00;
+    margin-bottom: 20px;
+}
+
+.popup-content p {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.popup-content ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+.popup-content li {
+    margin-bottom: 10px;
 }
 
 .close-button {
@@ -225,4 +270,27 @@
     color: white;
     text-decoration: none;
     cursor: pointer;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-image {
+    margin-right: 15px;
+}
+
+.character-portrait-popup {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #660000;
+}
+
+.popup-content h2 {
+    font-size: 24px;
+    color: #ffcc00;
+    margin: 0;
 }

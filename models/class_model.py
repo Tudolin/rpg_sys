@@ -246,6 +246,155 @@ def create_default_classes(db):
             "Sangue Místico": "Recebe bônus em magia devido a herança mágica",
             "Resistência a Magia": "Aumenta resistência contra magias adversárias"
         }
+    },
+    {
+        "name": "Bárbaro",
+        "hp": 20,
+        "forca": 18,
+        "destreza": 12,
+        "defense": 4,
+        "pericias": {
+            "Luta": "Força",
+            "Fortitude": "Constituição",
+            "Sobrevivência": "Sabedoria",
+            "Percepção": "Sabedoria",
+            "Atletismo": "Força",
+            "Intimidação": "Carisma",
+            "Reflexos": "Destreza"
+        },
+        "habilidades_classe": {
+            "Fúria": "Aumenta dano e resistência temporariamente, mas fica exausto depois.",
+            "Movimento Rápido": "Aumenta o deslocamento base.",
+            "Resistência ao Dano": "Reduz dano de fontes não mágicas."
+        }
+    },
+    {
+        "name": "Cavaleiro",
+        "hp": 18,
+        "forca": 16,
+        "destreza": 8,
+        "defense": 6,
+        "pericias": {
+            "Luta": "Força",
+            "Cavalgar": "Destreza",
+            "Guerra": "Inteligência",
+            "Diplomacia": "Carisma",
+            "Fortitude": "Constituição",
+            "Intimidação": "Carisma",
+            "Percepção": "Sabedoria"
+        },
+        "habilidades_classe": {
+            "Desafiar Inimigo": "Pode desafiar um inimigo, forçando-o a atacar o cavaleiro.",
+            "Presença Inspiradora": "Concede bônus a aliados próximos.",
+            "Montaria Especial": "Ganha uma montaria que aumenta em força e resistência conforme o nível."
+        }
+    },
+    {
+        "name": "Xamã",
+        "hp": 14,
+        "forca": 10,
+        "destreza": 10,
+        "defense": 3,
+        "pericias": {
+            "Magia": "Sabedoria",
+            "Conhecimento (Espíritos)": "Sabedoria",
+            "Cura": "Sabedoria",
+            "Sobrevivência": "Sabedoria",
+            "Intimidação": "Carisma",
+            "Percepção": "Sabedoria",
+            "Fortitude": "Constituição"
+        },
+        "habilidades_classe": {
+            "Conjuração Espiritual": "Invoca espíritos para assistência em combate ou em feitiços.",
+            "Comando Espiritual": "Pode comandar espíritos para realizar tarefas específicas.",
+            "Vínculo Espiritual": "Forma um vínculo com um espírito que oferece poderes adicionais."
+        }
+    },
+    {
+        "name": "Alquimista",
+        "hp": 12,
+        "forca": 8,
+        "destreza": 14,
+        "defense": 3,
+        "pericias": {
+            "Alquimia": "Inteligência",
+            "Conhecimento": "Inteligência",
+            "Magia": "Inteligência",
+            "Ofício": "Inteligência",
+            "Furtividade": "Destreza",
+            "Percepção": "Sabedoria",
+            "Reflexos": "Destreza"
+        },
+        "habilidades_classe": {
+            "Misturas Alquímicas": "Cria poções e elixires com efeitos diversos.",
+            "Bomba Alquímica": "Cria bombas que podem causar dano ou efeitos especiais.",
+            "Mutagênico": "Concede bônus temporários a atributos, mas com desvantagens."
+        }
+    },
+    {
+        "name": "Druida",
+        "hp": 14,
+        "forca": 12,
+        "destreza": 10,
+        "defense": 4,
+        "pericias": {
+            "Sobrevivência": "Sabedoria",
+            "Cura": "Sabedoria",
+            "Magia": "Sabedoria",
+            "Conhecimento (Natureza)": "Inteligência",
+            "Ofício": "Inteligência",
+            "Percepção": "Sabedoria",
+            "Cavalgar": "Destreza",
+            "Fortitude": "Constituição"
+        },
+        "habilidades_classe": {
+            "Forma Selvagem": "Permite transformar-se em animais.",
+            "Magia Natural": "Conjura magias relacionadas à natureza.",
+            "Companheiro Animal": "Possui um animal companheiro que o auxilia em combate."
+        }
+    },
+    {
+        "name": "Samurai",
+        "hp": 18,
+        "forca": 16,
+        "destreza": 12,
+        "defense": 5,
+        "pericias": {
+            "Luta": "Força",
+            "Cavalgar": "Destreza",
+            "Intimidação": "Carisma",
+            "Percepção": "Sabedoria",
+            "Fortitude": "Constituição",
+            "Reflexos": "Destreza",
+            "Conhecimento (Guerra)": "Inteligência"
+        },
+        "habilidades_classe": {
+            "Ataque Preciso": "Aumenta a precisão dos ataques, especialmente com espadas.",
+            "Resistência ao Medo": "Imunidade a medo e bônus para aliados próximos.",
+            "Combate com Duas Armas": "Permite utilizar duas armas de forma eficaz, especialmente katanas e wakizashis."
+        }
+    },
+    {
+        "name": "Metamorfo",
+        "hp": 16,
+        "forca": 14,
+        "destreza": 12,
+        "defense": 4,
+        "pericias": {
+            "Furtividade": "Destreza",
+            "Luta": "Força",
+            "Percepção": "Sabedoria",
+            "Reflexos": "Destreza",
+            "Magia": "Sabedoria",
+            "Conhecimento": "Inteligência",
+            "Cura": "Sabedoria",
+            "Fortitude": "Constituição"
+        },
+        "habilidades_classe": {
+            "Transformação": "Pode se transformar em diferentes formas, adquirindo as habilidades correspondentes.",
+            "Regeneração Rápida": "Recupera pontos de vida rapidamente enquanto estiver transformado.",
+            "Aprimoramento de Forma": "Pode melhorar suas formas transformadas, adquirindo habilidades adicionais."
+        }
     }
 ]
 

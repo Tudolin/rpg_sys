@@ -16,7 +16,7 @@ def get_class_by_id(db, class_id):
 def get_race_by_id(db, race_id):
     return db['races.races'].find_one({"_id": ObjectId(race_id)})
 
-def create_character(db, user_id, name, class_id, race_id, img_url, forca, destreza, constituicao, inteligencia, sabedoria, carisma, origem, reflexo, fortitude, vontade, pericias_selecionadas):
+def create_character(db, user_id, name, class_id, race_id, img_url, forca, destreza, constituicao, inteligencia, sabedoria, carisma, origem, pericias_selecionadas):
     selected_class = get_class_by_id(db, class_id)
     selected_race = get_race_by_id(db, race_id)
 
@@ -74,9 +74,6 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
         "hp": hp,
         "ataque": ataque,
         "defesa": defesa,
-        "reflexo": reflexo,
-        "fortitude": fortitude,
-        "vontade": vontade,
         "habilidades": habilidades,
         "pericias": pericias,
         "origem": origem

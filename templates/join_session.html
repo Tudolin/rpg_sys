@@ -5,6 +5,15 @@
 {% block content %}
     <h1 class="text-center mb-4">Entrar na Sessão: {{ session_name }}</h1>
 
+    <div class="text-center mb-4">
+        {% if session_data.created_by == session['userId'] %}
+            <form method="POST" action="{{ url_for('delete_session', session_id=session_data['_id']) }}" class="d-inline">
+                <button type="submit" class="btn btn-danger">Excluir Sessão</button>
+            </form>
+            <a href="{{ url_for('master_control', session_id=session_data['_id']) }}" class="btn btn-warning">Entrar como Mestre</a>
+        {% endif %}
+    </div>
+
     <form method="POST" class="mx-auto" style="max-width: 600px;">
         <div class="form-group">
             <label for="character_id"><strong>Selecione um Personagem:</strong></label>

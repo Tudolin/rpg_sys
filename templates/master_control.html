@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Controle do Mestre - {{ session_name }}{% endblock %}
+
+{% block content %}
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/master.css') }}">
+<h1>Controle do Mestre - {{ session_name }}</h1>
+
+<div class="characters-container">
+    <h2>Personagens na Sessão</h2>
+    <div class="character-list">
+        {% for character in characters %}
+            <div class="character-card">
+                <form method="POST" class="character-form" data-char-id="{{ character['_id'] }}">
+                    <input type="hidden" name="char_id" value="{{ character['_id'] }}">
+                    <p><strong>{{ character['name'] }}</strong></p>
+                    <label>HP: <input type="number" name="hp" value="{{ character['current_hp'] }}" class="hp-input"></label><br>
+                    <label>Status: <input type="text" name="status" value="{{ character.get('status', '') }}" class="status-input"></label><br>
+                    <button type="submit">Atualizar</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<h2>Enviar Mídia</h2>
+<form id="media-form" enctype="multipart/form-data">
+    <input type="file" name="media" id="media-input">
+    <button type="submit">Enviar</button>
+</form>
+
+<div id="media-preview"></div>
+
+<div class="music-player">
+    <label for="music-select">Music Player</label>
+    <select id="music-select">
+        <option value="">Selecione uma música</option>
+    </select>
+    <button id="play-button">Play</button>
+    <button id="stop-button">Stop</button>
+</div>
+
+<div id="media-container"></div>
+
+<!-- Elemento para tocar música -->
+<audio id="background-music" loop></audio>
+
+<script src="{{ url_for('static', filename='js/master_control.js') }}"></script>
+{% endblock %}

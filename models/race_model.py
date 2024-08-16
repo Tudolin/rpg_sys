@@ -106,7 +106,67 @@ def create_default_races(db):
                 "Visão no Escuro": "Enxerga no escuro a até 18m, mas apenas em preto e branco",
                 "Resistência ao Caos": "+2 em testes de resistência contra efeitos caóticos"
             }
+        },
+        {
+        "name": "Meio-Orc", 
+        "hp_bonus": 0, 
+        "forca_bonus": 2, 
+        "destreza_bonus": 0, 
+        "constituicao_bonus": 2, 
+        "inteligencia_bonus": -2, 
+        "sabedoria_bonus": 0, 
+        "carisma_bonus": -2,
+        "habilidades_inatas": {
+            "Visão no Escuro": "Enxerga no escuro a até 18m, mas apenas em preto e branco.",
+            "Fúria Orc": "Quando seus pontos de vida caem para 0 ou menos, você pode continuar a lutar por mais um turno como se tivesse 1 PV.",
+            "Intimidação Orc": "Recebe +2 em testes de Intimidação."
         }
+    },
+    {
+        "name": "Gnomo", 
+        "hp_bonus": 0, 
+        "forca_bonus": -2, 
+        "destreza_bonus": 2, 
+        "constituicao_bonus": 2, 
+        "inteligencia_bonus": 0, 
+        "sabedoria_bonus": 0, 
+        "carisma_bonus": 0,
+        "habilidades_inatas": {
+            "Magia Gnômica": "Pode lançar a magia Prestidigitação e Ilusão Menor 1 vez ao dia.",
+            "Visão no Escuro": "Enxerga no escuro a até 18m, mas apenas em preto e branco.",
+            "Resistência a Ilusões": "+2 em testes de resistência contra magias e efeitos de ilusão."
+        }
+    },
+    {
+        "name": "Tiefling", 
+        "hp_bonus": 0, 
+        "forca_bonus": 0, 
+        "destreza_bonus": 2, 
+        "constituicao_bonus": 0, 
+        "inteligencia_bonus": 2, 
+        "sabedoria_bonus": 0, 
+        "carisma_bonus": -2,
+        "habilidades_inatas": {
+            "Resistência Infernal": "Recebe resistência 5 a fogo.",
+            "Magia Sombria": "Pode lançar a magia Escuridão uma vez ao dia.",
+            "Visão no Escuro": "Enxerga no escuro a até 18m, mas apenas em preto e branco."
+        }
+    },
+    {
+        "name": "Halfling", 
+        "hp_bonus": 0, 
+        "forca_bonus": -2, 
+        "destreza_bonus": 2, 
+        "constituicao_bonus": 0, 
+        "inteligencia_bonus": 0, 
+        "sabedoria_bonus": 0, 
+        "carisma_bonus": 2,
+        "habilidades_inatas": {
+            "Sortudo": "Pode rolar novamente um teste de ataque, teste de habilidade ou teste de resistência em que tenha tirado 1 natural.",
+            "Pequeno e Ágil": "+2 em testes de Furtividade e Esquiva.",
+            "Visão Penumbra": "Ignora camuflagem (mas não camuflagem total) por escuridão."
+        }
+    }
     ]
 
     db.races.insert_many(races)

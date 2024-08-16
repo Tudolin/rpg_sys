@@ -1,25 +1,25 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const profileButton = document.getElementById("profile-button");
     const profilePopup = document.getElementById("profile-popup");
     const closeButtons = document.querySelectorAll(".close-button");
-
-    profileButton.addEventListener("click", function() {
-        // Faz a requisição para obter os detalhes do jogador atual
+    // Exibe o perfil do jogador ao clicar no botão de perfil
+    profileButton.addEventListener("click", function () {
         fetch('/get_current_player_details')
             .then(response => response.json())
             .then(data => {
-                console.log("Received current player data:", data);
-
                 const detailsContainer = document.querySelector("#profile-popup .popup-content");
 
-                // Habilidades
                 const habilidades = data.habilidades ? Object.entries(data.habilidades) : [];
-                // Perícias
                 const pericias = data.pericias ? Object.entries(data.pericias) : [];
 
                 detailsContainer.innerHTML = `
                     <span class="close-button">&times;</span>
-                    <h2>${data.name}</h2>
+                    <div class="profile-header">
+                        <div class="profile-image">
+                            <img src="${data.img_url}" alt="${data.name}" class="character-portrait-popup">
+                        </div>
+                        <h2>${data.name}</h2>
+                    </div>
                     <p><strong>Classe:</strong> ${data.class_name}</p>
                     <p><strong>Raça:</strong> ${data.race_name}</p>
                     <div class="attributes">
@@ -44,42 +44,79 @@ document.addEventListener("DOMContentLoaded", function() {
                         </ul>
                     </div>
                 `;
-
                 profilePopup.style.display = "block";
             })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            .catch(error => console.error('Error:', error));
     });
 
     closeButtons.forEach(button => {
-        button.addEventListener("click", function() {
+        button.addEventListener("click", function () {
             profilePopup.style.display = "none";
             document.getElementById("other-player-popup").style.display = "none";
         });
     });
 
-    const otherPlayers = document.querySelectorAll(".other-player");
+    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
-    otherPlayers.forEach(player => {
-        player.addEventListener("click", function() {
+    socket.on('connect', function () {
+        socket.emit('join', { data: 'Player joined!' });
+    });
+
+    socket.on('new_player', function (data) {
+        const playerList = document.querySelector('.other-players ul');
+        const existingPlayer = document.querySelector(`.other-player[data-player-id="${data._id}"]`);
+        if (existingPlayer) return;
+
+        const newPlayerHTML = `
+            <li class="other-player" data-player-id="${data._id}">
+                <div class="character-frame-small">
+                    <img src="${data.img_url}" alt="${data.name}" class="character-portrait-small">
+                </div>
+                <div class="player-stats">
+                    <p>${data.name}</p>
+                    <p>Classe: ${data.class_name}</p>
+                    <p>Raça: ${data.race_name}</p>
+                    <p>HP: ${data.hp}</p>
+                </div>
+            </li>
+        `;
+        playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
+    });
+
+    socket.on('player_left', function (data) {
+        const playerElement = document.querySelector(`.other-player[data-player-id="${data._id}"]`);
+        if (playerElement) playerElement.remove();
+    });
+
+    socket.on('health_updated', function (data) {
+        const healthBall = document.querySelector('.health-ball[data-character-id="' + data.character_id + '"] .health-fill');
+        const maxHp = document.querySelector('.health-ball[data-character-id="' + data.character_id + '"]').getAttribute('data-max-hp');
+        const percentage = (data.new_health / maxHp) * 100;
+        healthBall.style.height = percentage + '%';
+
+        const healthText = document.querySelector('.health-ball[data-character-id="' + data.character_id + '"] .health-text');
+        healthText.textContent = data.new_health + ' / ' + maxHp;
+    });
+
+    document.querySelectorAll(".other-player").forEach(player => {
+        player.addEventListener("click", function () {
             const playerId = this.getAttribute("data-player-id");
-
             fetch(`/get_player_details/${playerId}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log("Received player data:", data);
-
                     const otherPlayerPopup = document.getElementById("other-player-popup");
                     const detailsContainer = document.getElementById("other-player-details");
 
-                    // Habilidades
                     const habilidades = data.habilidades ? Object.entries(data.habilidades) : [];
-                    // Perícias
                     const pericias = data.pericias ? Object.entries(data.pericias) : [];
 
                     detailsContainer.innerHTML = `
-                        <h2>${data.name}</h2>
+                        <div class="profile-header">
+                            <div class="profile-image">
+                                <img src="${data.img_url}" alt="${data.name}" class="character-portrait-popup">
+                            </div>
+                            <h2>${data.name}</h2>
+                        </div>
                         <p><strong>Classe:</strong> ${data.class_name}</p>
                         <p><strong>Raça:</strong> ${data.race_name}</p>
                         <div class="attributes">
@@ -104,20 +141,18 @@ document.addEventListener("DOMContentLoaded", function() {
                             </ul>
                         </div>
                     `;
-
                     otherPlayerPopup.style.display = "block";
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                .catch(error => console.error('Error:', error));
         });
     });
 
-    window.onclick = function(event) {
-        if (event.target == profilePopup) {
+    window.onclick = function (event) {
+        if (event.target === profilePopup) {
             profilePopup.style.display = "none";
-        } else if (event.target == document.getElementById("other-player-popup")) {
+        } else if (event.target === document.getElementById("other-player-popup")) {
             document.getElementById("other-player-popup").style.display = "none";
         }
     };
+
 });
