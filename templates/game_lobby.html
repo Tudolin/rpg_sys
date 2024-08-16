@@ -48,7 +48,7 @@
         
             <div class="health-mana-bars">
                 <div class="health-ball" data-character-id="{{ character['_id'] }}" data-max-hp="{{ character['hp'] }}">
-                    <div class="health-fill" style="height: {{ character['current_hp'] / character['hp'] * 100 }}%"></div>
+                    <div class="health-fill" style="height: {{ (character['current_hp'] | int) / (character['hp'] | int) * 100 }}%"></div>
                     <div class="health-text">{{ character['current_hp'] }} / {{ character['hp'] }}</div>
                 </div>
             </div>
