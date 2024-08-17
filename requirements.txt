@@ -6,3 +6,4 @@ certifi==2024.7.4
 pymongo==4.8.0
 python-socketio==5.11.3
 simple-websocket==1.0.0
+Flask-SocketIO==5.3.6
