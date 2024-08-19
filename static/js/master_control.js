@@ -1,6 +1,19 @@
 document.addEventListener("DOMContentLoaded", function() {
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-    
+    const effectSelects = document.querySelectorAll('.status-effect-select');
+    const audioPlayer = document.getElementById('audio-player');
+    const forms = document.querySelectorAll(`.character-form[data-session-id="${sessionId}"]`);
+
+    // Atualiza a descrição dos efeitos selecionados
+    effectSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const description = selectedOption.getAttribute('data-description');
+            const descriptionElement = this.parentNode.querySelector('.effect-description');
+            
+            descriptionElement.textContent = description ? description : '';
+        });
+    });
 
     // Carrega as faixas de música
     fetch('/music_tracks')
@@ -20,7 +33,6 @@ document.addEventListener("DOMContentLoaded", function() {
     // Listener para o botão de tocar música
     document.getElementById('play-button').addEventListener('click', function () {
         const selectedTrack = document.getElementById('music-select').value;
-        const audioPlayer = document.getElementById('audio-player');
         
         if (selectedTrack && audioPlayer.src !== selectedTrack) { // Apenas altere se a faixa for diferente da atual
             audioPlayer.src = selectedTrack;
@@ -40,11 +52,9 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
     });
-    
 
     // Listener para o botão de parar música
     document.getElementById('stop-button').addEventListener('click', function () {
-        const audioPlayer = document.getElementById('audio-player');
         audioPlayer.pause();
         audioPlayer.src = '';
 
@@ -59,9 +69,8 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    // Reproduz música enviada pelos sockets
     socket.on('play_music', function(data) {
-        const audioPlayer = document.getElementById('audio-player');
-    
         if (audioPlayer.src !== data.track_url) { // Evita reiniciar a música se a faixa já estiver tocando
             audioPlayer.src = data.track_url;
             audioPlayer.play();
@@ -70,10 +79,9 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('current-track').textContent = `Reproduzindo: ${data.track_url.split('/').pop().split('.').slice(0, -1).join('.')}`;
         }
     });
-    
 
+    // Para a música pelos sockets
     socket.on('stop_music', function() {
-        const audioPlayer = document.getElementById('audio-player');
         audioPlayer.pause();
         audioPlayer.src = '';
 
@@ -81,18 +89,43 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('current-track').textContent = 'Nenhuma música em reprodução';
     });
 
-    
-    forms.forEach(function(form) {  // Itera sobre cada formulário
+    // Itera sobre cada formulário e lida com submissão
+    forms.forEach(function(form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             const charId = form.getAttribute('data-char-id');
             const hp = form.querySelector('.hp-input').value;
-            const status = form.querySelector('.status-input').value;
-        
+            const statusEffect = form.querySelector('.status-effect-select').value;
+            const effectDescription = form.querySelector('.status-effect-select option:checked').getAttribute('data-description');
+            const effectIcon = form.querySelector('.status-effect-select option:checked').getAttribute('data-icon');
+            
+            fetch('/update_character', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    char_id: charId,
+                    hp: hp,
+                    status_effect: statusEffect,
+                    effect_description: effectDescription,
+                    effect_icon: effectIcon
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Status atualizado com sucesso');
+                } else {
+                    console.error('Falha ao atualizar status');
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+
             socket.emit('update_health', {
                 character_id: charId,
                 new_health: hp,
-                status: status
+                status: statusEffect
             });
         });
     });
@@ -108,16 +141,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Recebe atualizações em tempo real sobre o status dos personagens
     socket.on('status_updated', function(data) {
-        const characterForm = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);
-        if (characterForm) {
-            const statusInput = characterForm.querySelector('.status-input');
-            statusInput.value = data.status;
-        }
+        const statusList = document.querySelector(`.character-form[data-char-id="${data.character_id}"] .status-effects ul`);
+        statusList.innerHTML = '';
+        data.status_effects.forEach(effect => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `<img src="${effect.icon_url}" alt="${effect.name}"> ${effect.name}: ${effect.description}`;
+            statusList.appendChild(listItem);
+        });
     });
 
     // Recebe notificação quando um novo jogador se junta à sessão
     socket.on('new_player', function(data) {
         const playerList = document.querySelector('.characters-container');
+        const existingPlayer = playerList.querySelector(`.character-form[data-char-id="${data._id}"]`);
+        if (existingPlayer) return;
 
         const newPlayerHTML = `
             <div class="character-card">
@@ -157,5 +194,4 @@ document.addEventListener("DOMContentLoaded", function() {
             characterForm.remove(); // Remove o formulário do personagem desconectado
         }
     });
-
 });
