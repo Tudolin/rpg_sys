@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const characterForms = document.querySelectorAll('.character-form');
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
     // Carrega as faixas de música
@@ -29,8 +28,8 @@ document.addEventListener("DOMContentLoaded", function() {
             audioPlayer.play();
 
             // Atualiza o nome da faixa em reprodução
-            const selectedOption = document.querySelector(#music-select option[value="${selectedTrack}"]);
-            currentTrack.textContent = Reproduzindo: ${selectedOption.textContent};
+            const selectedOption = document.querySelector(`#music-select option[value="${selectedTrack}"]`);
+            currentTrack.textContent = `Reproduzindo: ${selectedOption.textContent}`;
 
             // Envia o evento de tocar música para os outros clientes
             fetch('/play_music', {
@@ -69,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function() {
         audioPlayer.play();
 
         // Atualiza o nome da faixa em reprodução
-        currentTrack.textContent = Reproduzindo: ${data.track_url.split('/').pop().split('.').slice(0, -1).join('.')};
+        currentTrack.textContent = `Reproduzindo: ${data.track_url.split('/').pop().split('.').slice(0, -1).join('.')}`;
     });
 
     socket.on('stop_music', function() {
@@ -81,24 +80,25 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('current-track').textContent = 'Nenhuma música em reprodução';
     });
 
-
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const charId = form.getAttribute('data-char-id');
-        const hp = form.querySelector('.hp-input').value;
-        const status = form.querySelector('.status-input').value;
     
-        socket.emit('update_health', {
-            character_id: charId,
-            new_health: hp,
-            status: status
+    forms.forEach(function(form) {  // Itera sobre cada formulário
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const charId = form.getAttribute('data-char-id');
+            const hp = form.querySelector('.hp-input').value;
+            const status = form.querySelector('.status-input').value;
+        
+            socket.emit('update_health', {
+                character_id: charId,
+                new_health: hp,
+                status: status
+            });
         });
     });
-    
 
     // Recebe atualizações em tempo real sobre a saúde dos personagens
     socket.on('health_updated', function(data) {
-        const characterForm = document.querySelector(.character-form[data-char-id="${data.character_id}"]);
+        const characterForm = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);
         if (characterForm) {
             const healthInput = characterForm.querySelector('.hp-input');
             healthInput.value = data.new_health;
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Recebe atualizações em tempo real sobre o status dos personagens
     socket.on('status_updated', function(data) {
-        const characterForm = document.querySelector(.character-form[data-char-id="${data.character_id}"]);
+        const characterForm = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);
         if (characterForm) {
             const statusInput = characterForm.querySelector('.status-input');
             statusInput.value = data.status;
@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
     socket.on('new_player', function(data) {
         const playerList = document.querySelector('.characters-container');
 
-        const newPlayerHTML = 
+        const newPlayerHTML = `
             <div class="character-card">
                 <form method="POST" class="character-form" data-char-id="${data._id}">
                     <input type="hidden" name="char_id" value="${data._id}">
@@ -128,12 +128,12 @@ document.addEventListener("DOMContentLoaded", function() {
                     <button type="submit">Atualizar</button>
                 </form>
             </div>
-        ;
+        `;
 
         playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
 
         // Adiciona o novo formulário à lista de listeners para submissões
-        const newForm = playerList.querySelector(.character-form[data-char-id="${data._id}"]);
+        const newForm = playerList.querySelector(`.character-form[data-char-id="${data._id}"]`);
         newForm.addEventListener('submit', function(event) {
             event.preventDefault();
 
@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Recebe notificação quando um jogador sai da sessão
     socket.on('player_left', function(data) {
-        const characterForm = document.querySelector(.character-form[data-char-id="${data._id}"]);
+        const characterForm = document.querySelector(`.character-form[data-char-id="${data._id}"]`);
         if (characterForm) {
             characterForm.remove(); // Remove o formulário do personagem desconectado
         }
