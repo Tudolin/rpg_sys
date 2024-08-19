@@ -381,8 +381,8 @@ def get_player_details(player_id):
             "inteligencia": character['inteligencia'],
             "sabedoria": character['sabedoria'],
             "carisma": character['carisma'],
-            "class_habilidades": class_info['habilidades_classe'] if class_info else [],
-            "race_habilidades": race_info['habilidades_inatas'] if race_info else []
+            "habilidades": character['habilidades'],
+            "pericias": character['pericias']
         }
         return jsonify(response)
     else:
@@ -394,7 +394,7 @@ def get_current_player_details():
 
     if character:
         # Busca informações de classe e raça
-        class_info = db['classes.classes'].find_one({"_id": ObjectIda(character['class_id'])})
+        class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
         race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
         
         response = {
@@ -433,11 +433,9 @@ def master_control(session_id):
     if request.method == 'POST':
         char_id = request.form['char_id']
         hp = int(request.form['hp'])
-        status = request.form['status']
-
         db.chars.update_one(
             {"_id": ObjectId(char_id)},
-            {"$set": {"current_hp": hp, "status": status}}
+            {"$set": {"current_hp": hp}}
         )
 
         # Emitir atualização de vida via Socket.IO
@@ -453,7 +451,7 @@ def master_control(session_id):
         flash("Status do personagem atualizado com sucesso!", "success")
         return redirect(url_for('master_control', session_id=session_id))
 
-    return render_template('master_control.html', characters=characters, session_name=session_data['name'])
+    return render_template('master_control.html', characters=characters,session_data=session_data, session_name=session_data['name'])
 
 
 @app.route('/update_character', methods=['POST'])

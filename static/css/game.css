@@ -2,74 +2,72 @@ body {
     font-family: 'Cinzel', serif;
     color: #e0e0e0;
     background-color: #101010;
-}
-
-.stats-container h2 {
-    font-size: 26px;
-    color: #fff;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
-.stats-container p {
-    font-size: 18px;
-    color: #ccc;
-    text-align: center;
-}
-
-.attribute span {
-    font-size: 16px;
-    color: #fff;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 .game-lobby-container {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
+    justify-content: center;
+    align-items: flex-start;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     background-image: url('/static/images/rpg_background.jpg');
     background-size: cover;
     padding: 20px;
     box-sizing: border-box;
 }
 
-.board-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1;
+/* Adiciona a estrutura do layout principal */
+.main-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
 }
 
-.game-board {
-    max-width: 80%;
-    border: 5px solid #000;
-    border-radius: 15px;
-}
-
-.player-info, .other-players, .popup-content {
+/* Seção de informações do jogador */
+.player-info {
     border: 2px solid #660000;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     background-color: rgba(0, 0, 0, 0.85);
     padding: 20px;
     border-radius: 15px;
+    width: 60%;
+    max-width: 600px;
+    box-sizing: border-box;
+    text-align: center;
+    margin: 20px auto;
 }
 
 .character-frame {
     width: 150px;
     height: 150px;
-    margin: 0 auto 10px;
+    margin: 0 auto 15px;
     background: url('/static/images/character_frame.png') no-repeat center center;
     background-size: contain;
     border-radius: 50%;
 }
 
+.character-portrait {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.stats-container h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.stats-container p {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
 .health-ball {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     background-color: #1a1a1a;
     border-radius: 50%;
     border: 5px solid #660000;
@@ -78,7 +76,7 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    margin: 0 auto;
+    margin: 20px auto;
 }
 
 .health-fill {
@@ -93,63 +91,27 @@ body {
 .health-text {
     position: absolute;
     color: #ffffff;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     z-index: 1;
 }
 
-.character-portrait {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-}
-
-.stats-container {
-    color: #fff;
-}
-
-.attributes {
-    display: flex;
-    justify-content: space-around;
-    margin: 20px 0;
-}
-
-.attribute {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #fff;
-    transition: transform 0.2s ease-in-out;
-}
-
-.attribute img {
-    width: 30px;
-    height: 30px;
-    margin-bottom: 5px;
-}
-
-.attribute:hover {
-    transform: scale(1.2);
-}
-
-.health-mana-bars {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-}
-
+/* Seção de outros jogadores */
 .other-players {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 15px #000;
-    color: #fff;
+    border: 2px solid #660000;
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 20px;
+    border-radius: 15px;
+    width: 30%;
     max-width: 300px;
+    box-sizing: border-box;
+    margin: 20px;
     text-align: left;
-    z-index: 2;
+}
+
+.other-players h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
 }
 
 .other-players ul {
@@ -161,17 +123,13 @@ body {
 .other-players li {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     transition: transform 0.2s ease-in-out;
 }
 
-.other-players li:hover {
-    transform: scale(1.1);
-}
-
 .character-frame-small {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     margin-right: 10px;
     background: url('/static/images/character_frame_small.png') no-repeat center center;
     background-size: contain;
@@ -183,8 +141,10 @@ body {
     border-radius: 50%;
 }
 
-.player-stats {
+.player-stats p {
     color: #fff;
+    font-size: 14px;
+    margin: 2px 0;
 }
 
 /* Barra inferior */
@@ -192,7 +152,7 @@ body {
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 80px;
+    height: 60px;
     background-color: rgba(0, 0, 0, 0.9);
     display: flex;
     justify-content: center;
@@ -201,15 +161,16 @@ body {
 }
 
 .bottom-bar-icon {
-    margin: 0 20px;
+    margin: 0 10px;
     text-align: center;
     color: white;
     cursor: pointer;
+    flex: 1;
 }
 
 .bottom-bar-icon-img {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     margin-bottom: 5px;
 }
@@ -232,36 +193,17 @@ body {
     margin: 10% auto;
     padding: 20px;
     border: 1px solid #660000;
-    width: 50%;
+    width: 80%;
+    max-width: 400px;
     color: white;
     border-radius: 10px;
-}
-
-.popup-content h2 {
-    text-align: center;
-    font-size: 28px;
-    color: #ffcc00;
-    margin-bottom: 20px;
-}
-
-.popup-content p {
-    font-size: 18px;
-    margin-bottom: 15px;
-}
-
-.popup-content ul {
-    list-style-type: disc;
-    margin-left: 20px;
-}
-
-.popup-content li {
-    margin-bottom: 10px;
+    box-sizing: border-box;
 }
 
 .close-button {
     color: #aaa;
     float: right;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
 }
 
@@ -272,25 +214,82 @@ body {
     cursor: pointer;
 }
 
-.profile-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+/* Media Queries */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .player-info {
+        width: 90%;
+        max-width: 100%;
+    }
+
+    .other-players {
+        width: 90%;
+        max-width: 100%;
+        margin: 20px auto;
+    }
+
+    .character-frame {
+        width: 100px;
+        height: 100px;
+    }
+
+    .character-frame-small {
+        width: 35px;
+        height: 35px;
+    }
+
+    .health-ball {
+        width: 60px;
+        height: 60px;
+    }
+
+    .health-text {
+        font-size: 12px;
+    }
+
+    .popup-content {
+        width: 90%;
+        margin: 20% auto;
+    }
 }
 
-.profile-image {
-    margin-right: 15px;
-}
+@media (max-width: 480px) {
+    .character-frame {
+        width: 80px;
+        height: 80px;
+    }
 
-.character-portrait-popup {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 2px solid #660000;
-}
+    .character-frame-small {
+        width: 30px;
+        height: 30px;
+    }
 
-.popup-content h2 {
-    font-size: 24px;
-    color: #ffcc00;
-    margin: 0;
+    .bottom-bar-icon {
+        margin: 0 5px;
+    }
+
+    .popup-content {
+        padding: 10px;
+        width: 90%;
+    }
+
+    .stats-container h2 {
+        font-size: 18px;
+    }
+
+    .stats-container p {
+        font-size: 14px;
+    }
+
+    .other-players h3 {
+        font-size: 16px;
+    }
+
+    .player-stats p {
+        font-size: 12px;
+    }
 }

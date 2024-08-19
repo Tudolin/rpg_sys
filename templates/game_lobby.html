@@ -10,15 +10,6 @@
     <div class="board-center">
     </div>
 
-    <div class="player-info">
-        <div class="character-frame">
-            <img src="{{ character['img_url'] }}" alt="{{ character['name'] }}" class="character-portrait">
-        </div>
-        <div class="stats-container">
-            <h2>{{ character['name'] }}</h2>
-            <p><strong>Classe:</strong> {{ character['class_name'] }}</p>
-            <p><strong>Raça:</strong> {{ character['race_name'] }}</p>
-
             <!--<div class="status-effects">
                 <h3>Status</h3>
                 <ul>
@@ -57,88 +48,102 @@
                     <span>Carisma: {{ character['carisma'] }}</span>
                 </div>
             </div>
-        -->
-            <div class="health-mana-bars">
-                <div class="health-ball" data-character-id="{{ character['_id'] }}" data-max-hp="{{ character['hp'] }}">
-                    <div class="health-fill" style="height: {{ (character['current_hp'] | int) / (character['hp'] | int) * 100 }}%"></div>
-                    <div class="health-text">{{ character['current_hp'] }} / {{ character['hp'] }}</div>
+-->
+        
+
+            <div class="game-lobby-container">
+                <div class="main-content">
+                    <div class="other-players">
+                        <h3>Jogadores na Sessão</h3>
+                        <ul>
+                            {% for char in other_characters %}
+                                <li class="other-player" data-player-id="{{ char['_id'] }}">
+                                    <div class="character-frame-small">
+                                        <img src="{{ char['img_url'] }}" alt="{{ char['name'] }}" class="character-portrait-small">
+                                    </div>
+                                    <div class="player-stats">
+                                        <p>{{ char['name'] }}</p>
+                                        <p>Classe: {{ char['class_name'] }}</p>
+                                        <p>Raça: {{ char['race_name'] }}</p>
+                                        <p>HP: {{ char['hp'] }}</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+            
+                    <div class="player-info">
+                        <div class="character-frame">
+                            <img src="{{ character['img_url'] }}" alt="{{ character['name'] }}" class="character-portrait">
+                        </div>
+                        <div class="stats-container">
+                            <h2>{{ character['name'] }}</h2>
+                            <p><strong>Classe:</strong> {{ character['class_name'] }}</p>
+                            <p><strong>Raça:</strong> {{ character['race_name'] }}</p>
+            
+                            <div class="health-mana-bars">
+                                <div class="health-ball" data-character-id="{{ character['_id'] }}" data-max-hp="{{ character['hp'] }}">
+                                    <div class="health-fill" style="height: {{ (character['current_hp'] | int) / (character['hp'] | int) * 100 }}%"></div>
+                                    <div class="health-text">{{ character['current_hp'] }} / {{ character['hp'] }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Barra inferior -->
+                <div class="bottom-bar">
+                    <div class="bottom-bar-icon" id="profile-button">
+                        <img src="{{ character['img_url'] }}" alt="Perfil" class="bottom-bar-icon-img">
+                        <span>Perfil</span>
+                    </div>
+                </div>
+            
+                <!-- Popups -->
+                <div id="profile-popup" class="popup">
+                    <div class="popup-content">
+                        <span class="close-button">&times;</span>
+                        <h2>{{ character['name'] }}</h2>
+                        <p><strong>Classe:</strong> {{ character['class_name'] }}</p>
+                        <p><strong>Raça:</strong> {{ character['race_name'] }}</p>
+                        <div class="attributes">
+                            <p><strong>Atributos:</strong></p>
+                            <ul>
+                                <li>Força: {{ character['forca'] }}</li>
+                                <li>Destreza: {{ character['destreza'] }}</li>
+                                <li>Constituição: {{ character['constituicao'] }}</li>
+                                <li>Inteligência: {{ character['inteligencia'] }}</li>
+                                <li>Sabedoria: {{ character['sabedoria'] }}</li>
+                                <li>Carisma: {{ character['carisma'] }}</li>
+                            </ul>
+                        </div>
+                        <div class="skills">
+                            <p><strong>Habilidades:</strong></p>
+                            <ul>
+                                {% for habilidade in character['habilidades'] %}
+                                    <li>{{ habilidade }}</li>
+                                {% endfor %}
+                            </ul>
+                            <p><strong>Perícias:</strong></p>
+                            <ul>
+                                {% for pericia, valor in character['pericias'].items() %}
+                                    <li>{{ pericia }}: +{{ valor }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            
+                <div id="other-player-popup" class="popup">
+                    <div class="popup-content">
+                        <span class="close-button">&times;</span>
+                        <div id="other-player-details">
+                            <!-- Detalhes do jogador clicado serão carregados via JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            
-        
-
-    <div class="other-players">
-        <h3>Jogadores na Sessão</h3>
-        <ul>
-            {% for char in other_characters %}
-                <li class="other-player" data-player-id="{{ char['_id'] }}">
-                    <div class="character-frame-small">
-                        <img src="{{ char['img_url'] }}" alt="{{ char['name'] }}" class="character-portrait-small">
-                    </div>
-                    <div class="player-stats">
-                        <p>{{ char['name'] }}</p>
-                        <p>Classe: {{ char['class_name'] }}</p>
-                        <p>Raça: {{ char['race_name'] }}</p>
-                        <p>HP: {{ char['hp'] }}</p>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <!-- Barra inferior -->
-    <div class="bottom-bar">
-        <div class="bottom-bar-icon" id="profile-button">
-            <img src="{{ character['img_url'] }}" alt="Perfil" class="bottom-bar-icon-img">
-            <span>Perfil</span>
-        </div>
-    </div>
-
-    <!-- Popups -->
-    <div id="profile-popup" class="popup">
-        <div class="popup-content">
-            <span class="close-button">&times;</span>
-            <h2>{{ character['name'] }}</h2>
-            <p><strong>Classe:</strong> {{ character['class_name'] }}</p>
-            <p><strong>Raça:</strong> {{ character['race_name'] }}</p>
-            <div class="attributes">
-                <p><strong>Atributos:</strong></p>
-                <ul>
-                    <li>Força: {{ character['forca'] }}</li>
-                    <li>Destreza: {{ character['destreza'] }}</li>
-                    <li>Constituição: {{ character['constituicao'] }}</li>
-                    <li>Inteligência: {{ character['inteligencia'] }}</li>
-                    <li>Sabedoria: {{ character['sabedoria'] }}</li>
-                    <li>Carisma: {{ character['carisma'] }}</li>
-                </ul>
-            </div>
-            <div class="skills">
-                <p><strong>Habilidades:</strong></p>
-                <ul>
-                    {% for habilidade in character['habilidades'] %}
-                        <li>{{ habilidade }}</li>
-                    {% endfor %}
-                </ul>
-                <p><strong>Perícias:</strong></p>
-                <ul>
-                    {% for pericia, valor in character['pericias'].items() %}
-                        <li>{{ pericia }}: +{{ valor }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div id="other-player-popup" class="popup">
-        <div class="popup-content">
-            <span class="close-button">&times;</span>
-            <div id="other-player-details">
-                <!-- Detalhes do jogador clicado serão carregados via JS -->
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="{{ url_for('static', filename='js/game.js') }}"></script>
 {% endblock %}
