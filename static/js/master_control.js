@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const effectSelects = document.querySelectorAll('.status-effect-select');
     const audioPlayer = document.getElementById('audio-player');
     const forms = document.querySelectorAll(`.character-form[data-session-id="${sessionId}"]`);
+    const musicSelect = document.getElementById('music-select');
+    const currentTrackElement = document.getElementById('current-track');
 
     // Atualiza a descrição dos efeitos selecionados
     effectSelects.forEach(select => {
@@ -15,11 +17,37 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    function saveMusicState() {
+        localStorage.setItem('musicPlayerState', JSON.stringify({
+            trackUrl: audioPlayer.src,
+            currentTime: audioPlayer.currentTime,
+            playing: !audioPlayer.paused
+        }));
+    }
+
+    function loadMusicState() {
+        const savedState = localStorage.getItem('musicPlayerState');
+        if (savedState) {
+            const { trackUrl, currentTime, playing } = JSON.parse(savedState);
+            if (trackUrl) {
+                audioPlayer.src = trackUrl;
+                audioPlayer.currentTime = currentTime;
+                if (playing) {
+                    audioPlayer.play();
+                }
+                const selectedOption = document.querySelector(`#music-select option[value="${trackUrl}"]`);
+                if (selectedOption) {
+                    currentTrackElement.textContent = `Reproduzindo: ${selectedOption.textContent}`;
+                }
+            }
+        }
+    }
+
+    loadMusicState();
     // Carrega as faixas de música
     fetch('/music_tracks')
         .then(response => response.json())
         .then(tracks => {
-            const musicSelect = document.getElementById('music-select');
             musicSelect.innerHTML = '';
             tracks.forEach(track => {
                 const option = document.createElement('option');
@@ -32,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Listener para o botão de tocar música
     document.getElementById('play-button').addEventListener('click', function () {
-        const selectedTrack = document.getElementById('music-select').value;
+        const selectedTrack = musicSelect.value;
         
         if (selectedTrack && audioPlayer.src !== selectedTrack) { // Apenas altere se a faixa for diferente da atual
             audioPlayer.src = selectedTrack;
@@ -40,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
             // Atualiza o nome da faixa em reprodução
             const selectedOption = document.querySelector(`#music-select option[value="${selectedTrack}"]`);
-            document.getElementById('current-track').textContent = `Reproduzindo: ${selectedOption.textContent}`;
+            currentTrackElement.textContent = `Reproduzindo: ${selectedOption.textContent}`;
     
             // Envia o evento de tocar música para os outros clientes
             fetch('/play_music', {
@@ -50,6 +78,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 body: JSON.stringify({ track_url: selectedTrack }),
             });
+
+            // Salva o estado da música
+            saveMusicState();
         }
     });
 
@@ -57,9 +88,8 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('stop-button').addEventListener('click', function () {
         audioPlayer.pause();
         audioPlayer.src = '';
-
-        // Atualiza o nome da faixa em reprodução
-        document.getElementById('current-track').textContent = 'Nenhuma música em reprodução';
+        currentTrackElement.textContent = 'Nenhuma música em reprodução';
+        localStorage.removeItem('musicPlayerState'); // Remove o estado salvo
 
         fetch('/stop_music', {
             method: 'POST',
@@ -74,9 +104,8 @@ document.addEventListener("DOMContentLoaded", function() {
         if (audioPlayer.src !== data.track_url) { // Evita reiniciar a música se a faixa já estiver tocando
             audioPlayer.src = data.track_url;
             audioPlayer.play();
-    
-            // Atualiza o nome da faixa em reprodução
-            document.getElementById('current-track').textContent = `Reproduzindo: ${data.track_url.split('/').pop().split('.').slice(0, -1).join('.')}`;
+            currentTrackElement.textContent = `Reproduzindo: ${data.track_url.split('/').pop().split('.').slice(0, -1).join('.')}`;
+            saveMusicState(); // Salva o estado da música
         }
     });
 
@@ -84,12 +113,13 @@ document.addEventListener("DOMContentLoaded", function() {
     socket.on('stop_music', function() {
         audioPlayer.pause();
         audioPlayer.src = '';
-
-        // Atualiza o nome da faixa em reprodução
-        document.getElementById('current-track').textContent = 'Nenhuma música em reprodução';
+        currentTrackElement.textContent = 'Nenhuma música em reprodução';
+        localStorage.removeItem('musicPlayerState'); // Remove o estado salvo
     });
 
-    // Itera sobre cada formulário e lida com submissão
+    window.addEventListener('beforeunload', saveMusicState);
+    window.addEventListener('unload', saveMusicState);
+    
     forms.forEach(function(form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
