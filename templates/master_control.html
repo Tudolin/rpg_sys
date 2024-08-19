@@ -16,7 +16,23 @@
                     <input type="hidden" name="char_id" value="{{ character['_id'] }}">
                     <p><strong>{{ character['name'] }}</strong></p>
                     <label>HP: <input type="number" name="hp" value="{{ character['current_hp'] }}" class="hp-input"></label><br>
-                    <label>Status: <input type="text" name="status" value="{{ character.get('status', '') }}" class="status-input"></label><br>
+                    
+                    <!-- Nova seção de seleção de efeitos -->
+                    <!-- <label for="status-effect-select">Adicionar Efeito:</label>
+                    <select name="status_effect" class="status-effect-select">
+                        <option value="">Selecione um efeito</option>
+                        <option value="poison" data-description="Envenenamento (-3 de HP por rodada)" data-icon="poison icon.png">Envenenamento</option>
+                        <option value="sleep" data-description="Sono (Paralisado por uma rodada)" data-icon="sleep icon.png">Sono</option>
+                        <option value="confusion" data-description="Confusão (Ataca um aliado aleatório)" data-icon="confusion icon.png">Confusão</option>
+                        <option value="agility" data-description="Agilidade (+2 em Destreza)" data-icon="agility icon.png">Agilidade</option>
+                        <option value="rage" data-description="Fúria (+3 em Força, -2 em Defesa)" data-icon="rage icon.png">Fúria</option>
+                        <option value="curse" data-description="Maldição (-5 em todas as habilidades)" data-icon="curse icon.png">Maldição</option>
+                        <option value="silence" data-description="Silêncio (Impossibilitado de usar magia)" data-icon="silence icon.png">Silêncio</option>
+                        <option value="buff" data-description="Bônus de ataque (+2 em Força)" data-icon="buff icon.png">Bônus de ataque</option>
+                        <option value="debuff" data-description="Redução de ataque (-2 em Força)" data-icon="debuff icon.png">Redução de ataque</option>
+                    </select>
+                    <p class="effect-description"></p><br> -->
+                    
                     <button type="submit">Atualizar</button>
                 </form>
             </div>
@@ -41,10 +57,19 @@
     <button id="stop-button">Stop</button>
 </div>
 
+<div id="music-player">
+    <p id="current-track">Nenhuma música em reprodução</p>
+    <audio id="audio-player" controls></audio>
+</div>
+
 <div id="media-container"></div>
 
 <!-- Elemento para tocar música -->
 <audio id="background-music" loop></audio>
+
+<script>
+    const sessionId = "{{ session_data['_id'] }}";  // Passe o ID da sessão para o JavaScript
+</script>
 
 <script src="{{ url_for('static', filename='js/master_control.js') }}"></script>
 {% endblock %}
