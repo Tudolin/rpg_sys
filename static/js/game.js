@@ -88,15 +88,24 @@ document.addEventListener("DOMContentLoaded", function () {
         if (playerElement) playerElement.remove();
     });
 
-    socket.on('health_updated', function (data) {
+    socket.on('health_updated', function(data) {
         const healthBall = document.querySelector('.health-ball[data-character-id="' + data.character_id + '"] .health-fill');
         const maxHp = document.querySelector('.health-ball[data-character-id="' + data.character_id + '"]').getAttribute('data-max-hp');
         const percentage = (data.new_health / maxHp) * 100;
         healthBall.style.height = percentage + '%';
-
+    
         const healthText = document.querySelector('.health-ball[data-character-id="' + data.character_id + '"] .health-text');
         healthText.textContent = data.new_health + ' / ' + maxHp;
     });
+    
+    socket.on('status_updated', function(data) {
+        // Atualize o status na interface
+        const statusField = document.querySelector(`.status-input[data-char-id="${data.character_id}"]`);
+        if (statusField) {
+            statusField.value = data.status;
+        }
+    });
+    
 
     document.querySelectorAll(".other-player").forEach(player => {
         player.addEventListener("click", function () {

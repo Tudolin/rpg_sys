@@ -41,22 +41,19 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    characterForms.forEach(form => {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const charId = form.getAttribute('data-char-id');
-            const hp = form.querySelector('.hp-input').value;
-            const status = form.querySelector('.status-input').value;
-
-            // Emite um evento via Socket.IO para atualizar o personagem
-            socket.emit('update_health', {
-                character_id: charId,
-                new_health: hp,
-                status: status
-            });
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const charId = form.getAttribute('data-char-id');
+        const hp = form.querySelector('.hp-input').value;
+        const status = form.querySelector('.status-input').value;
+    
+        socket.emit('update_health', {
+            character_id: charId,
+            new_health: hp,
+            status: status
         });
     });
+    
 
     // Recebe atualizações em tempo real sobre a saúde dos personagens
     socket.on('health_updated', function(data) {
