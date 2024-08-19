@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+    
 
     // Carrega as faixas de música
     fetch('/music_tracks')
@@ -19,18 +20,16 @@ document.addEventListener("DOMContentLoaded", function() {
     // Listener para o botão de tocar música
     document.getElementById('play-button').addEventListener('click', function () {
         const selectedTrack = document.getElementById('music-select').value;
-        if (selectedTrack) {
-            const audioPlayer = document.getElementById('audio-player');
-            const currentTrack = document.getElementById('current-track');
-
-            // Atualiza o src do elemento de áudio e toca a música
+        const audioPlayer = document.getElementById('audio-player');
+        
+        if (selectedTrack && audioPlayer.src !== selectedTrack) { // Apenas altere se a faixa for diferente da atual
             audioPlayer.src = selectedTrack;
             audioPlayer.play();
-
+    
             // Atualiza o nome da faixa em reprodução
             const selectedOption = document.querySelector(`#music-select option[value="${selectedTrack}"]`);
-            currentTrack.textContent = `Reproduzindo: ${selectedOption.textContent}`;
-
+            document.getElementById('current-track').textContent = `Reproduzindo: ${selectedOption.textContent}`;
+    
             // Envia o evento de tocar música para os outros clientes
             fetch('/play_music', {
                 method: 'POST',
@@ -41,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         }
     });
+    
 
     // Listener para o botão de parar música
     document.getElementById('stop-button').addEventListener('click', function () {
@@ -61,15 +61,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     socket.on('play_music', function(data) {
         const audioPlayer = document.getElementById('audio-player');
-        const currentTrack = document.getElementById('current-track');
-
-        // Atualiza o src do elemento de áudio e toca a música
-        audioPlayer.src = data.track_url;
-        audioPlayer.play();
-
-        // Atualiza o nome da faixa em reprodução
-        currentTrack.textContent = `Reproduzindo: ${data.track_url.split('/').pop().split('.').slice(0, -1).join('.')}`;
+    
+        if (audioPlayer.src !== data.track_url) { // Evita reiniciar a música se a faixa já estiver tocando
+            audioPlayer.src = data.track_url;
+            audioPlayer.play();
+    
+            // Atualiza o nome da faixa em reprodução
+            document.getElementById('current-track').textContent = `Reproduzindo: ${data.track_url.split('/').pop().split('.').slice(0, -1).join('.')}`;
+        }
     });
+    
 
     socket.on('stop_music', function() {
         const audioPlayer = document.getElementById('audio-player');
