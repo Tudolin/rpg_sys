@@ -63,10 +63,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     socket.on('new_player', function (data) {
+        console.log('New player joined:', data);  // Log de depuração
         const playerList = document.querySelector('.other-players ul');
         const existingPlayer = document.querySelector(`.other-player[data-player-id="${data._id}"]`);
         if (existingPlayer) return;
-
+    
         const newPlayerHTML = `
             <li class="other-player" data-player-id="${data._id}">
                 <div class="character-frame-small">
@@ -82,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
     });
+    
 
     socket.on('player_left', function (data) {
         const playerElement = document.querySelector(`.other-player[data-player-id="${data._id}"]`);
@@ -89,22 +91,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     socket.on('health_updated', function(data) {
-        const healthBall = document.querySelector('.health-ball[data-character-id="' + data.character_id + '"] .health-fill');
-        const maxHp = document.querySelector('.health-ball[data-character-id="' + data.character_id + '"]').getAttribute('data-max-hp');
+        console.log('Health update received:', data);  // Log de depuração
+        const healthBall = document.querySelector(`.health-ball[data-character-id="${data.character_id}"] .health-fill`);
+        const maxHp = document.querySelector(`.health-ball[data-character-id="${data.character_id}"]`).getAttribute('data-max-hp');
         const percentage = (data.new_health / maxHp) * 100;
         healthBall.style.height = percentage + '%';
     
-        const healthText = document.querySelector('.health-ball[data-character-id="' + data.character_id + '"] .health-text');
+        const healthText = document.querySelector(`.health-ball[data-character-id="${data.character_id}"] .health-text`);
         healthText.textContent = data.new_health + ' / ' + maxHp;
     });
     
+    
     socket.on('status_updated', function(data) {
-        // Atualize o status na interface
+        console.log('Status update received:', data);  // Log de depuração
         const statusField = document.querySelector(`.status-input[data-char-id="${data.character_id}"]`);
         if (statusField) {
             statusField.value = data.status;
         }
     });
+    
     
 
     document.querySelectorAll(".other-player").forEach(player => {
