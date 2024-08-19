@@ -18,6 +18,18 @@
             <h2>{{ character['name'] }}</h2>
             <p><strong>Classe:</strong> {{ character['class_name'] }}</p>
             <p><strong>Raça:</strong> {{ character['race_name'] }}</p>
+
+            <!--<div class="status-effects">
+                <h3>Status</h3>
+                <ul>
+                    {% for status in character['status_effects'] %}
+                        <li>
+                            <img src="{{ url_for('static', filename='icons/' + status['icon']) }}" alt="{{ status['name'] }}">
+                            {{ status['name'] }}: {{ status['description'] }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         
             <div class="attributes">
                 <div class="attribute" id="attr-forca">
@@ -45,7 +57,7 @@
                     <span>Carisma: {{ character['carisma'] }}</span>
                 </div>
             </div>
-        
+        -->
             <div class="health-mana-bars">
                 <div class="health-ball" data-character-id="{{ character['_id'] }}" data-max-hp="{{ character['hp'] }}">
                     <div class="health-fill" style="height: {{ (character['current_hp'] | int) / (character['hp'] | int) * 100 }}%"></div>
