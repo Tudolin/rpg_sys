@@ -504,17 +504,24 @@ def upload_media():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
+    display_time = request.form.get('display_time', type=int)
+
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['MEDIA_FOLDER'], filename)
         file.save(file_path)
 
-        # Envie a mídia para todos os jogadores
-        socketio.emit('new_media', {'media_url': url_for('static', filename=f'media/{filename}')}, broadcast=True)
+        # Send the media to all players
+        socketio.emit('new_media', {
+            'media_url': url_for('static', filename=f'media/{filename}'),
+            'display_time': display_time
+        }, to='/')  # Broadcast to all connected clients
 
         return jsonify({'success': True, 'media_url': url_for('static', filename=f'media/{filename}')})
     
     return jsonify({'error': 'File not allowed'}), 400
+
+
 
 @app.route('/music_tracks', methods=['GET'])
 def get_music_tracks():
@@ -682,11 +689,9 @@ def export_pdf(character_id):
         p.setFillColor(colors.darkred)
         p.drawCentredString(width / 2.0, height - 50, f"Ficha de Personagem: {character['name']}")
 
-        # Draw character image within a frame
         if character['img_url']:
-            image_path = character['img_url']  # Ensure this path is correct
+            image_path = character['img_url']
 
-            # Check if the image is a PNG or JPG
             image_extension = os.path.splitext(image_path)[1].lower()
 
             try:

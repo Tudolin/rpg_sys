@@ -12,6 +12,24 @@ body {
     box-sizing: border-box;
 }
 
+.media-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.media-content img, .media-content video {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+
 .characters-container {
     display: flex;
     flex-wrap: wrap;

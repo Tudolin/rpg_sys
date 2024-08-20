@@ -7,7 +7,7 @@
     <h1>Lobby das Sessões</h1>
     <form method="POST">
         <input type="text" name="session_name" placeholder="Nome da Sessão" required>
-        <button type="submit" class="btn btn-primary">Criar Sessão</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i>  Criar Sessão</button>
     </form>
 
     <h2 class="mt-4">Sessões Disponíveis</h2>
@@ -17,13 +17,13 @@
                 <div class="media-body">
                     <h5 class="mt-0 mb-1">{{ session['name'] }}</h5>
                     <p>Criada por: {{ session['creator_name'] }} (ID Criador: {{ session['created_by'] }} | ID Usuário: {{ session['userId'] }})</p>
-                    <a href="{{ url_for('join_session', session_id=session['_id']) }}" class="btn btn-primary btn-sm">Entrar na Sessão</a>
+                    <a href="{{ url_for('join_session', session_id=session['_id']) }}" class="btn btn-primary btn-sm"><i class="bi bi-controller"></i>  Entrar na Sessão</a>
 
                     {% if session['created_by'] == session['userId'] %}
                         <form method="POST" action="{{ url_for('delete_session', session_id=session['_id']) }}" class="d-inline">
-                            <button type="submit" class="btn btn-danger btn-sm">Excluir Sessão</button>
+                            <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i>  Excluir Sessão</button>
                         </form>
-                        <a href="{{ url_for('master_control', session_id=session['_id']) }}" class="btn btn-warning btn-sm">Entrar como Mestre</a>
+                        <a href="{{ url_for('master_control', session_id=session['_id']) }}" class="btn btn-warning btn-sm"><i class="bi bi-dice-6"></i>  Entrar como Mestre</a>
                     {% endif %}
                 </div>
             </li>

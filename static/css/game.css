@@ -11,6 +11,11 @@ body {
     padding: 0;
     box-sizing: border-box;
 }
+.navbar-toggler {
+    background-color: #c25757; /* Cor de fundo do botão */
+    border-color: #c25757; /* Cor da borda do botão */
+    transition: background-color 0.3s ease; /* Animação de transição */
+}
 
 .game-lobby-container {
     display: flex;
@@ -219,7 +224,27 @@ body {
     cursor: pointer;
 }
 
-/* Media Queries */
+.popup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.media-popup .media-content img,
+.media-popup .media-content video {
+    max-width: 100%;
+    max-height: 80vh; /* Limit height to 80% of viewport height */
+    display: block;
+    margin: 0 auto;
+}
+
+
 @media (max-width: 768px) {
     .main-content {
         flex-direction: column;

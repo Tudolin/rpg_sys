@@ -42,9 +42,12 @@
 
 <h2>Enviar Mídia</h2>
 <form id="media-form" enctype="multipart/form-data">
-    <input type="file" name="media" id="media-input">
-    <button type="submit">Enviar</button>
+    <input type="file" name="media" id="media-input" required>
+    <label for="display-time">Tempo de exibição (segundos):</label>
+    <input type="number" id="display-time" name="display_time" min="1" required>
+    <button type="submit"><i class="bi bi-send"></i>  Enviar</button>
 </form>
+
 
 <div id="media-preview"></div>
 
@@ -53,8 +56,8 @@
     <select id="music-select">
         <option value="">Selecione uma música</option>
     </select>
-    <button id="play-button">Play</button>
-    <button id="stop-button">Stop</button>
+    <button id="play-button"><i class="bi bi-play-circle"></i>  Play</button>
+    <button id="stop-button"><i class="bi bi-stop-circle"></i>  Stop</button>
 </div>
 
 <div id="music-player">

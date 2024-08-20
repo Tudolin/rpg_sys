@@ -4,7 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
-    <h1 class="text-center">Bem-vindo, {{ session['username'] }}</h1>
+    <h1 class="text-center" style="border-bottom: 2px solid #ffffff; padding-bottom: 10px;">Bem-vindo, {{ session['username'] }}</h1>
     <h2 class="text-center mb-5">Seus Personagens</h2>
     <ul class="list-unstyled">
         {% for char in characters %}
@@ -39,17 +39,17 @@
                         {% endfor %}
                     </ul>
                     <div class="mt-3">
-                        <a href="{{ url_for('edit_character_route', character_id=char['_id']) }}" class="btn btn-warning btn-sm mr-2">Editar</a>
-                        <a href="{{ url_for('delete_character_route', character_id=char['_id']) }}" class="btn btn-danger btn-sm">Excluir</a>
+                        <a href="{{ url_for('edit_character_route', character_id=char['_id']) }}" class="btn btn-warning btn-sm mr-2"><i class="bi bi-pencil-square"></i>  Editar</a>
+                        <a href="{{ url_for('delete_character_route', character_id=char['_id']) }}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i>  Excluir</a>
                         <!-- Export PDF button -->
-                        <a href="{{ url_for('export_pdf', character_id=char['_id']) }}" class="btn btn-success btn-sm">Exportar PDF</a>
+                        <a href="{{ url_for('export_pdf', character_id=char['_id']) }}" class="btn btn-success btn-sm"><i class="bi bi-arrow-down-square"></i>  Exportar PDF</a>
                     </div>
                 </div>
             </li>
         {% endfor %}
     </ul>
     <div class="text-center mt-5">
-        <a href="{{ url_for('create_character_route') }}" class="btn btn-primary btn-lg">Criar Personagem</a>
-        <a href="{{ url_for('sessions') }}" class="btn btn-secondary btn-lg ml-3">Se juntar a uma Sessão</a>
+        <a href="{{ url_for('create_character_route') }}" class="btn btn-primary btn-lg"><i class="bi bi-plus-circle"></i>  Criar Personagem</a>
+        <a href="{{ url_for('sessions') }}" class="btn btn-secondary btn-lg ml-3"><i class="bi bi-people-fill"></i>  Se juntar a uma Sessão</a>
     </div>
 {% endblock %}

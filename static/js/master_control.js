@@ -58,7 +58,41 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(error => console.error('Erro ao carregar músicas:', error));
 
-    // Listener para o botão de tocar música
+        document.getElementById('media-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            const formData = new FormData();
+            const fileInput = document.getElementById('media-input');
+            const displayTime = document.getElementById('display-time').value;
+    
+            formData.append('media', fileInput.files[0]);
+            formData.append('display_time', displayTime);
+    
+            fetch('/upload_media', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // Check if the response is successful
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error('Server error: ' + text);
+                    });
+                }
+                return response.json(); // Parse JSON only if the response is okay
+            })
+            .then(data => {
+                if (data.success) {
+                    console.log('Media sent successfully:', data.media_url);
+                } else {
+                    console.error('Error sending media:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
     document.getElementById('play-button').addEventListener('click', function () {
         const selectedTrack = musicSelect.value;
         

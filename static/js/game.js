@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const profilePopup = document.getElementById("profile-popup");
     const otherPlayerPopup = document.getElementById("other-player-popup");
     const closeButtons = document.querySelectorAll(".close-button");
+    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
     window.addEventListener('beforeunload', function (e) {
         const confirmationMessage = 'Você tem certeza que deseja sair do lobby? Isso pode causar a perda de progresso.';
@@ -10,7 +11,35 @@ document.addEventListener("DOMContentLoaded", function () {
         (e || window.event).returnValue = confirmationMessage; // Standard for most browsers
         return confirmationMessage; // For some other browsers
     });
-    
+
+    socket.on('new_media', function(data) {
+        console.log('New media received:', data);  // Debugging log
+
+        // Clear any existing content
+        mediaContent.innerHTML = '';
+
+        // Check if it's an image, GIF, or video
+        if (data.media_url.match(/\.(jpeg|jpg|gif|png)$/)) {
+            const img = document.createElement('img');
+            img.src = data.media_url;
+            mediaContent.appendChild(img);
+        } else if (data.media_url.match(/\.(mp4|webm)$/)) {
+            const video = document.createElement('video');
+            video.src = data.media_url;
+            video.controls = true;
+            video.autoplay = true;
+            mediaContent.appendChild(video);
+        }
+
+        // Display the media popup
+        mediaPopup.style.display = 'block';
+
+        // Remove the popup after the defined display time
+        setTimeout(() => {
+            mediaPopup.style.display = 'none';
+        }, data.display_time * 1000); // Convert to milliseconds
+    });
+
     profileButton.addEventListener("click", function () {
         fetch('/get_current_player_details')
             .then(response => response.json())
@@ -127,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Adiciona listeners aos jogadores que já estão na lista
     document.querySelectorAll(".other-player").forEach(attachPlayerClickEvent);
 
-    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
 
     socket.on('connect', function () {
         socket.emit('join', { data: 'Player joined!' });
