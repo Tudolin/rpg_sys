@@ -12,8 +12,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url_for('home') }}">Home</a>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='logo.png') }}" width="70" style="hover:opacity 70%"></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -29,7 +29,7 @@
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <div class="container-fluid">
         {% block content %}{% endblock %}
     </div>
 </body>

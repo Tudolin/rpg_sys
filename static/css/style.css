@@ -1,0 +1,182 @@
+@font-face {
+    font-family: Enchanted Land;
+    src: url(/static/fonts/Seagram\ tfb.ttf);
+ }
+
+body {
+    font-family: Enchanted Land;
+    color: #e0e0e0;
+    background-color: #101010;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.custom-container {
+    background-color: #212529;
+    color: #e0e0e0;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.navbar {
+    background-color: rgba(35, 97, 78, 0);
+    top: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar .navbar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar .navbar-nav .nav-link {
+    justify-content: center;
+    font-family: Enchanted Land;
+    color: #ffffff !important;
+    cursor: pointer;
+    background-image: linear-gradient(to right, #d11818 0%, #d11818 100%);
+    background-position: 50% 100%;
+    background-size: 0% 2px; /* Diminuir a altura da linha */
+    background-repeat: no-repeat;
+    transition: background-size 0.3s, background-position 0.3s; /* Animação suave */
+}
+
+.navbar .navbar-nav .nav-link:hover {
+    color: #ffffffcc !important;
+    background-size: 60% 3px; /* Aumentar a largura da linha ao passar o mouse */
+    background-position: 50% 100%;
+}
+
+
+.navbar .navbar-left, .navbar .navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar .navbar-left {
+    flex: 1;
+    justify-content: center;
+}
+
+.navbar .navbar-right {
+    margin-left: auto;
+}
+
+.navbar-nav {
+    flex-direction: row;
+}
+
+.navbar-nav .nav-item {
+    border-radius: 20%;
+    margin-left: 6px;
+}
+
+.navbar-nav.ml-auto {
+    margin-left: auto;
+}
+
+.navbar a {
+    color: #ffffff !important;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Ajustes de opacidade e cor */
+.navbar-nav > li > a {
+    color: #ffffff8a !important;
+    justify-content: center;
+    align-items: left;
+}
+
+.navbar-nav > li > a:hover, .navbar-nav > li > a:focus {
+    color: #ffffff !important;
+}
+.navbar-nav > li > a::after, .navbar-nav > li > a:focus {
+    width: 100%;
+    transition: width .3s;
+}
+
+.container-fluid {
+    padding: 0 15px;
+    min-height: 100vh;
+}
+
+/* Override Bootstrap bg-light class to ensure dark theme */
+.bg-light {
+    background-color: transparent !important;
+}
+
+h1, h2 {
+    color: #ffcc00; /* Golden color for headings */
+    text-align: center;
+}
+
+ul.list-unstyled {
+    padding: 0;
+}
+
+li.media {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    border: 2px solid #660000;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+li.media img {
+    border: 3px solid #660000;
+}
+
+li.media .media-body h5 {
+    color: #ffcc00; /* Golden color for character names */
+    font-size: 20px;
+}
+
+li.media .media-body p {
+    font-size: 16px;
+}
+
+li.media .media-body ul.list-inline {
+    padding-left: 0;
+}
+
+li.media .media-body ul.list-inline li {
+    font-size: 14px;
+    background-color: #333;
+    color: #e0e0e0;
+    border-radius: 5px;
+    padding: 5px;
+    margin-right: 5px;
+}
+
+li.media .media-body .btn {
+    margin-right: 10px;
+}
+
+.text-center {
+    color: #f0f0f0;
+}
+
+.btn-primary, .btn-secondary, .btn-warning, .btn-danger, .btn-success {
+    color: #fff;
+    border: 2px solid #660000;
+    background-color: #1a1a1a;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.btn-primary:hover, .btn-secondary:hover, .btn-warning:hover, .btn-danger:hover, .btn-success:hover {
+    background-color: #660000;
+    color: #fff;
+}
+
+.text-center a.btn-lg {
+    margin: 15px 0;
+}
+

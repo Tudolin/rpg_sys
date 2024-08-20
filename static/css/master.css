@@ -1,3 +1,17 @@
+@font-face {
+    font-family: Enchanted Land;
+    src: url(/static/fonts/Seagram\ tfb.ttf);
+ }
+
+body {
+    font-family: Enchanted Land;
+    color: #e0e0e0;
+    background-color: #101010;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 .characters-container {
     display: flex;
     flex-wrap: wrap;

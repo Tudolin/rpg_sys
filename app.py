@@ -1,9 +1,17 @@
 import os
+from io import BytesIO
 
 from bson import ObjectId
 from flask import (Flask, flash, jsonify, redirect, render_template, request,
-                   session, url_for)
+                   send_file, session, url_for)
 from flask_socketio import SocketIO, emit, join_room
+from reportlab.lib import colors, enums
+from reportlab.lib.pagesizes import A4, letter
+from reportlab.lib.units import inch
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
 from werkzeug.utils import secure_filename
 
 from conection_db import connection
@@ -25,9 +33,6 @@ MEDIA_FOLDER = 'static/media/'
 app.config['MEDIA_FOLDER'] = MEDIA_FOLDER
 MUSIC_FOLDER = 'static/music/'
 app.config['MUSIC_FOLDER'] = MUSIC_FOLDER
-
-if not os.path.exists(MEDIA_FOLDER):
-    os.makedirs(MEDIA_FOLDER)
 
 @app.route('/')
 def home():
@@ -311,9 +316,10 @@ def game_lobby():
     if not character:
         return redirect(url_for('home'))
 
+    # Certifique-se de atualizar `current_hp` corretamente
     db.chars.update_one(
         {"_id": ObjectId(character['_id'])},
-        {"$set": {"current_hp": character['hp']}}
+        {"$set": {"current_hp": character.get('current_hp', character['hp'])}}
     )
 
     # Buscando informações de classe e raça
@@ -357,6 +363,7 @@ def game_lobby():
     other_characters = list({v['_id']:v for v in other_characters}.values())
 
     return render_template('game_lobby.html', character=character, other_characters=other_characters, session_name=session_data['name'])
+
 
 
 
@@ -428,7 +435,8 @@ def master_control(session_id):
     characters = []
     for char_id in session_data['characters']:
         character = db.chars.find_one({"_id": ObjectId(char_id)})
-        characters.append(character)
+        if character:
+            characters.append(character)
 
     if request.method == 'POST':
         char_id = request.form['char_id']
@@ -595,7 +603,32 @@ def handle_disconnect():
             # Notifique os outros jogadores, incluindo o mestre, que o jogador saiu
             socketio.emit('player_left', {'_id': str(character['_id'])}, room=room)
 
+@socketio.on('connect')
+def on_connect():
+    room = session.get('game_session_id')
+    if room:
+        join_room(room)
+        character = db.chars.find_one({"user_id": ObjectId(session['userId'])})
 
+        if character:
+            class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
+            race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
+
+            character_data = {
+                '_id': str(character['_id']),
+                'name': character['name'],
+                'class_name': class_info['name'] if class_info else "Classe Desconhecida",
+                'race_name': race_info['name'] if race_info else "Raça Desconhecida",
+                'hp': character['hp'],
+                'img_url': character['img_url']
+            }
+            # Notifica todos na sala, incluindo o mestre
+            emit('new_player', character_data, room=room)
+            emit('health_updated', {
+                'character_id': str(character['_id']),
+                'new_health': character['current_hp'],
+                'max_health': character['hp']
+            }, room=room)
 
 @socketio.on('update_health')
 def update_health(data):
@@ -614,12 +647,177 @@ def update_health(data):
             'character_id': character_id,
             'new_health': character['current_hp']
         }, room=session['game_session_id'])
-
+        
         emit('status_updated', {
             'character_id': character_id,
             'status': status
         }, room=session['game_session_id'])
 
+pdfmetrics.registerFont(TTFont('MedievalFont', 'static/fonts/Enchanted Land.otf'))
 
+
+@app.route('/export_pdf/<character_id>')
+def export_pdf(character_id):
+    # Fetch character data from the database
+    character = db.chars.find_one({"_id": ObjectId(character_id)})
+    
+    if character:
+        # Fetch class and race details
+        class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
+        race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
+
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+
+        # Set parchment-like background color
+        p.setFillColorRGB(0.96, 0.87, 0.70)  # Light beige color
+        p.rect(0, 0, width, height, stroke=0, fill=1)
+
+        # Set font
+        p.setFont("MedievalFont", 16)
+
+        # Add title with medieval font
+        p.setFont("MedievalFont", 24)
+        p.setFillColor(colors.darkred)
+        p.drawCentredString(width / 2.0, height - 50, f"Ficha de Personagem: {character['name']}")
+
+        # Draw character image within a frame
+        if character['img_url']:
+            image_path = character['img_url']  # Ensure this path is correct
+
+            # Check if the image is a PNG or JPG
+            image_extension = os.path.splitext(image_path)[1].lower()
+
+            try:
+                if image_extension in ['.png', '.jpg', '.jpeg']:
+                    img_x = width - 220
+                    img_y = height - 250  # Moved the image higher on the page
+                    img_width = 150
+                    img_height = 150
+                    p.setStrokeColor(colors.black)
+                    p.setLineWidth(2)
+                    p.rect(img_x - 10, img_y - 10, img_width + 20, img_height + 20)  # Frame
+                    p.drawImage(ImageReader(image_path), img_x, img_y, width=img_width, height=img_height)
+                else:
+                    print("Unsupported image format. Only PNG and JPG are supported.")
+            except Exception as e:
+                print(f"Error loading the image: {e}")
+
+        # Add character details with adjusted spacing
+        p.setFont("MedievalFont", 16)
+        text_x = 60
+        text_y_start = height - 150
+        line_height = 20
+
+        # Titles and values in the same line but with different colors
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, text_y_start, "Classe:")
+        p.setFillColor(colors.black)
+        p.drawString(text_x + 100, text_y_start, f"{class_info['name'] if class_info else 'Classe Desconhecida'}")
+
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, text_y_start - line_height, "Raca:")
+        p.setFillColor(colors.black)
+        p.drawString(text_x + 100, text_y_start - line_height, f"{race_info['name'] if race_info else 'Raca Desconhecida'}")
+
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, text_y_start - 2 * line_height, "HP:")
+        p.setFillColor(colors.black)
+        p.drawString(text_x + 100, text_y_start - 2 * line_height, f"{character['hp']}")
+
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, text_y_start - 3 * line_height, "Forca:")
+        p.setFillColor(colors.black)
+        p.drawString(text_x + 100, text_y_start - 3 * line_height, f"{character['forca']}")
+
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, text_y_start - 4 * line_height, "Destreza:")
+        p.setFillColor(colors.black)
+        p.drawString(text_x + 100, text_y_start - 4 * line_height, f"{character['destreza']}")
+
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, text_y_start - 5 * line_height, "Constituição:")
+        p.setFillColor(colors.black)
+        p.drawString(text_x + 100, text_y_start - 5 * line_height, f"{character['constituicao']}")
+
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, text_y_start - 6 * line_height, "Inteligência:")
+        p.setFillColor(colors.black)
+        p.drawString(text_x + 100, text_y_start - 6 * line_height, f"{character['inteligencia']}")
+
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, text_y_start - 7 * line_height, "Sabedoria:")
+        p.setFillColor(colors.black)
+        p.drawString(text_x + 100, text_y_start - 7 * line_height, f"{character['sabedoria']}")
+
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, text_y_start - 8 * line_height, "Carisma:")
+        p.setFillColor(colors.black)
+        p.drawString(text_x + 100, text_y_start - 8 * line_height, f"{character['carisma']}")
+
+        # Add skills and abilities with headers and adjusted spacing
+        p.setFont("MedievalFont", 18)
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, text_y_start - 10 * line_height, "Habilidades de Classe:")
+
+        y = text_y_start - 11 * line_height
+        p.setFont("MedievalFont", 14)
+        if class_info:
+            for habilidade, descricao in class_info.get("habilidades_classe", {}).items():
+                p.setFillColor(colors.black)
+                p.drawString(text_x + 20, y, f"{habilidade}: {descricao}")
+                y -= line_height
+
+        p.setFont("MedievalFont", 18)
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, y - line_height, "Habilidades Raciais:")
+
+        y -= 2 * line_height
+        p.setFont("MedievalFont", 14)
+        if race_info:
+            for habilidade, descricao in race_info.get("habilidades_inatas", {}).items():
+                p.setFillColor(colors.black)
+                p.drawString(text_x + 20, y, f"{habilidade}: {descricao}")
+                y -= line_height
+        
+        p.setFont("MedievalFont", 18)
+        p.setFillColor(colors.darkred)
+        p.drawString(text_x, y - line_height, "Perícias:")
+
+        y -= 2 * line_height
+        p.setFont("MedievalFont", 14)
+        for pericia, valor in character.get("pericias", {}).items():
+            p.setFillColor(colors.black)
+            p.drawString(text_x + 20, y, f"{pericia}: +{valor}")
+            y -= line_height
+
+        # Add character history (História)
+        if "origem" in character:
+            p.setFont("MedievalFont", 18)
+            p.setFillColor(colors.darkred)
+            p.drawString(text_x, y - 2 * line_height, "História do Personagem:")
+
+            y -= 3 * line_height
+            p.setFont("MedievalFont", 14)
+            history_text = character["origem"]
+            text_lines = history_text.split('\n')  # Split history into lines
+            for line in text_lines:
+                p.setFillColor(colors.black)
+                p.drawString(text_x + 20, y, line)
+                y -= line_height
+
+        # Finalize PDF
+        p.showPage()
+        p.save()
+
+        buffer.seek(0)
+        
+        # Send the PDF as a downloadable file
+        return send_file(buffer, as_attachment=True, download_name=f'{character["name"]}_Ficha.pdf', mimetype='application/pdf')
+    else:
+        return "Character not found", 404
+
+    
 if __name__ == '__main__':
     socketio.run(app, debug=True, host="0.0.0.0", port=8080)

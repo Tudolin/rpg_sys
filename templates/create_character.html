@@ -3,6 +3,7 @@
 {% block title %}Criar Personagem{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
     <h1>Criar Novo Personagem</h1>
     <form method="POST" enctype="multipart/form-data">
         <div class="row">
@@ -13,9 +14,9 @@
                     <input type="text" id="name" name="name" class="form-control" required>
                 </div>
 
-                <h2>1. Escolha sua Raça</h2>
+                <h2>1. Escolha sua Raca</h2>
                 <div class="form-group">
-                    <label for="race_id">Raça:</label>
+                    <label for="race_id">Raca:</label>
                     <select id="race_id" name="race_id" class="form-control" onchange="atualizarImagemRaça()">
                         {% for race in races %}
                             <option value="{{ race._id }}"
@@ -70,7 +71,7 @@
 
             <!-- Exibir Imagem de Raça ou Classe à Direita -->
             <div class="col-md-6">
-                <h2>Exemplo de Raça</h2>
+                <h2>Exemplo de Raca</h2>
                 <div class="image-container">
                     <img id="selected-image" src="/static/images/default.png" alt="Imagem Selecionada" class="img-fluid">
                 </div>
@@ -93,12 +94,12 @@
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Atuação" id="pericia-atuacao1">
-                <label class="form-check-label" for="pericia-atuacao1">Atuação (________________)</label>
+                <label class="form-check-label" for="pericia-atuacao1">Atuacao (________________)</label>
                 <input type="text" class="form-control" name="atuacao_custom1" id="atuacao_custom1">
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Atuação" id="pericia-atuacao2">
-                <label class="form-check-label" for="pericia-atuacao2">Atuação (________________)</label>
+                <label class="form-check-label" for="pericia-atuacao2">Atuacao (________________)</label>
                 <input type="text" class="form-control" name="atuacao_custom2" id="atuacao_custom2">
             </div>
             <div class="form-check">
@@ -125,7 +126,7 @@
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Enganação" id="pericia-enganacao">
-                <label class="form-check-label" for="pericia-enganacao">Enganação</label>
+                <label class="form-check-label" for="pericia-enganacao">Enganacao</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Furtividade" id="pericia-furtividade">
@@ -141,11 +142,11 @@
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Intimidação" id="pericia-intimidacao">
-                <label class="form-check-label" for="pericia-intimidacao">Intimidação</label>
+                <label class="form-check-label" for="pericia-intimidacao">Intimidacao</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Intuição" id="pericia-intuicao">
-                <label class="form-check-label" for="pericia-intuicao">Intuição</label>
+                <label class="form-check-label" for="pericia-intuicao">Intuiçao</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Ladinagem" id="pericia-ladinagem">
@@ -153,7 +154,7 @@
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Obter Informação" id="pericia-obter-informacao">
-                <label class="form-check-label" for="pericia-obter-informacao">Obter Informação</label>
+                <label class="form-check-label" for="pericia-obter-informacao">Obter Informacao</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Ofício" id="pericia-oficio1">
@@ -167,11 +168,11 @@
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Percepção" id="pericia-percepcao">
-                <label class="form-check-label" for="pericia-percepcao">Percepção</label>
+                <label class="form-check-label" for="pericia-percepcao">Percepcao</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Sobrevivência" id="pericia-sobrevivencia">
-                <label class="form-check-label" for="pericia-sobrevivencia">Sobrevivência</label>
+                <label class="form-check-label" for="pericia-sobrevivencia">Sobrevivencia</label>
             </div>
         </div>
 

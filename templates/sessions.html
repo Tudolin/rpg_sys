@@ -3,6 +3,7 @@
 {% block title %}Sessões{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
     <h1>Lobby das Sessões</h1>
     <form method="POST">
         <input type="text" name="session_name" placeholder="Nome da Sessão" required>

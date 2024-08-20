@@ -4,7 +4,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const otherPlayerPopup = document.getElementById("other-player-popup");
     const closeButtons = document.querySelectorAll(".close-button");
 
-    // Exibe o perfil do jogador ao clicar no botão de perfil
+    window.addEventListener('beforeunload', function (e) {
+        const confirmationMessage = 'Você tem certeza que deseja sair do lobby? Isso pode causar a perda de progresso.';
+        
+        (e || window.event).returnValue = confirmationMessage; // Standard for most browsers
+        return confirmationMessage; // For some other browsers
+    });
+    
     profileButton.addEventListener("click", function () {
         fetch('/get_current_player_details')
             .then(response => response.json())
