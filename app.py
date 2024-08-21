@@ -28,6 +28,7 @@ from models.session_model import (add_character_to_session, create_session,
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+app.config['SESSION_PROTECTION'] = 'strong'
 sys.path.insert(0, '/home/angellnadalin/rpg_sys')
 db = connection()
 UPLOAD_FOLDER = 'static/uploads/'
