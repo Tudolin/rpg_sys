@@ -42,7 +42,7 @@ sys.path.insert(0, '/home/angellnadalin/rpg_sys')
 db = connection()
 UPLOAD_FOLDER = 'static/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="https://familyrpg.servebeer.com")
 MEDIA_FOLDER = 'static/media/'
 app.config['MEDIA_FOLDER'] = MEDIA_FOLDER
 MUSIC_FOLDER = 'static/music/'
