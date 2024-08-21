@@ -1,12 +1,22 @@
 document.addEventListener("DOMContentLoaded", function() {
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+    console.log(socket);
+
     const effectSelects = document.querySelectorAll('.status-effect-select');
     const audioPlayer = document.getElementById('audio-player');
     const forms = document.querySelectorAll(`.character-form[data-session-id="${sessionId}"]`);
     const musicSelect = document.getElementById('music-select');
     const currentTrackElement = document.getElementById('current-track');
 
-    // Atualiza a descrição dos efeitos selecionados
+    console.log(typeof io); // Verifique se 'io' é definido
+if (typeof io !== 'undefined') {
+    const socket = io();
+    console.log('Socket.IO conectado:', socket);
+} else {
+    console.error('Socket.IO não está definido');
+}
+
+
     effectSelects.forEach(select => {
         select.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
