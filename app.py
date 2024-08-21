@@ -3,7 +3,7 @@ import sys
 from io import BytesIO
 from gevent import monkey
 monkey.patch_all()
-
+from flask_cors import CORS
 from bson import ObjectId
 from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    send_file, session, url_for)
@@ -29,6 +29,7 @@ from models.session_model import (add_character_to_session, create_session,
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY') or 'a212d3b5e27f9cd2dfb8a9d18587ae51b2f88af9e1e95112'
 app.config['SESSION_PROTECTION'] = 'strong'
+CORS(app)
 sys.path.insert(0, '/home/angellnadalin/rpg_sys')
 db = connection()
 UPLOAD_FOLDER = 'static/uploads/'
