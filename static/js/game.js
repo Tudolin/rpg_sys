@@ -3,8 +3,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const profilePopup = document.getElementById("profile-popup");
     const otherPlayerPopup = document.getElementById("other-player-popup");
     const closeButtons = document.querySelectorAll(".close-button");
-    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port, {
+    transports: ['websocket']
+});
 
+    
     window.addEventListener('beforeunload', function (e) {
         const confirmationMessage = 'Você tem certeza que deseja sair do lobby? Isso pode causar a perda de progresso.';
         
