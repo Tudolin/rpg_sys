@@ -1,11 +1,11 @@
 import os
+import sys
 from io import BytesIO
 
 from bson import ObjectId
 from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    send_file, session, url_for)
 from flask_socketio import SocketIO, emit, join_room
-from flask_talisman import Talisman
 from reportlab.lib import colors, enums
 from reportlab.lib.pagesizes import A4, letter
 from reportlab.lib.units import inch
@@ -15,6 +15,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from werkzeug.utils import secure_filename
 
+from app import app as application
 from conection_db import connection
 from models.character_model import (create_character, delete_character,
                                     get_characters_by_user, update_character)
@@ -26,7 +27,7 @@ from models.session_model import (add_character_to_session, create_session,
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-Talisman(app)
+sys.path.insert(0, '/home/angellnadalin/rpg_sys')
 db = connection()
 UPLOAD_FOLDER = 'static/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -832,4 +833,4 @@ if __name__ == '__main__':
     cert_path = "/etc/letsencrypt/live/familyrpg.servebeer.com/fullchain.pem"
     key_path = "/etc/letsencrypt/live/familyrpg.servebeer.com/privkey.pem"
     
-    socketio.run(app, debug=True, host="0.0.0.0", port=8080, ssl_context=(cert_path, key_path))
+    socketio.run(app, debug=True, host="0.0.0.0", port=8080)
