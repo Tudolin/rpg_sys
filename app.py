@@ -833,4 +833,4 @@ if __name__ == '__main__':
     cert_path = "/etc/letsencrypt/live/familyrpg.servebeer.com/fullchain.pem"
     key_path = "/etc/letsencrypt/live/familyrpg.servebeer.com/privkey.pem"
     
-    socketio.run(app, debug=True, host="0.0.0.0", port=8080)
+    socketio.run(app, debug=True, host="0.0.0.0", port=80)
