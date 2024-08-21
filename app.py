@@ -1,15 +1,17 @@
 import os
 import sys
 from io import BytesIO
+
 from gevent import monkey
+
 monkey.patch_all()
-from flask_session import Session
-from redis import Redis
-from flask_cors import CORS
 from bson import ObjectId
 from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    send_file, session, url_for)
+from flask_cors import CORS
+from flask_session import Session
 from flask_socketio import SocketIO, emit, join_room
+from redis import Redis
 from reportlab.lib import colors, enums
 from reportlab.lib.pagesizes import A4, letter
 from reportlab.lib.units import inch
@@ -844,5 +846,5 @@ def export_pdf(character_id):
 
     
 if __name__ == '__main__':
-    # socketio.run(app, debug=True, host="0.0.0.0", port=8000)
-    pass
+    socketio.run(app, debug=True, host="0.0.0.0", port=8000)
+    # pass
