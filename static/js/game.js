@@ -3,8 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const profilePopup = document.getElementById("profile-popup");
     const otherPlayerPopup = document.getElementById("other-player-popup");
     const closeButtons = document.querySelectorAll(".close-button");
-    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port, {
-    transports: ['websocket']
+    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 });
 
     
