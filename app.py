@@ -5,6 +5,7 @@ from bson import ObjectId
 from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    send_file, session, url_for)
 from flask_socketio import SocketIO, emit, join_room
+from flask_talisman import Talisman
 from reportlab.lib import colors, enums
 from reportlab.lib.pagesizes import A4, letter
 from reportlab.lib.units import inch
@@ -25,6 +26,7 @@ from models.session_model import (add_character_to_session, create_session,
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+Talisman(app)
 db = connection()
 UPLOAD_FOLDER = 'static/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -827,4 +829,7 @@ def export_pdf(character_id):
 
     
 if __name__ == '__main__':
-    socketio.run(app, debug=True, host="0.0.0.0", port=8080)
+    cert_path = "/etc/letsencrypt/live/familyrpg.servebeer.com/fullchain.pem"
+    key_path = "/etc/letsencrypt/live/familyrpg.servebeer.com/privkey.pem"
+    
+    socketio.run(app, debug=True, host="0.0.0.0", port=8080, ssl_context=(cert_path, key_path))
