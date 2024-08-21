@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-    console.log(socket);
+    const socket = io.connect('wss://familyrpg.servebeer.com', {
+        transports: ['websocket']
+    });
+    
 
     const effectSelects = document.querySelectorAll('.status-effect-select');
     const audioPlayer = document.getElementById('audio-player');
