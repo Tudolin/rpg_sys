@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const otherPlayerPopup = document.getElementById("other-player-popup");
     const closeButtons = document.querySelectorAll(".close-button");
     const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-});
 
     
     window.addEventListener('beforeunload', function (e) {

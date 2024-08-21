@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         throw new Error('Server error: ' + text);
                     });
                 }
-                return response.json(); // Parse JSON only if the response is okay
+                return response.json();
             })
             .then(data => {
                 if (data.success) {

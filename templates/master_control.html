@@ -4,6 +4,7 @@
 
 {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/5.11.3/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/master_control.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/master.css') }}">
 <h1>Controle do Mestre - {{ session_name }}</h1>
 
@@ -74,5 +75,4 @@
     const sessionId = "{{ session_data['_id'] }}";  // Passe o ID da sessão para o JavaScript
 </script>
 
-<script src="{{ url_for('static', filename='js/master_control.js') }}"></script>
 {% endblock %}
