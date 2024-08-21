@@ -15,7 +15,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from werkzeug.utils import secure_filename
 
-from app import app as application
 from conection_db import connection
 from models.character_model import (create_character, delete_character,
                                     get_characters_by_user, update_character)
@@ -833,4 +832,4 @@ if __name__ == '__main__':
     cert_path = "/etc/letsencrypt/live/familyrpg.servebeer.com/fullchain.pem"
     key_path = "/etc/letsencrypt/live/familyrpg.servebeer.com/privkey.pem"
     
-    socketio.run(app, debug=True, host="0.0.0.0", port=80)
+    socketio.run(app, debug=True, host="0.0.0.0", port=443)
