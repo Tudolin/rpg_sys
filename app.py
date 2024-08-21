@@ -70,16 +70,21 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
+        app.logger.info(f"Tentativa de login com usuário: {username}")
+
         user = collection.find_one({'username': username, 'password': password})
         if user:
             session['logged_in'] = True
-            session['userId'] = str(user['_id'])  # Certifique-se de que o ID do usuário está sendo armazenado como string
+            session['userId'] = str(user['_id'])
             session['username'] = user['username']
+            app.logger.info("Login bem-sucedido")
             return redirect(url_for('home'))
         else:
+            app.logger.warning("Credenciais inválidas")
             return render_template('login.html', error='Credenciais inválidas')
 
     return render_template('login.html')
+
 
 
 
