@@ -377,7 +377,6 @@ def get_player_details(player_id):
         class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
         race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
 
-        
         response = {
             "name": character['name'],
             "class_name": class_info['name'] if class_info else "Classe Desconhecida",
@@ -389,7 +388,8 @@ def get_player_details(player_id):
             "sabedoria": character['sabedoria'],
             "carisma": character['carisma'],
             "habilidades": character['habilidades'],
-            "pericias": character['pericias']
+            "pericias": character['pericias'],
+            "img_url": character['img_url'] if 'img_url' in character else '/static/images/default.png'  # Adiciona a imagem
         }
         return jsonify(response)
     else:
@@ -403,7 +403,7 @@ def get_current_player_details():
         # Busca informações de classe e raça
         class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
         race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
-        
+
         response = {
             "name": character['name'],
             "class_name": class_info['name'] if class_info else "Classe Desconhecida",
@@ -415,11 +415,13 @@ def get_current_player_details():
             "sabedoria": character['sabedoria'],
             "carisma": character['carisma'],
             "habilidades": character['habilidades'],
-            "pericias": character['pericias']
+            "pericias": character['pericias'],
+            "img_url": character['img_url'] if 'img_url' in character else '/static/images/default.png'  # Adiciona a imagem
         }
         return jsonify(response)
     else:
         return jsonify({"error": "Character not found"}), 404
+
 
 @app.route('/master_control/<session_id>', methods=['GET', 'POST'])
 def master_control(session_id):

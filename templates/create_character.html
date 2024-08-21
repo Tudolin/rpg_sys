@@ -20,15 +20,16 @@
                     <select id="race_id" name="race_id" class="form-control" onchange="atualizarImagemRaça()">
                         {% for race in races %}
                             <option value="{{ race._id }}"
-                                data-nome="{{ race.name }}"
-                                data-forca="{{ race.forca_bonus }}"
-                                data-destreza="{{ race.destreza_bonus }}"
-                                data-constituicao="{{ race.constituicao_bonus }}"
-                                data-inteligencia="{{ race.inteligencia_bonus }}"
-                                data-sabedoria="{{ race.sabedoria_bonus }}"
-                                data-carisma="{{ race.carisma_bonus }}">
-                                {{ race.name }} ({{ race.habilidades_inatas | join(', ') }})
-                            </option>
+                            data-nome="{{ race.name }}"
+                            data-forca="{{ race.forca_bonus }}"
+                            data-destreza="{{ race.destreza_bonus }}"
+                            data-constituicao="{{ race.constituicao_bonus }}"
+                            data-inteligencia="{{ race.inteligencia_bonus }}"
+                            data-sabedoria="{{ race.sabedoria_bonus }}"
+                            data-carisma="{{ race.carisma_bonus }}"
+                            data-resumo="{{ race.resumo }}">
+                            {{ race.name }} ({{ race.habilidades_inatas | join(', ') }})
+                        </option>
                         {% endfor %}
                     </select>
                     <div id="atributos-raca-tooltip" class="tooltip-custom"></div>
@@ -37,7 +38,7 @@
                 <h2>2. Escolha sua Classe</h2>
                 <div class="form-group">
                     <label for="class_id">Classe:</label>
-                    <select id="class_id" name="class_id" class="form-control" onchange="atualizarImagemClasse()">
+                    <select id="class_id" name="class_id" class="form-control">
                         {% for class in classes %}
                             <option value="{{ class._id }}"
                                 data-nome="{{ class.name }}"
@@ -51,7 +52,6 @@
                             </option>
                         {% endfor %}
                     </select>
-                    <div id="atributos-classe-tooltip" class="tooltip-custom"></div>
                 </div>
 
                 <h2>3. Defina seus Atributos (Min 3 e max 18)</h2>
@@ -69,16 +69,16 @@
                 {% endfor %}
             </div>
 
-            <!-- Exibir Imagem de Raça ou Classe à Direita -->
+            <!-- Exibir Imagem de Raça à Direita -->
             <div class="col-md-6">
-                <h2>Exemplo de Raça</h2>
+                <h2>Exemplo de Raca</h2>
                 <div class="image-container">
                     <img id="selected-image" src="{{ url_for('static', filename='images/default.png') }}" alt="Imagem Selecionada" class="img-fluid fade-in">
                 </div>
                 <!-- Descrição da Raça -->
                 <div class="race-description mt-3">
-                    <h3>Descrição da Raça</h3>
-                    <p id="race-description-text">{{ character['race_description'] if request.endpoint == 'edit_character_route' else '' }}</p>
+                    <h3>Descricão da Raca</h3>
+                    <p id="race-description-text">{{ character['resumo'] if request.endpoint == 'edit_character_route' else '' }}</p>
                 </div>
             </div>
         </div>
@@ -146,19 +146,19 @@
                 <label class="form-check-label" for="pericia-iniciativa">Iniciativa</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Intimidação" id="pericia-intimidacao">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Intimidacão" id="pericia-intimidacao">
                 <label class="form-check-label" for="pericia-intimidacao">Intimidacao</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Intuição" id="pericia-intuicao">
-                <label class="form-check-label" for="pericia-intuicao">Intuiçao</label>
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Intuicão" id="pericia-intuicao">
+                <label class="form-check-label" for="pericia-intuicao">Intuicao</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Ladinagem" id="pericia-ladinagem">
                 <label class="form-check-label" for="pericia-ladinagem">Ladinagem</label>
             </div>
             <div class="form-check">
-                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Obter Informação" id="pericia-obter-informacao">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Obter Informacão" id="pericia-obter-informacao">
                 <label class="form-check-label" for="pericia-obter-informacao">Obter Informacao</label>
             </div>
             <div class="form-check">
@@ -172,7 +172,7 @@
                 <input type="text" class="form-control" name="oficio_custom2" id="oficio_custom2">
             </div>
             <div class="form-check">
-                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Percepção" id="pericia-percepcao">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Percepcão" id="pericia-percepcao">
                 <label class="form-check-label" for="pericia-percepcao">Percepcao</label>
             </div>
             <div class="form-check">
@@ -204,7 +204,6 @@
         const basePontos = 10;
         let pontosExtraHumano = 0;
 
-
         function atualizarPontosRestantes() {
             let total = 0;
             atributos.forEach(input => {
@@ -229,7 +228,6 @@
             }
         }
         
-
         function alterarValor(atributo, valor) {
             const input = document.getElementById(atributo);
             let atual = parseInt(input.value);
@@ -246,42 +244,35 @@
             const raceSelect = document.getElementById('race_id');
             const selectedRace = raceSelect.options[raceSelect.selectedIndex];
             const imageUrl = `/static/images/races/${selectedRace.getAttribute('data-nome').toLowerCase()}.png`;
-            document.getElementById('selected-image').src = imageUrl;
-            document.getElementById('selected-image').classList.add('fade-in');  // Adiciona a classe de animação
-
+            const imageElement = document.getElementById('selected-image');
+            
+            // Reiniciar a animação removendo e adicionando a classe
+            imageElement.classList.remove('fade-in');
+            
+            // Forçar um reflow para garantir que a classe seja removida e adicionada novamente
+            void imageElement.offsetWidth;
+            
+            imageElement.src = imageUrl;
+            imageElement.classList.add('fade-in');
+        
             // Atualiza a descrição da raça
             const raceDescription = selectedRace.getAttribute('data-resumo');
             document.getElementById('race-description-text').textContent = raceDescription;
-
+        
             // Verifica se a raça é humano
             if (selectedRace.getAttribute('data-nome').toLowerCase() === 'humano') {
                 pontosExtraHumano = 3;
             } else {
                 pontosExtraHumano = 0;
             }
-
+        
             atributos.forEach(input => {
                 const bonus = parseInt(selectedRace.getAttribute(`data-${input.id}`)) || 0; // Certifique-se de que bonus seja um número válido
                 input.value = 10 + bonus;
             });
-
-            atualizarPontosRestantes();
-        }
-
-        function atualizarImagemClasse() {
-            const classSelect = document.getElementById('class_id');
-            const selectedClass = classSelect.options[classSelect.selectedIndex];
-            const imageUrl = `/static/images/classes/${selectedClass.getAttribute('data-nome').toLowerCase()}.png`;
-            document.getElementById('selected-image').src = imageUrl;
-        
-            atributos.forEach(input => {
-                const baseValue = parseInt(selectedClass.getAttribute(`data-${input.id}`)) || 10; // Certifique-se de que baseValue seja um número válido
-                input.value = baseValue;
-            });
         
             atualizarPontosRestantes();
-        }
-        
+        }        
 
         function mostrarTooltip(selectElement, tooltipId) {
             const tooltip = document.getElementById(tooltipId);
@@ -304,22 +295,12 @@
         }
 
         const raceSelect = document.getElementById('race_id');
-        const classSelect = document.getElementById('class_id');
-
         raceSelect.addEventListener('mouseover', function() {
             mostrarTooltip(raceSelect, 'atributos-raca-tooltip');
         });
 
         raceSelect.addEventListener('mouseout', function() {
             ocultarTooltip('atributos-raca-tooltip');
-        });
-
-        classSelect.addEventListener('mouseover', function() {
-            mostrarTooltip(classSelect, 'atributos-classe-tooltip');
-        });
-
-        classSelect.addEventListener('mouseout', function() {
-            ocultarTooltip('atributos-classe-tooltip');
         });
 
         atributos.forEach(input => {

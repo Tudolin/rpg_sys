@@ -4,7 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
-    <h1 class="text-center" style="border-bottom: 2px solid #ffffff; padding-bottom: 10px;">Bem-vindo, {{ session['username'] }}</h1>
+    <h1 class="text-center" style="border-bottom: 2px solid #ffffff; padding-bottom: 10px;">Bem-vinde, {{ session['username'] }}</h1>
     <h2 class="text-center mb-5">Seus Personagens</h2>
     <ul class="list-unstyled">
         {% for char in characters %}

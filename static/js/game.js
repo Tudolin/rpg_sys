@@ -45,26 +45,29 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 const detailsContainer = document.querySelector("#profile-popup .popup-content");
-
+    
                 const habilidades = data.habilidades ? Object.entries(data.habilidades) : [];
                 const pericias = data.pericias ? Object.entries(data.pericias) : [];
-
+    
+                // Verificação para garantir que img_url não seja undefined ou vazio
+                const imgUrl = data.img_url ? data.img_url : '/static/images/default.png';
+    
                 detailsContainer.innerHTML = `
                     <span class="close-button">&times;</span>
                     <div class="profile-header">
                         <div class="profile-image">
-                            <img src="${data.img_url}" alt="${data.name}" class="character-portrait-popup">
+                            <img src="${imgUrl}" alt="${data.name}" class="character-portrait-popup">
                         </div>
                         <h2>${data.name}</h2>
                     </div>
                     <p><strong>Classe:</strong> ${data.class_name}</p>
-                    <p><strong>Raça:</strong> ${data.race_name}</p>
+                    <p><strong>Raca:</strong> ${data.race_name}</p>
                     <div class="attributes">
                         <p><strong>Atributos:</strong></p>
                         <ul>
-                            <li>Força: ${data.forca}</li>
+                            <li>Forca: ${data.forca}</li>
                             <li>Destreza: ${data.destreza}</li>
-                            <li>Constituição: ${data.constituicao}</li>
+                            <li>Constituicão: ${data.constituicao}</li>
                             <li>Inteligência: ${data.inteligencia}</li>
                             <li>Sabedoria: ${data.sabedoria}</li>
                             <li>Carisma: ${data.carisma}</li>
@@ -82,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 `;
                 profilePopup.style.display = "block";
-
+    
                 // Adiciona evento de fechamento ao novo botão close criado dinamicamente
                 document.querySelector("#profile-popup .close-button").addEventListener("click", function () {
                     profilePopup.style.display = "none";
@@ -90,6 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => console.error('Error:', error));
     });
+    
 
     // Listener de fechamento para os botões close existentes
     closeButtons.forEach(button => {
@@ -107,25 +111,28 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(response => response.json())
                 .then(data => {
                     const detailsContainer = document.getElementById("other-player-details");
-
+    
                     const habilidades = data.habilidades ? Object.entries(data.habilidades) : [];
                     const pericias = data.pericias ? Object.entries(data.pericias) : [];
-
+    
+                    // Verificação para garantir que img_url não seja undefined ou vazio
+                    const imgUrl = data.img_url ? data.img_url : '/static/images/default.png';
+    
                     detailsContainer.innerHTML = `
                         <div class="profile-header">
-                            <div class="profile-image">
-                                <img src="${data.img_url}" alt="${data.name}" class="character-portrait-popup">
-                            </div>
-                            <h2>${data.name}</h2>
+                        <div class="profile-image">
+                            <img src="${data.img_url}" alt="${data.name}" class="character-portrait-popup">
                         </div>
+                        <h2>${data.name}</h2>
+                    </div>
                         <p><strong>Classe:</strong> ${data.class_name}</p>
-                        <p><strong>Raça:</strong> ${data.race_name}</p>
+                        <p><strong>Raca:</strong> ${data.race_name}</p>
                         <div class="attributes">
                             <p><strong>Atributos:</strong></p>
                             <ul>
-                                <li>Força: ${data.forca}</li>
+                                <li>Forca: ${data.forca}</li>
                                 <li>Destreza: ${data.destreza}</li>
-                                <li>Constituição: ${data.constituicao}</li>
+                                <li>Constituicão: ${data.constituicao}</li>
                                 <li>Inteligência: ${data.inteligencia}</li>
                                 <li>Sabedoria: ${data.sabedoria}</li>
                                 <li>Carisma: ${data.carisma}</li>
@@ -143,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </div>
                     `;
                     otherPlayerPopup.style.display = "block";
-
+    
                     // Adiciona evento de fechamento ao novo botão close criado dinamicamente
                     document.querySelector("#other-player-popup .close-button").addEventListener("click", function () {
                         otherPlayerPopup.style.display = "none";
@@ -152,6 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .catch(error => console.error('Error:', error));
         });
     }
+    
 
     // Adiciona listeners aos jogadores que já estão na lista
     document.querySelectorAll(".other-player").forEach(attachPlayerClickEvent);
@@ -170,13 +178,15 @@ document.addEventListener("DOMContentLoaded", function () {
     
         const newPlayerHTML = `
             <li class="other-player" data-player-id="${data._id}">
-                <div class="character-frame-small">
-                    <img src="${data.img_url}" alt="${data.name}" class="character-portrait-small">
+                <div class="profile-header">
+                    <div class="profile-image">
+                        <img src="${data.img_url}" alt="${data.name}" class="character-portrait-popup">
+                    </div>
                 </div>
                 <div class="player-stats">
                     <p>${data.name}</p>
                     <p>Classe: ${data.class_name}</p>
-                    <p>Raça: ${data.race_name}</p>
+                    <p>Raca: ${data.race_name}</p>
                     <p>HP: ${data.hp}</p>
                 </div>
             </li>
