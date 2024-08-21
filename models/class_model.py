@@ -397,8 +397,13 @@ def create_default_classes(db):
         }
     }
 ]
-
-    db.classes.insert_many(classes)
+    for class_data in classes:
+        db.classes.update_one(
+            {"name": class_data["name"]},
+            {"$set": class_data},
+            upsert=True  # Isso garante que o documento seja inserido se não existir
+        )
+    # db.classes.insert_many(classes)
 
 
 def get_class_by_id(db, class_id):
