@@ -27,7 +27,7 @@ from models.session_model import (add_character_to_session, create_session,
                                   remove_character_from_session)
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ.get('SECRET_KEY') or 'a212d3b5e27f9cd2dfb8a9d18587ae51b2f88af9e1e95112'
 app.config['SESSION_PROTECTION'] = 'strong'
 sys.path.insert(0, '/home/angellnadalin/rpg_sys')
 db = connection()
