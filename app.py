@@ -1,6 +1,8 @@
 import os
 import sys
 from io import BytesIO
+from gevent import monkey
+monkey.patch_all()
 
 from bson import ObjectId
 from flask import (Flask, flash, jsonify, redirect, render_template, request,
