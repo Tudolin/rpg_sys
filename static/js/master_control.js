@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const forms = document.querySelectorAll(`.character-form[data-session-id="${sessionId}"]`);
     const musicSelect = document.getElementById('music-select');
     const currentTrackElement = document.getElementById('current-track');
+    const playerList = document.querySelector('.characters-container .character-list');
 
     console.log(typeof io); // Verifique se 'io' é definido
 if (typeof io !== 'undefined') {
@@ -17,7 +18,40 @@ if (typeof io !== 'undefined') {
 } else {
     console.error('Socket.IO não está definido');
 }
+function removePlayer(charId) {
+    fetch(`/remove_player/${charId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Player removed successfully');
+            socket.emit('player_removed', { character_id: charId });
+        } else {
+            console.error('Failed to remove player');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
 
+// Listener para o botão de remoção
+document.querySelectorAll('.remove-player-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const charId = this.getAttribute('data-char-id');
+        removePlayer(charId);
+    });
+});
+
+// Recebe notificação de jogador removido e remove da lista
+socket.on('player_removed', function(data) {
+    const characterForm = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);
+    if (characterForm) {
+        characterForm.remove();
+    }
+});
 
     effectSelects.forEach(select => {
         select.addEventListener('change', function() {
@@ -228,7 +262,6 @@ if (typeof io !== 'undefined') {
 
     // Recebe notificação quando um novo jogador se junta à sessão
     socket.on('new_player', function(data) {
-        const playerList = document.querySelector('.characters-container');
         const existingPlayer = playerList.querySelector(`.character-form[data-char-id="${data._id}"]`);
         if (existingPlayer) return;
 
@@ -238,7 +271,6 @@ if (typeof io !== 'undefined') {
                     <input type="hidden" name="char_id" value="${data._id}">
                     <p><strong>${data.name}</strong></p>
                     <label>HP: <input type="number" name="hp" value="${data.hp}" class="hp-input"></label><br>
-                    <label>Status: <input type="text" name="status" value="" class="status-input"></label><br>
                     <button type="submit">Atualizar</button>
                 </form>
             </div>
@@ -253,21 +285,19 @@ if (typeof io !== 'undefined') {
 
             const charId = newForm.getAttribute('data-char-id');
             const hp = newForm.querySelector('.hp-input').value;
-            const status = newForm.querySelector('.status-input').value;
 
             socket.emit('update_health', {
                 character_id: charId,
-                new_health: hp,
-                status: status
+                new_health: hp
             });
         });
     });
 
     // Recebe notificação quando um jogador sai da sessão
     socket.on('player_left', function(data) {
-        const characterForm = document.querySelector(`.character-form[data-char-id="${data._id}"]`);
+        const characterForm = playerList.querySelector(`.character-form[data-char-id="${data._id}"]`);
         if (characterForm) {
-            characterForm.remove(); // Remove o formulário do personagem desconectado
+            characterForm.remove();
         }
     });
 });
