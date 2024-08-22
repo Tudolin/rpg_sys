@@ -253,8 +253,8 @@ def edit_character_route(character_id):
         return redirect(url_for('home'))
 
     # Carregando as classes e raças para o formulário de edição
-    classes = db.classes.find()
-    races = db.races.find()
+    classes = db['classes.classes'].find()
+    races = db['races.races'].find()
     return render_template('edit_character.html', character=character, classes=classes, races=races)
 
 
