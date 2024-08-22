@@ -207,8 +207,9 @@ def edit_character_route(character_id):
 
     if request.method == 'POST':
         name = request.form['name']
-        class_id = request.form['class_id']
-        race_id = request.form['race_id']
+        class_id = request.form.get('class_id')
+        race_id = request.form.get('race_id')
+
         
         # Atualizando os atributos
         forca = int(request.form['forca'])
