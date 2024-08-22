@@ -387,6 +387,7 @@ def game_lobby():
 
 
 
+
 @app.route('/get_player_details/<player_id>', methods=['GET'])
 def get_player_details(player_id):
     character = db.chars.find_one({"_id": ObjectId(player_id)})
@@ -511,6 +512,28 @@ def update_character():
         return jsonify({"success": True})
     
     return jsonify({"success": False}), 400
+
+@app.route('/remove_player/<char_id>', methods=['POST'])
+def remove_player(char_id):
+    if not session.get('logged_in'):
+        return jsonify({"success": False, "error": "Not logged in"}), 403
+
+    session_id = session.get('game_session_id')
+    if not session_id:
+        return jsonify({"success": False, "error": "No active session"}), 403
+
+    # Verifique se o usuário é o mestre da sessão
+    session_data = get_session_by_id(db, session_id)
+    if session_data['created_by'] != ObjectId(session['userId']):
+        return jsonify({"success": False, "error": "Not the session master"}), 403
+
+    # Remova o personagem da sessão
+    remove_character_from_session(db, session_id, char_id)
+
+    # Envie uma mensagem via WebSocket para desconectar o jogador
+    socketio.emit('player_removed', {'character_id': char_id}, room=session_id)
+
+    return jsonify({"success": True})
 
 
 def allowed_file(filename):

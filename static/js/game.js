@@ -176,10 +176,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     socket.on('new_player', function (data) {
         console.log('New player joined:', data);  // Log de depuração
+    
         const playerList = document.querySelector('.other-players ul');
         const existingPlayer = document.querySelector(`.other-player[data-player-id="${data._id}"]`);
+        
+        // Verifica se o jogador já existe na lista para evitar duplicações
         if (existingPlayer) return;
-    
+        
         const newPlayerHTML = `
             <li class="other-player" data-player-id="${data._id}">
                 <div class="profile-header">
@@ -196,11 +199,12 @@ document.addEventListener("DOMContentLoaded", function () {
             </li>
         `;
         playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
-
+    
         // Adiciona o evento de clique ao novo jogador adicionado
         const newPlayerElement = playerList.querySelector(`.other-player[data-player-id="${data._id}"]`);
         attachPlayerClickEvent(newPlayerElement);
     });
+    
 
     socket.on('player_left', function (data) {
         const playerElement = document.querySelector(`.other-player[data-player-id="${data._id}"]`);
