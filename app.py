@@ -9,7 +9,6 @@ from bson import ObjectId
 from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    send_file, session, url_for)
 from flask_cors import CORS
-from flask_session import Session
 from flask_socketio import SocketIO, emit, join_room
 from redis import Redis
 from reportlab.lib import colors, enums
@@ -22,6 +21,7 @@ from reportlab.pdfgen import canvas
 from werkzeug.utils import secure_filename
 
 from conection_db import connection
+from flask_session import Session
 from models.character_model import (create_character, delete_character,
                                     get_characters_by_user, update_character)
 from models.class_model import create_default_classes, get_class_by_id
@@ -35,6 +35,7 @@ app.secret_key = os.environ.get('SECRET_KEY') or 'a212d3b5e27f9cd2dfb8a9d18587ae
 app.config['SESSION_PROTECTION'] = 'strong'
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379, db=0, password=None)
+# app.config['SESSION_TYPE'] = 'filesystem' #for local host debug
 Session(app)
 Session(app)
 CORS(app)
@@ -149,8 +150,8 @@ def create_character_route():
 
     if request.method == 'POST':
         name = request.form['name']
-        class_id = request.form['class_id']
-        race_id = request.form['race_id']
+        class_id = request.form.get('class_id')  # Use .get() to avoid KeyError
+        race_id = request.form.get('race_id')
         origem = request.form['origem']
         
         # Atributos
@@ -164,21 +165,33 @@ def create_character_route():
         # Perícias
         pericias_selecionadas = request.form.getlist('pericias')
 
-        # Processa o upload da imagem
+        ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+        def allowed_file(filename):
+            return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        
+        img_url = None  # Initialize img_url to None
         if 'img_url' in request.files:
             file = request.files['img_url']
-            if file.filename != '':
+            if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(file_path)
                 img_url = file_path
+            else:
+                return "Unsupported image format. Only PNG and JPG are supported.", 400
 
-                create_character(db, session['userId'], name, class_id, race_id, img_url, forca, destreza, constituicao, inteligencia, sabedoria, carisma, origem, pericias_selecionadas)
-                return redirect(url_for('home'))
+        # Ensure that required fields are provided
+        if not class_id or not race_id:
+            return "Class ID and Race ID are required.", 400
+
+        create_character(db, session['userId'], name, class_id, race_id, img_url, forca, destreza, constituicao, inteligencia, sabedoria, carisma, origem, pericias_selecionadas)
+        return redirect(url_for('home'))
 
     classes = db['classes.classes'].find()
     races = db['races.races'].find()
     return render_template('create_character.html', classes=classes, races=races)
+
 
 
 
@@ -739,14 +752,14 @@ def export_pdf(character_id):
             image_extension = os.path.splitext(image_path)[1].lower()
 
             try:
-                if image_extension in ['.png', '.jpg', '.jpeg']:
+                if image_extension in ['.png', '.jpg', '.jpeg', '.webp']:
                     img_x = width - 220
-                    img_y = height - 250  # Moved the image higher on the page
+                    img_y = height - 250
                     img_width = 150
                     img_height = 150
                     p.setStrokeColor(colors.black)
                     p.setLineWidth(2)
-                    p.rect(img_x - 10, img_y - 10, img_width + 20, img_height + 20)  # Frame
+                    p.rect(img_x - 10, img_y - 10, img_width + 20, img_height + 20)
                     p.drawImage(ImageReader(image_path), img_x, img_y, width=img_width, height=img_height)
                 else:
                     print("Unsupported image format. Only PNG and JPG are supported.")
