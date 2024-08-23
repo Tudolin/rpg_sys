@@ -12,6 +12,39 @@
      }
 }
 
+.dice-result {
+    position: fixed;
+    bottom: 20%;  /* Ajuste para centralizar o dado verticalmente */
+    left: 50%;
+    transform: translate(-50%, 0);
+    font-size: 3rem;  /* Aumenta o tamanho da fonte para maior visibilidade */
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+    opacity: 1;
+    z-index: 100;  /* Garante que fique acima de outros elementos */
+}
+
+.dice-result.rolling {
+    animation: diceRoll 1.5s ease-in-out;
+}
+
+
+@keyframes diceRoll {
+    0% { transform: translateX(-50%) rotate(0); }
+    25% { transform: translateX(-50%) rotate(180deg); }
+    50% { transform: translateX(-50%) rotate(360deg); }
+    75% { transform: translateX(-50%) rotate(540deg); }
+    100% { transform: translateX(-50%) rotate(720deg); }
+}
+
+
+
 body {
     font-family: Enchanted Land;
     color: #e0e0e0;
@@ -141,8 +174,8 @@ body {
 }
 
 .health-ball {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     background-color: #1a1a1a;
     border-radius: 50%;
     border: 5px solid #660000;
@@ -338,8 +371,8 @@ body {
     }
 
     .health-ball {
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
     }
 
     .health-text {

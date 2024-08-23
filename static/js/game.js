@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const profilePopup = document.getElementById("profile-popup");
     const otherPlayerPopup = document.getElementById("other-player-popup");
     const closeButtons = document.querySelectorAll(".close-button");
+    const rollDiceButton = document.getElementById("roll-dice-button");
+    const diceResult = document.getElementById("dice-result");
     const socket = io.connect('wss://familyrpg.servebeer.com', {
         transports: ['websocket']
     });
@@ -42,6 +44,18 @@ document.addEventListener("DOMContentLoaded", function () {
         setTimeout(() => {
             mediaPopup.style.display = 'none';
         }, data.display_time * 1000); // Convert to milliseconds
+    });
+    rollDiceButton.addEventListener("click", function () {
+        // Define um ponto de interrogação como valor inicial durante a rolagem
+        diceResult.textContent = `🎲`;
+        diceResult.classList.add("rolling");
+
+        // Após 1.5 segundos (duração da animação), mostra o resultado real
+        setTimeout(() => {
+            const result = Math.floor(Math.random() * 20) + 1;
+            diceResult.textContent = `🎲 ${result}`;
+            diceResult.classList.remove("rolling");
+        }, 1500); // Duração da animação definida em @keyframes
     });
 
     profileButton.addEventListener("click", function () {
