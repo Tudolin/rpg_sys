@@ -11,3 +11,4 @@ reportlab==4.2.2
 flask_talisman
 flask_session
 redis
+flask_cors
