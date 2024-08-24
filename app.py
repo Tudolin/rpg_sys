@@ -1,3 +1,6 @@
+from gevent import monkey
+
+monkey.patch_all()
 import logging
 import os
 import sys
@@ -8,7 +11,6 @@ from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    send_file, session, url_for)
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room
-from gevent import monkey
 from redis import Redis
 from reportlab.lib import colors, enums
 from reportlab.lib.pagesizes import A4, letter
@@ -30,13 +32,12 @@ from models.session_model import (add_character_to_session, create_session,
                                   remove_character_from_session)
 
 app = Flask(__name__)
-monkey.patch_all()
+
 app.secret_key = os.environ.get('SECRET_KEY') or 'a212d3b5e27f9cd2dfb8a9d18587ae51b2f88af9e1e95112'
 app.config['SESSION_PROTECTION'] = 'strong'
 # app.config['SESSION_TYPE'] = 'redis'
 # app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379, db=0, password=None)
 app.config['SESSION_TYPE'] = 'filesystem' #for local host debug
-Session(app)
 Session(app)
 CORS(app)
 sys.path.insert(0, '/home/angellnadalin/rpg_sys')
@@ -76,6 +77,10 @@ def delete_session(session_id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     collection = connection(table_name='users')
+    if collection is None:
+        app.logger.error("Failed to connect to the users collection.")
+        return render_template('login.html', error='Database connection failed.')
+    
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -94,6 +99,7 @@ def login():
             return render_template('login.html', error='Credenciais inválidas')
 
     return render_template('login.html')
+
 
 
 
@@ -342,15 +348,15 @@ def join_session(session_id):
 def game_lobby():
     if not session.get('logged_in') or 'game_session_id' not in session:
         return redirect(url_for('login'))
-    if not character.get('current_hp'):
-        character['current_hp'] = character['hp']
-        logging.debug(f"Set default current_hp for character: {character['_id']}")
 
     session_data = get_session_by_id(db, session['game_session_id'])
     character = db.chars.find_one({"user_id": ObjectId(session['userId'])})
-
     if not character:
         return redirect(url_for('home'))
+
+    if 'current_hp' not in character or character['current_hp'] is None:
+        character['current_hp'] = character['hp']
+        logging.debug(f"Set default current_hp for character: {character['_id']}")
 
     # Certifique-se de atualizar `current_hp` corretamente
     db.chars.update_one(
