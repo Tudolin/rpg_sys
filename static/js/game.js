@@ -19,29 +19,34 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     socket.on('new_media', function(data) {
-        try {
-            const popup = document.getElementById('media-popup');
-            const content = document.querySelector('.media-content');
-    
-            if (!data.media_url) {
-                throw new Error("Media URL is missing or undefined.");
+        const mediaContainer = document.getElementById('media-container');  // Correct the selector here
+
+        if (mediaContainer) {
+            // Clear previous contents
+            mediaContainer.innerHTML = '';
+
+            // Check if it's an image, GIF, or video
+            if (data.media_url.match(/\.(jpeg|jpg|gif|png)$/)) {
+                const img = document.createElement('img');
+                img.src = data.media_url;
+                img.style.width = '100%'; // Adjust as necessary
+                mediaContainer.appendChild(img);
+            } else if (data.media_url.match(/\.(mp4|webm)$/)) {
+                const video = document.createElement('video');
+                video.src = data.media_url;
+                video.controls = true;
+                video.autoplay = true;
+                mediaContainer.appendChild(video);
             }
-    
-            const img = new Image();
-            img.src = data.media_url;
-            img.onload = () => {
-                content.innerHTML = ''; // Clear previous contents only if the image loads successfully
-                content.appendChild(img);
-                popup.style.display = 'block'; // Show the popup
-            };
-            img.onerror = () => {
-                throw new Error("Failed to load image at URL: " + data.media_url);
-            };
-        } catch (error) {
-            console.error("Error displaying media:", error);
+
+            // Show the popup
+            document.getElementById('media-popup').style.display = 'block';
+        } else {
+            console.error('Media container not found');
         }
     });
     
+
     rollDiceButton.addEventListener("click", function () {
         // Define um ponto de interrogação como valor inicial durante a rolagem
         diceResult.textContent = `🎲`;
