@@ -19,22 +19,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     socket.on('new_media', function(data) {
-        const popup = document.getElementById('media-popup');
-        const content = document.querySelector('.media-content');
-
-        // Create an image element and set its source
-        const img = new Image();
-        img.src = data.media_url;
-        img.style.width = '100%'; // Adjust as necessary
-
-        // Clear previous contents and append the new image
-        content.innerHTML = '';
-        content.appendChild(img);
-
-        // Show the popup
-        popup.style.display = 'block';
+        try {
+            const popup = document.getElementById('media-popup');
+            const content = document.querySelector('.media-content');
+    
+            if (!data.media_url) {
+                throw new Error("Media URL is missing or undefined.");
+            }
+    
+            const img = new Image();
+            img.src = data.media_url;
+            img.onload = () => {
+                content.innerHTML = ''; // Clear previous contents only if the image loads successfully
+                content.appendChild(img);
+                popup.style.display = 'block'; // Show the popup
+            };
+            img.onerror = () => {
+                throw new Error("Failed to load image at URL: " + data.media_url);
+            };
+        } catch (error) {
+            console.error("Error displaying media:", error);
+        }
     });
-
+    
     rollDiceButton.addEventListener("click", function () {
         // Define um ponto de interrogação como valor inicial durante a rolagem
         diceResult.textContent = `🎲`;
