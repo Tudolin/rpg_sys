@@ -345,7 +345,8 @@ body {
 
 @media (max-width: 768px) {
     .dice-result {
-        width: 70%;
+        width: 30px;
+        height: 30px;
     }
     .main-content {
         flex-direction: column;
