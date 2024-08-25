@@ -12,6 +12,79 @@ document.addEventListener("DOMContentLoaded", function() {
     const currentTrackElement = document.getElementById('current-track');
     const playerList = document.querySelector('.characters-container .character-list');
 
+    socket.on('connect', function() {
+        socket.emit('request_session_sync', { session_id: sessionId });
+    });
+
+    socket.on('session_sync', function(data) {
+        updatePlayerList(data.characters);
+    });
+
+    socket.on('new_player', function(data) {
+        addOrUpdatePlayer(data);
+    });
+
+    socket.on('player_left', function(data) {
+        removePlayerFromList(data._id);
+    });
+
+    function updatePlayerList(characters) {
+        playerList.innerHTML = ''; // Clear the current list
+        
+        characters.forEach(char => {
+            addOrUpdatePlayer(char);
+        });
+    }
+
+    function addOrUpdatePlayer(char) {
+        let existingPlayer = playerList.querySelector(`.character-form[data-char-id="${char._id}"]`);
+    
+        if (existingPlayer) {
+            updatePlayerElement(existingPlayer, char);
+        } else {
+            createPlayerElement(char);
+        }
+    }
+
+    function updatePlayerElement(element, char) {
+        const hpInput = element.querySelector('.hp-input');
+        hpInput.value = char.hp;
+        // Update other elements as necessary
+    }
+
+    function createPlayerElement(char) {
+        const newPlayerHTML = `
+            <div class="character-card">
+                <form method="POST" class="character-form" data-char-id="${char._id}">
+                    <input type="hidden" name="char_id" value="${char._id}">
+                    <p><strong>${char.name}</strong></p>
+                    <label>HP: <input type="number" name="hp" value="${char.hp}" class="hp-input"></label><br>
+                    <button type="submit">Atualizar</button>
+                </form>
+            </div>
+        `;
+        playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
+
+        const newForm = playerList.querySelector(`.character-form[data-char-id="${char._id}"]`);
+        newForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const charId = newForm.getAttribute('data-char-id');
+            const hp = newForm.querySelector('.hp-input').value;
+
+            socket.emit('update_health', {
+                character_id: charId,
+                new_health: hp
+            });
+        });
+    }
+
+    function removePlayerFromList(charId) {
+        const playerElement = playerList.querySelector(`.character-form[data-char-id="${charId}"]`);
+        if (playerElement) {
+            playerElement.remove();
+        }
+    }
+
     if (mediaForm) {
         mediaForm.addEventListener('submit', function(event) {
             event.preventDefault();  // Prevent the default form submission
