@@ -19,32 +19,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     socket.on('new_media', function(data) {
-        console.log('New media received:', data);  // Debugging log
+        const popup = document.getElementById('media-popup');
+        const content = document.querySelector('.media-content');
 
-        // Clear any existing content
-        mediaContent.innerHTML = '';
+        // Create an image element and set its source
+        const img = new Image();
+        img.src = data.media_url;
+        img.style.width = '100%'; // Adjust as necessary
 
-        // Check if it's an image, GIF, or video
-        if (data.media_url.match(/\.(jpeg|jpg|gif|png)$/)) {
-            const img = document.createElement('img');
-            img.src = data.media_url;
-            mediaContent.appendChild(img);
-        } else if (data.media_url.match(/\.(mp4|webm)$/)) {
-            const video = document.createElement('video');
-            video.src = data.media_url;
-            video.controls = true;
-            video.autoplay = true;
-            mediaContent.appendChild(video);
-        }
+        // Clear previous contents and append the new image
+        content.innerHTML = '';
+        content.appendChild(img);
 
-        // Display the media popup
-        mediaPopup.style.display = 'block';
-
-        // Remove the popup after the defined display time
-        setTimeout(() => {
-            mediaPopup.style.display = 'none';
-        }, data.display_time * 1000); // Convert to milliseconds
+        // Show the popup
+        popup.style.display = 'block';
     });
+
     rollDiceButton.addEventListener("click", function () {
         // Define um ponto de interrogação como valor inicial durante a rolagem
         diceResult.textContent = `🎲`;
@@ -190,7 +180,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     socket.on('new_player', function (data) {
         console.log('New player joined:', data);  // Log de depuração
-    
+        console.log('New media received:', data);
+        const img = document.createElement('img');
+        img.src = data.media_url;
+        img.alt = 'New media';
+        document.getElementById('media-container').appendChild(img);
         const playerList = document.querySelector('.other-players ul');
         const existingPlayer = document.querySelector(`.other-player[data-player-id="${data._id}"]`);
         
@@ -219,6 +213,11 @@ document.addEventListener("DOMContentLoaded", function () {
         attachPlayerClickEvent(newPlayerElement);
     });
     
+    socket.on('play_music', function(data) {
+        const player = document.getElementById('game-music-player');
+        player.src = data.track_url; // Set the source of the music to be played
+        player.play(); // Start playing the music
+    });
 
     socket.on('player_left', function (data) {
         const playerElement = document.querySelector(`.other-player[data-player-id="${data._id}"]`);

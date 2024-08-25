@@ -704,6 +704,16 @@ def on_connect():
                 'max_health': character['hp']
             }, room=room)
 
+@socketio.on('new_media')
+def handle_new_media(data):
+    session_id = session.get('game_session_id')
+    if session_id:
+        filename = data.get('filename')
+        if filename:
+            media_url = url_for('static', filename=f'media/{filename}')
+            socketio.emit('new_media', {'media_url': media_url}, room=session_id)
+
+
 @socketio.on('update_health')
 def update_health(data):
     character_id = data['character_id']

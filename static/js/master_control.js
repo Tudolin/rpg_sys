@@ -2,8 +2,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const socket = io.connect('wss://familyrpg.servebeer.com', {
         transports: ['websocket']
     });
-    
 
+    const mediaForm = document.getElementById('media-form');
+    
     const effectSelects = document.querySelectorAll('.status-effect-select');
     const audioPlayer = document.getElementById('audio-player');
     const forms = document.querySelectorAll(`.character-form[data-session-id="${sessionId}"]`);
@@ -11,13 +12,47 @@ document.addEventListener("DOMContentLoaded", function() {
     const currentTrackElement = document.getElementById('current-track');
     const playerList = document.querySelector('.characters-container .character-list');
 
-    console.log(typeof io); // Verifique se 'io' é definido
-if (typeof io !== 'undefined') {
-    const socket = io();
-    console.log('Socket.IO conectado:', socket);
-} else {
-    console.error('Socket.IO não está definido');
-}
+    if (mediaForm) {
+        mediaForm.addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the default form submission
+            
+            const formData = new FormData(this);  // 'this' refers to the form itself
+            const fileInput = document.getElementById('media-input');
+            
+            // Check if a file is selected
+            if (fileInput.files.length === 0) {
+                console.error('No file selected!');
+                return;
+            }
+            
+            formData.append('media', fileInput.files[0]);
+            const displayTime = document.getElementById('display-time').value;
+            formData.append('display_time', displayTime);
+        
+            fetch('/upload_media', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    console.log('Media uploaded successfully!', data.media_url);
+                    // Additional actions can be performed here with data.media_url
+                } else {
+                    throw new Error('Error uploading media: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error.message);
+            });
+        });
+    }
+
 function removePlayer(charId) {
     fetch(`/remove_player/${charId}`, {
         method: 'POST',
@@ -103,41 +138,6 @@ socket.on('player_removed', function(data) {
             });
         })
         .catch(error => console.error('Erro ao carregar músicas:', error));
-
-        document.getElementById('media-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-    
-            const formData = new FormData();
-            const fileInput = document.getElementById('media-input');
-            const displayTime = document.getElementById('display-time').value;
-    
-            formData.append('media', fileInput.files[0]);
-            formData.append('display_time', displayTime);
-    
-            fetch('/upload_media', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                // Check if the response is successful
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error('Server error: ' + text);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    console.log('Media sent successfully:', data.media_url);
-                } else {
-                    console.error('Error sending media:', data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });
 
     document.getElementById('play-button').addEventListener('click', function () {
         const selectedTrack = musicSelect.value;
@@ -295,9 +295,7 @@ socket.on('player_removed', function(data) {
 
     // Recebe notificação quando um jogador sai da sessão
     socket.on('player_left', function(data) {
-        const characterForm = playerList.querySelector(`.character-form[data-char-id="${data._id}"]`);
-        if (characterForm) {
-            characterForm.remove();
-        }
+        const playerElement = document.querySelector(`.other-player[data-player-id="${data._id}"]`);
+        if (playerElement) playerElement.remove();
     });
 });
