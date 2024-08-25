@@ -13,8 +13,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const playerList = document.querySelector('.characters-container .character-list');
 
     socket.on('connect', function() {
+        console.log('Connected to the server, requesting session sync...');
         socket.emit('request_session_sync', { session_id: sessionId });
     });
+    
 
     socket.on('session_sync', function(data) {
         updatePlayerList(data.characters);

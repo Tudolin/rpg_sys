@@ -737,20 +737,25 @@ def get_current_session_data(session_id):
                 class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
                 race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
                 
-                characters.append({
+                character_info = {
                     '_id': str(character['_id']),
                     'name': character['name'],
                     'class_name': class_info['name'] if class_info else 'Classe Desconhecida',
                     'race_name': race_info['name'] if race_info else 'Raça Desconhecida',
                     'hp': character['hp'],
                     'img_url': character.get('img_url', '/static/images/default.png')
-                })
+                }
+                characters.append(character_info)
+                app.logger.info(f"Character info added to session sync: {character_info}")
         
-        return {
+        session_sync_data = {
             'session_id': session_id,
             'characters': characters
         }
+        app.logger.info(f"Session sync data: {session_sync_data}")
+        return session_sync_data
     return {}
+
 
 def get_session_id_from_char(character_id):
     session = db.sessions.find_one({"characters": ObjectId(character_id)})
