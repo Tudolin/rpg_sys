@@ -661,8 +661,15 @@ def on_join(data):
                 'hp': character['hp'],
                 'img_url': character['img_url']
             }
-            # Notifica todos na sala, incluindo o mestre
-            emit('new_player', character_data, room=room)
+
+            # Verificar se o personagem já está na lista de personagens da sessão
+            session_data = get_session_by_id(db, room)
+            if str(character['_id']) not in [str(c_id) for c_id in session_data.get('characters', [])]:
+                add_character_to_session(db, room, character['_id'])
+
+            # Emite a lista atualizada de todos os personagens para sincronização completa
+            emit('session_sync', get_current_session_data(room), room=room)
+
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -685,24 +692,31 @@ def on_connect():
         character = db.chars.find_one({"user_id": ObjectId(session['userId'])})
 
         if character:
-            class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
-            race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
+            # Adiciona o personagem à sessão se ele não estiver nela
+            session_data = get_session_by_id(db, room)
+            if str(character['_id']) not in [str(c_id) for c_id in session_data.get('characters', [])]:
+                add_character_to_session(db, room, character['_id'])
 
-            character_data = {
-                '_id': str(character['_id']),
-                'name': character['name'],
-                'class_name': class_info['name'] if class_info else "Classe Desconhecida",
-                'race_name': race_info['name'] if race_info else "Raça Desconhecida",
-                'hp': character['hp'],
-                'img_url': character['img_url']
-            }
-            # Notifica todos na sala, incluindo o mestre
-            emit('new_player', character_data, room=room)
-            emit('health_updated', {
-                'character_id': str(character['_id']),
-                'new_health': character['current_hp'],
-                'max_health': character['hp']
-            }, room=room)
+            # Enviar a lista atualizada de todos os jogadores na sessão
+            all_characters = session_data.get('characters', [])
+            all_character_data = []
+            for char_id in all_characters:
+                char = db.chars.find_one({"_id": ObjectId(char_id)})
+                if char:  # Garante que o personagem foi encontrado
+                    char_class_info = db['classes.classes'].find_one({"_id": ObjectId(char['class_id'])})
+                    char_race_info = db['races.races'].find_one({"_id": ObjectId(char['race_id'])})
+                    all_character_data.append({
+                        '_id': str(char['_id']),
+                        'name': char['name'],
+                        'class_name': char_class_info['name'] if char_class_info else "Classe Desconhecida",
+                        'race_name': char_race_info['name'] if char_race_info else "Raça Desconhecida",
+                        'hp': char['hp'],
+                        'img_url': char['img_url']
+                    })
+
+            emit('session_sync', {'characters': all_character_data}, room=room)
+
+
 
 @socketio.on('new_media')
 def handle_new_media(data):
@@ -713,29 +727,81 @@ def handle_new_media(data):
             media_url = url_for('static', filename=f'media/{filename}')
             socketio.emit('new_media', {'media_url': media_url}, room=session_id)
 
+def get_current_session_data(session_id):
+    session_data = get_session_by_id(db, session_id)
+    if session_data:
+        characters = []
+        for char_id in session_data.get('characters', []):
+            character = db.chars.find_one({"_id": ObjectId(char_id)})
+            if character:
+                class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
+                race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
+                
+                characters.append({
+                    '_id': str(character['_id']),
+                    'name': character['name'],
+                    'class_name': class_info['name'] if class_info else 'Classe Desconhecida',
+                    'race_name': race_info['name'] if race_info else 'Raça Desconhecida',
+                    'hp': character['hp'],
+                    'img_url': character.get('img_url', '/static/images/default.png')
+                })
+        
+        return {
+            'session_id': session_id,
+            'characters': characters
+        }
+    return {}
+
+def get_session_id_from_char(character_id):
+    session = db.sessions.find_one({"characters": ObjectId(character_id)})
+    if session:
+        return str(session['_id'])
+    return None
+
+@socketio.on('play_music')
+def handle_play_music(data):
+    session_id = session.get('game_session_id')
+    if session_id:
+        emit('play_music', {'track_url': data['track_url']}, room=session_id)
+
+@socketio.on('stop_music')
+def handle_stop_music():
+    session_id = session.get('game_session_id')
+    if session_id:
+        emit('stop_music', {}, room=session_id)
+
+
+@socketio.on('player_removed')
+def handle_player_removed(data):
+    session_id = get_session_id_from_char(data['character_id'])
+    if session_id:
+        remove_character_from_session(db, session_id, data['character_id'])
+        emit('session_sync', get_current_session_data(session_id), room=session_id)
+
+@socketio.on('request_session_sync')
+def handle_session_sync(data):
+    session_id = data.get('session_id')
+    if session_id:
+        emit('session_sync', get_current_session_data(session_id), room=session_id)
+
 
 @socketio.on('update_health')
-def update_health(data):
+def handle_update_health(data):
     character_id = data['character_id']
     new_health = data['new_health']
-    status = data.get('status')
-
+    
     db.chars.update_one(
         {"_id": ObjectId(character_id)},
-        {"$set": {"current_hp": new_health, "status": status}}
+        {"$set": {"current_hp": new_health}}
     )
 
-    character = db.chars.find_one({"_id": ObjectId(character_id)})
-    if character:
+    session_id = get_session_id_from_char(character_id)
+    if session_id:
         emit('health_updated', {
             'character_id': character_id,
-            'new_health': character['current_hp']
-        }, room=session['game_session_id'])
-        
-        emit('status_updated', {
-            'character_id': character_id,
-            'status': status
-        }, room=session['game_session_id'])
+            'new_health': new_health
+        }, room=session_id)
+
 
 pdfmetrics.registerFont(TTFont('MedievalFont', 'static/fonts/Enchanted Land.otf'))
 

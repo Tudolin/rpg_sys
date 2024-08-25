@@ -179,6 +179,43 @@ socket.on('player_removed', function(data) {
         });
     });
 
+    socket.on('connect', function() {
+        socket.emit('request_session_sync', { session_id: sessionId });
+    });
+
+    socket.on('session_sync', function(data) {
+        playerList.innerHTML = ''; // Limpa a lista existente
+    
+        data.characters.forEach(char => {
+            const newPlayerHTML = `
+                <div class="character-card">
+                    <form method="POST" class="character-form" data-char-id="${char._id}">
+                        <input type="hidden" name="char_id" value="${char._id}">
+                        <p><strong>${char.name}</strong></p>
+                        <label>HP: <input type="number" name="hp" value="${char.hp}" class="hp-input"></label><br>
+                        <button type="submit">Atualizar</button>
+                    </form>
+                </div>
+            `;
+            playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
+    
+            // Adiciona o novo formulário à lista de listeners para submissões
+            const newForm = playerList.querySelector(`.character-form[data-char-id="${char._id}"]`);
+            newForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+    
+                const charId = newForm.getAttribute('data-char-id');
+                const hp = newForm.querySelector('.hp-input').value;
+    
+                socket.emit('update_health', {
+                    character_id: charId,
+                    new_health: hp
+                });
+            });
+        });
+    });
+    
+    
     // Reproduz música enviada pelos sockets
     socket.on('play_music', function(data) {
         if (audioPlayer.src !== data.track_url) { // Evita reiniciar a música se a faixa já estiver tocando
@@ -295,7 +332,8 @@ socket.on('player_removed', function(data) {
 
     // Recebe notificação quando um jogador sai da sessão
     socket.on('player_left', function(data) {
-        const playerElement = document.querySelector(`.other-player[data-player-id="${data._id}"]`);
+        const playerElement = document.querySelector(`.character-form[data-char-id="${data._id}"]`);
         if (playerElement) playerElement.remove();
     });
+    
 });

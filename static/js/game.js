@@ -187,6 +187,33 @@ document.addEventListener("DOMContentLoaded", function () {
         socket.emit('join', { data: 'Player joined!' });
     });
 
+    socket.on('session_sync', function(data) {
+        const playerList = document.querySelector('.other-players ul');
+        playerList.innerHTML = ''; // Limpa a lista existente
+    
+        data.characters.forEach(char => {
+            const newPlayerHTML = `
+                <li class="other-player" data-player-id="${char._id}">
+                    <div class="profile-header">
+                        <div class="profile-image">
+                            <img src="${char.img_url}" alt="${char.name}" class="character-portrait-popup">
+                        </div>
+                    </div>
+                    <div class="player-stats">
+                        <p>${char.name}</p>
+                        <p>Classe: ${char.class_name}</p>
+                        <p>Raca: ${char.race_name}</p>
+                        <p>HP: ${char.hp}</p>
+                    </div>
+                </li>
+            `;
+            playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
+            // Re-anexar eventos de clique
+            attachPlayerClickEvent(playerList.querySelector(`.other-player[data-player-id="${char._id}"]`));
+        });
+    });
+    
+
     socket.on('new_player', function (data) {
         console.log('New player joined:', data);  // Log de depuração
         console.log('New media received:', data);
