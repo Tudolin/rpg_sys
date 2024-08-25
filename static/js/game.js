@@ -8,39 +8,36 @@ document.addEventListener("DOMContentLoaded", function () {
     const socket = io.connect('wss://familyrpg.servebeer.com', {
         transports: ['websocket']
     });
-    
 
-    
     window.addEventListener('beforeunload', function (e) {
         const confirmationMessage = 'Você tem certeza que deseja sair do lobby? Isso pode causar a perda de progresso.';
-        
-        (e || window.event).returnValue = confirmationMessage; // Standard for most browsers
+        e.returnValue = confirmationMessage; // Standard for most browsers
         return confirmationMessage; // For some other browsers
     });
 
     socket.on('new_media', function(data) {
-        const mediaContainer = document.getElementById('media-container');  // Correct the selector here
+        const mediaPopup = document.getElementById('media-popup');
+        const mediaContainer = document.getElementById('media-container');
 
         if (mediaContainer) {
-            // Clear previous contents
-            mediaContainer.innerHTML = '';
+            mediaContainer.innerHTML = ''; // Clear previous contents
 
-            // Check if it's an image, GIF, or video
-            if (data.media_url.match(/\.(jpeg|jpg|gif|png)$/)) {
+            if (data.media_url.match(/\.(jpeg|jpg|gif|png)$/i)) {
                 const img = document.createElement('img');
                 img.src = data.media_url;
                 img.style.width = '100%'; // Adjust as necessary
                 mediaContainer.appendChild(img);
-            } else if (data.media_url.match(/\.(mp4|webm)$/)) {
+            } else if (data.media_url.match(/\.(mp4|webm)$/i)) {
                 const video = document.createElement('video');
                 video.src = data.media_url;
                 video.controls = true;
                 video.autoplay = true;
+                video.style.width = '100%'; // Ensure it fits in the container
                 mediaContainer.appendChild(video);
             }
 
             // Show the popup
-            document.getElementById('media-popup').style.display = 'block';
+            mediaPopup.style.display = 'block';
         } else {
             console.error('Media container not found');
         }
