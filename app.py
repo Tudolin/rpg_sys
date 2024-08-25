@@ -729,6 +729,8 @@ def handle_new_media(data):
 
 def get_current_session_data(session_id):
     session_data = get_session_by_id(db, session_id)
+    app.logger.info(f"Session Data: {session_data}")
+
     if session_data:
         characters = []
         for char_id in session_data.get('characters', []):
@@ -755,6 +757,7 @@ def get_current_session_data(session_id):
         app.logger.info(f"Session sync data: {session_sync_data}")
         return session_sync_data
     return {}
+
 
 
 def get_session_id_from_char(character_id):

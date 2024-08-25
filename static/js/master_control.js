@@ -19,8 +19,14 @@ document.addEventListener("DOMContentLoaded", function() {
     
 
     socket.on('session_sync', function(data) {
-        updatePlayerList(data.characters);
+        console.log('Received session sync:', data);
+        if (data && data.characters && data.characters.length > 0) {
+            updatePlayerList(data.characters);
+        } else {
+            console.warn('No characters found in session sync data.');
+        }
     });
+    
 
     socket.on('new_player', function(data) {
         addOrUpdatePlayer(data);
