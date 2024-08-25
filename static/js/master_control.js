@@ -257,7 +257,12 @@ socket.on('player_removed', function(data) {
     });
 
     socket.on('session_sync', function(data) {
-        playerList.innerHTML = ''; // Limpa a lista existente
+        console.log('Received session sync:', data);
+            if (data && data.characters && data.characters.length > 0) {
+                updatePlayerList(data.characters);
+            } else {
+                console.warn('No characters found in session sync data.');
+            }
     
         data.characters.forEach(char => {
             const newPlayerHTML = `
