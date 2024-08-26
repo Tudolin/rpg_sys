@@ -56,7 +56,7 @@
 
                 <h2>3. Defina seus Atributos (Min 3 e max 18)</h2>
                 <h1>Pontos restantes: <span id="pontosRestantes">10</span></h1>
-                {% set atributos = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma"] %}
+                {% set atributos = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma", "mana", "energia"] %}
                 {% for atributo in atributos %}
                 <div class="form-group">
                     <label for="{{ atributo|lower }}">{{ atributo|capitalize }}:</label>
@@ -188,11 +188,35 @@
             <textarea id="origem" name="origem" class="form-control" rows="4" placeholder="Descreva o histórico do personagem..." required></textarea>
         </div>
 
+        <h2>6. Adicionar Habilidades</h2>
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#habilidadesModal">Adicionar Habilidades</button>
+
+        <!-- Modal para seleção de habilidades -->
+        <div class="modal fade" id="habilidadesModal" tabindex="-1" role="dialog" aria-labelledby="habilidadesModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="habilidadesModalLabel">Escolha 5 Habilidades</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="habilidadesForm">
+                <div id="habilidadesLista"></div>
+                <button type="submit" class="btn btn-primary">Confirmar</button>
+                </form>
+            </div>
+            </div>
+        </div>
+        </div>
+
         <!-- Upload da Imagem -->
         <div class="form-group">
             <label for="img_url">Foto do Personagem:</label>
             <input type="file" id="img_url" name="img_url" class="form-control" accept="image/*" required>
         </div>
+
 
         <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i>  Criar</button>
     </form>
@@ -227,6 +251,38 @@
                 atualizarPontosRestantes();
             }
         }
+
+        document.getElementById('habilidadesForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const habilidadesSelecionadas = document.querySelectorAll('input[name="habilidades"]:checked');
+            if (habilidadesSelecionadas.length > 5) {
+            alert('Você só pode selecionar até 5 habilidades.');
+            return;
+            }
+            // Processa as habilidades selecionadas
+            // Aqui, você pode enviar as habilidades selecionadas para o backend ou atualizar a interface conforme necessário
+            $('#habilidadesModal').modal('hide');
+        });
+
+        const habilidadesDisponiveis = [
+    // Aqui seria preenchido com base na classe e raça selecionada
+            {id: 1, nome: "Ataque Preciso", descricao: "Aumenta a precisão dos ataques", custo_mana: 5},
+            {id: 2, nome: "Resistência a Dano", descricao: "Reduz o dano recebido", custo_energia: 3},
+            // Adicione mais habilidades
+        ];
+
+        const habilidadesLista = document.getElementById('habilidadesLista');
+        habilidadesDisponiveis.forEach(habilidade => {
+        habilidadesLista.innerHTML += `
+            <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="habilidades" value="${habilidade.id}" id="habilidade${habilidade.id}">
+            <label class="form-check-label" for="habilidade${habilidade.id}">
+                ${habilidade.nome} (Custo Mana: ${habilidade.custo_mana || 0}, Custo Energia: ${habilidade.custo_energia || 0})
+            </label>
+            <p>${habilidade.descricao}</p>
+            </div>
+        `;
+        });
         
         function alterarValor(atributo, valor) {
             const input = document.getElementById(atributo);

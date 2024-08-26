@@ -12,3 +12,4 @@ flask_talisman
 flask_session
 redis
 flask_cors
+gevent
