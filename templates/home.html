@@ -23,18 +23,25 @@
                     <p><strong>Inteligencia:</strong> {{ char['inteligencia'] }}</p>
                     <p><strong>Sabedoria:</strong> {{ char['sabedoria'] }}</p>
                     <p><strong>Carisma:</strong> {{ char['carisma'] }}</p>
-                    <p><strong>Habilidades:</strong></p>
-                    <ul class="list-inline">
-                        {% for habilidade in char['habilidades'] %}
-                            <li class="list-inline-item">{{ habilidade }}</li>
+                    <ul class="list-unstyled">
+                        {% for habilidade_id, habilidade in char['habilidades'].items() %}
+                            <li>
+                                <strong>{{ habilidade['name'] }}</strong>:
+                                <span>{{ habilidade['description'] }}</span><br>
+                                <small><em style="color: aqua;">Custo Mana: {{ habilidade['cost']['mana'] }}, Custo Energia: {{ habilidade['cost']['energy'] }}</em></small>
+                            </li>
                         {% endfor %}
                     </ul>
-                    <p><strong>Pericias:</strong></p>
+                    
+                    
+                    
                     <ul class="list-inline">
                         {% for pericia, valor in char['pericias'].items() %}
                             <li class="list-inline-item">{{ pericia }}: +{{ valor }}</li>
                         {% endfor %}
                     </ul>
+                    
+
                     <div class="mt-3">
                         <a href="{{ url_for('edit_character_route', character_id=char['_id']) }}" class="btn btn-warning btn-sm mr-2"><i class="bi bi-pencil-square"></i>  Editar</a>
                         <a href="{{ url_for('delete_character_route', character_id=char['_id']) }}" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i>  Excluir</a>

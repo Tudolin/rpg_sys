@@ -1,6 +1,7 @@
 from gevent import monkey
 
 monkey.patch_all()
+import json
 import logging
 import os
 import sys
@@ -100,10 +101,6 @@ def login():
             return render_template('login.html', error='Credenciais inválidas')
 
     return render_template('login.html')
-
-
-
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -214,7 +211,7 @@ def create_character_route():
 
         # Get selected skills and abilities
         pericias_selecionadas = request.form.getlist('pericias')
-        habilidades_selecionadas = request.form.getlist('habilidades')
+        habilidades_selecionadas = json.loads(request.form.get('habilidades_selecionadas'))
 
         print("Pericias : ", pericias_selecionadas)
         print("Habilidades : ", habilidades_selecionadas)
@@ -245,16 +242,13 @@ def create_character_route():
         create_character(
             db, session['userId'], name, class_id, race_id, img_url,
             forca, destreza, constituicao, inteligencia, sabedoria, carisma,
-            origem, pericias_selecionadas, habilidades_selecionadas
-        )
+            None, None,
+            origem, pericias_selecionadas=pericias_selecionadas, habilidades_selecionadas=habilidades_selecionadas)
         return redirect(url_for('home'))
+
 
     # Renderizar o template com os dados
     return render_template('create_character.html', classes=classes, races=races, habilidades_disponiveis=habilidades_disponiveis)
-
-
-
-
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
@@ -265,14 +259,65 @@ def edit_character_route(character_id):
         return redirect(url_for('login'))
 
     character = db.chars.find_one({"_id": ObjectId(character_id)})
+    if not character:
+        return redirect(url_for('home'))
+    
+    char_habilities = []
+    for habilidade_id in character['habilidades']:
+        print("Habilidade ID", habilidade_id)
+        char_habilities.append(habilidade_id)
+
+    char_race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
+    race_name = char_race_info['name'] if char_race_info else "Raça Desconhecida"
+
+    # Carregar classes, raças e habilidades
+    classes = list(db['classes.classes'].find())
+    races = list(db['races.races'].find())
+    abilities = list(db['abilities.abilities'].find())
+
+    habilidades_disponiveis = {
+        'race': [],
+        'class': []
+    }
+
+    # Populate race abilities
+    for race in races:
+        habilidades_race = []
+        for habilidade in abilities:
+            if race['_id'] in [ObjectId(id) for id in habilidade['related_to']['race_ids']]:
+                habilidades_race.append({
+                    'nome': habilidade['name'],
+                    'descricao': habilidade['description'],
+                    'custo_mana': habilidade['cost']['mana'],
+                    'custo_energia': habilidade['cost']['energy']
+                })
+        habilidades_disponiveis['race'].append({
+            'id': str(race['_id']),
+            'habilidades': habilidades_race
+        })
+
+    # Populate class abilities
+    for classe in classes:
+        habilidades_class = []
+        for habilidade in abilities:
+            if classe['_id'] in [ObjectId(id) for id in habilidade['related_to']['race_ids']]:
+                habilidades_class.append({
+                    'nome': habilidade['name'],
+                    'descricao': habilidade['description'],
+                    'custo_mana': habilidade['cost']['mana'],
+                    'custo_energia': habilidade['cost']['energy']
+                })
+        habilidades_disponiveis['class'].append({
+            'id': str(classe['_id']),
+            'habilidades': habilidades_class
+        })
 
     if request.method == 'POST':
         name = request.form['name']
-        class_id = request.form.get('class_id')
-        race_id = request.form.get('race_id')
+        class_id = request.form['class_id']
+        race_id = request.form['race_id']
 
-        
-        # Atualizando os atributos
+        # Atualizar atributos
         forca = int(request.form['forca'])
         destreza = int(request.form['destreza'])
         constituicao = int(request.form['constituicao'])
@@ -280,7 +325,8 @@ def edit_character_route(character_id):
         sabedoria = int(request.form['sabedoria'])
         carisma = int(request.form['carisma'])
 
-        # Processa o upload da nova imagem, se for o caso
+        # Upload de imagem se necessário
+        img_url = character['img_url']
         if 'img_url' in request.files and request.files['img_url'].filename != '':
             file = request.files['img_url']
             if file and allowed_file(file.filename):
@@ -288,12 +334,22 @@ def edit_character_route(character_id):
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(file_path)
                 img_url = file_path
-            else:
-                img_url = character['img_url']
-        else:
-            img_url = character['img_url']
 
-        # Atualizando o personagem no banco de dados
+        habilidades_selecionadas = json.loads(request.form.get('habilidades_selecionadas'))
+        habilidades = {}
+        
+        pericias_selecionadas = request.form.getlist('pericias')
+        pericias = {pericia: 4 for pericia in pericias_selecionadas}
+
+        for habilidade_nome in habilidades_selecionadas:
+            habilidade = db['abilities.abilities'].find_one({"name": habilidade_nome})
+            if habilidade:
+                habilidades[str(habilidade['_id'])] = {
+                    'name': habilidade['name'],
+                    'description': habilidade['description'],
+                    'cost': habilidade['cost']
+                }
+
         update_data = {
             "name": name,
             "class_id": ObjectId(class_id),
@@ -304,20 +360,26 @@ def edit_character_route(character_id):
             "inteligencia": inteligencia,
             "sabedoria": sabedoria,
             "carisma": carisma,
-            "img_url": img_url
+            "img_url": img_url,
+            "pericias": pericias,
+            "habilidades": habilidades
         }
 
-        db.chars.update_one(
-            {"_id": ObjectId(character_id)},
-            {"$set": update_data}
-        )
+
+        # Atualizar personagem no banco de dados
+        db.chars.update_one({"_id": ObjectId(character_id)}, {"$set": update_data})
+
         return redirect(url_for('home'))
 
-    # Carregando as classes e raças para o formulário de edição
-    classes = db['classes.classes'].find()
-    races = db['races.races'].find()
-    return render_template('edit_character.html', character=character, classes=classes, races=races)
-
+    # Renderizar a página com o personagem carregado
+    return render_template(
+        'edit_character.html',
+        character=character,
+        classes=classes,
+        races=races,
+        habilidades_disponiveis=habilidades_disponiveis,
+        race_name=race_name,
+    )
 
 @app.route('/delete_character/<character_id>')
 def delete_character_route(character_id):

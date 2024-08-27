@@ -60,17 +60,19 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
             }
 
     # Adiciona habilidades selecionadas manualmente
-    for habilidade_id in habilidades_selecionadas:
-        habilidade = db['abilities.abilities'].find_one({"_id": ObjectId(habilidade_id)})
+    for habilidade_nome in habilidades_selecionadas:
+        habilidade = db['abilities.abilities'].find_one({"name": habilidade_nome})
         if habilidade:
-            habilidades[habilidade_id] = {
+            habilidades[str(habilidade['_id'])] = {
                 'name': habilidade['name'],
                 'description': habilidade['description'],
                 'cost': habilidade['cost']
             }
 
+    # Processa as perícias selecionadas
     pericias = {pericia: 4 for pericia in pericias_selecionadas}
 
+    # Cria o documento do personagem
     character = {
         "user_id": ObjectId(user_id),
         "name": name,
@@ -94,9 +96,6 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
     }
 
     db.chars.insert_one(character)
-
-
-
 
 
 def delete_character(db, character_id):

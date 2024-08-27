@@ -14,7 +14,6 @@
                     <input type="text" id="name" name="name" class="form-control" value="{{ character['name'] }}" required>
                 </div>
 
-                <!-- Seleção de Raça -->
                 <h2>1. Escolha sua Raça</h2>
                 <div class="form-group">
                     <label for="race_id">Raça:</label>
@@ -28,6 +27,7 @@
                                 data-inteligencia="{{ race.inteligencia_bonus }}"
                                 data-sabedoria="{{ race.sabedoria_bonus }}"
                                 data-carisma="{{ race.carisma_bonus }}"
+                                data-resumo="{{ race.resumo }}"
                                 {% if race._id == character['race_id'] %}selected{% endif %}>
                                 {{ race.name }} ({{ race.habilidades_inatas | join(', ') }})
                             </option>
@@ -36,11 +36,10 @@
                     <div id="atributos-raca-tooltip" class="tooltip-custom"></div>
                 </div>
 
-                <!-- Seleção de Classe -->
                 <h2>2. Escolha sua Classe</h2>
                 <div class="form-group">
                     <label for="class_id">Classe:</label>
-                    <select id="class_id" name="class_id" class="form-control" onchange="atualizarImagemClasse()">
+                    <select id="class_id" name="class_id" class="form-control" onchange="atualizarHabilidades(); atualizarImagemClasse();">
                         {% for class in classes %}
                             <option value="{{ class._id }}"
                                 data-nome="{{ class.name }}"
@@ -58,9 +57,8 @@
                     <div id="atributos-classe-tooltip" class="tooltip-custom"></div>
                 </div>
 
-                <!-- Distribuição de Atributos -->
                 <h2>3. Defina seus Atributos (Min 3 e max 18)</h2>
-                <h1>Pontos restantes: <span id="pontosRestantes">30</span></h1>
+                <h1>Pontos restantes: <span id="pontosRestantes">10</span></h1>
                 {% set atributos = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma"] %}
                 {% for atributo in atributos %}
                 <div class="form-group">
@@ -72,18 +70,26 @@
                     </div>
                 </div>
                 {% endfor %}
+                <div class="form-group">
+                    <label for="mana" class="atributo-label">Mana:</label>
+                    <p id="mana" class="form-control-static atributo-display">{{ character['mana'] }}</p>
+                </div>
+                <div class="form-group">
+                    <label for="energia" class="atributo-label">Energia:</label>
+                    <p id="energia" class="form-control-static atributo-display">{{ character['energia'] }}</p>
+                </div>
             </div>
 
             <!-- Exibir Imagem de Raça ou Classe à Direita -->
             <div class="col-md-6">
                 <h2>Exemplo de Raça</h2>
-                <div class="image-container">
-                    <img id="selected-image" src="{{ url_for('static', filename='images/default.png') }}" alt="Imagem Selecionada" class="img-fluid fade-in">
+                <div class="image-container text-center">
+                    <img id="selected-image" src="{{ url_for('static', filename='images/races/' + race_name.lower() + '.png') }}" alt="Imagem Selecionada" class="img-fluid fade-in">
                 </div>
                 <!-- Descrição da Raça -->
                 <div class="race-description mt-3">
                     <h3>Descrição da Raça</h3>
-                    <p id="race-description-text">{{ character['race_description'] if request.endpoint == 'edit_character_route' else '' }}</p>
+                    <p id="race-description-text">{{ character['race_description'] }}</p>
                 </div>
             </div>
         </div>
@@ -91,12 +97,86 @@
         <!-- Seleção de Perícias -->
         <h2>4. Escolha até 3 Perícias</h2>
         <div class="form-group">
-            {% for pericia in pericias %}
-                <div class="form-check">
-                    <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="{{ pericia }}" id="pericia-{{ pericia | lower }}" {% if pericia in character['pericias'] %}checked{% endif %}>
-                    <label class="form-check-label" for="pericia-{{ pericia | lower }}">{{ pericia }}</label>
-                </div>
-            {% endfor %}
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Acrobacia" id="pericia-acrobacia">
+                <label class="form-check-label" for="pericia-acrobacia">Acrobacia</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Adestrar Animais" id="pericia-adestrar-animais">
+                <label class="form-check-label" for="pericia-adestrar-animais">Adestrar Animais</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Atletismo" id="pericia-atletismo">
+                <label class="form-check-label" for="pericia-atletismo">Atletismo</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Atuação" id="pericia-atuacao1">
+                <label class="form-check-label" for="pericia-atuacao1">Atuacao (________________)</label>
+                <input type="text" class="form-control" name="atuacao_custom1" id="atuacao_custom1">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Cavalgar" id="pericia-cavalgar">
+                <label class="form-check-label" for="pericia-cavalgar">Cavalgar</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Conhecimento" id="pericia-conhecimento1">
+                <label class="form-check-label" for="pericia-conhecimento1">Conhecimento (__________)</label>
+                <input type="text" class="form-control" name="conhecimento_custom1" id="conhecimento_custom1">
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Cura" id="pericia-cura">
+                <label class="form-check-label" for="pericia-cura">Cura</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Diplomacia" id="pericia-diplomacia">
+                <label class="form-check-label" for="pericia-diplomacia">Diplomacia</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Enganação" id="pericia-enganacao">
+                <label class="form-check-label" for="pericia-enganacao">Enganacao</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Furtividade" id="pericia-furtividade">
+                <label class="form-check-label" for="pericia-furtividade">Furtividade</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Identificar Magia" id="pericia-identificar-magia">
+                <label class="form-check-label" for="pericia-identificar-magia">Identificar Magia</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Iniciativa" id="pericia-iniciativa">
+                <label class="form-check-label" for="pericia-iniciativa">Iniciativa</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Intimidacão" id="pericia-intimidacao">
+                <label class="form-check-label" for="pericia-intimidacao">Intimidacao</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Intuicão" id="pericia-intuicao">
+                <label class="form-check-label" for="pericia-intuicao">Intuicao</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Ladinagem" id="pericia-ladinagem">
+                <label class="form-check-label" for="pericia-ladinagem">Ladinagem</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Obter Informacão" id="pericia-obter-informacao">
+                <label class="form-check-label" for="pericia-obter-informacao">Obter Informacao</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Ofício" id="pericia-oficio1">
+                <label class="form-check-label" for="pericia-oficio1">Ofício (_________________)</label>
+                <input type="text" class="form-control" name="oficio_custom1" id="oficio_custom1">
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Percepcão" id="pericia-percepcao">
+                <label class="form-check-label" for="pericia-percepcao">Percepcao</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Sobrevivência" id="pericia-sobrevivencia">
+                <label class="form-check-label" for="pericia-sobrevivencia">Sobrevivencia</label>
+            </div>
         </div>
 
         <!-- Descrição da Origem -->
@@ -106,7 +186,11 @@
             <textarea id="origem" name="origem" class="form-control" rows="4" placeholder="Descreva o histórico do personagem..." required>{{ character['origem'] }}</textarea>
         </div>
 
-        <!-- Upload da Imagem -->
+        <h2>6. Adicionar Habilidades</h2>
+        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#habilidadesModal">Adicionar Habilidades</button>
+
+        <input type="hidden" id="habilidadesSelecionadas" name="habilidades_selecionadas" value='{{ character['habilidades'] | tojson }}'>
+
         <div class="form-group">
             <label for="img_url">Foto do Personagem:</label>
             <div class="mb-3">
@@ -120,7 +204,34 @@
         <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 
-    <script>
+    <div class="modal fade" id="habilidadesModal" tabindex="-1" role="dialog" aria-labelledby="habilidadesModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="habilidadesModalLabel">Escolha 5 Habilidades</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="habilidadesLista"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="confirmarHabilidades()">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        window.onload = function() {
+            atualizarImagemRaça();
+            atualizarImagemClasse();
+            atualizarPontosRestantes();
+            atualizarHabilidades();
+        }
+
         const maxPontos = 10;
         let pontosExtraHumano = 0; // Variável para armazenar os pontos extras do humano
         const pontosRestantesElem = document.getElementById('pontosRestantes');
@@ -205,11 +316,63 @@
             input.addEventListener('input', atualizarPontosRestantes);
         });
 
-        // Chama funções de atualização de imagens e pontos no carregamento inicial
+        const habilidadesDisponiveis = {{ habilidades_disponiveis|tojson }};
         window.onload = function() {
             atualizarImagemRaça();
             atualizarImagemClasse();
             atualizarPontosRestantes();
+            atualizarHabilidades();
+        }
+
+        // Função para atualizar as habilidades disponíveis com base na raça e classe selecionadas
+        function atualizarHabilidades() {
+            const raceId = document.getElementById('race_id').value;
+            const classId = document.getElementById('class_id').value;
+
+            const habilidadesRace = habilidadesDisponiveis.race.find(r => r.id === raceId)?.habilidades || [];
+            const habilidadesClass = habilidadesDisponiveis.class.find(c => c.id === classId)?.habilidades || [];
+
+            const habilidadesCombinadas = [...habilidadesRace, ...habilidadesClass];
+
+            const habilidadesLista = document.getElementById('habilidadesLista');
+            habilidadesLista.innerHTML = '';  // Limpa a lista
+
+            habilidadesCombinadas.forEach(habilidade => {
+                habilidadesLista.innerHTML +=
+                    `<div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="habilidades" value="${habilidade.nome}" id="habilidade${habilidade.nome}">
+                        <label class="form-check-label" for="habilidade${habilidade.nome}">
+                            ${habilidade.nome} (Custo Mana: ${habilidade.custo_mana || 0}, Custo Energia: ${habilidade.custo_energia || 0})
+                        </label>
+                        <p>${habilidade.descricao}</p>
+                    </div>`;
+            });
+
+            if (habilidadesCombinadas.length === 0) {
+                habilidadesLista.innerHTML = '<p>Nenhuma habilidade disponível para essa combinação de raça e classe.</p>';
+            }
+
+            // Seleciona as habilidades já escolhidas pelo personagem
+            const habilidadesSelecionadas = JSON.parse(document.getElementById('habilidadesSelecionadas').value || '[]');
+            habilidadesSelecionadas.forEach(habilidade => {
+                const checkbox = document.getElementById(`habilidade${habilidade}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+
+        // Função para confirmar as habilidades selecionadas
+        function confirmarHabilidades() {
+            const selectedHabilidades = document.querySelectorAll('#habilidadesLista input[type="checkbox"]:checked');
+            if (selectedHabilidades.length > 5) {
+                alert("Você só pode selecionar até 5 habilidades.");
+                return;
+            }
+
+            const habilidadesSelecionadas = Array.from(selectedHabilidades).map(checkbox => checkbox.value);
+            document.getElementById('habilidadesSelecionadas').value = JSON.stringify(habilidadesSelecionadas);
+            $('#habilidadesModal').modal('hide'); // Fechar o modal
         }
 
         // Limite de 3 perícias selecionadas
