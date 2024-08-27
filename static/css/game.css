@@ -30,6 +30,54 @@
     z-index: 100;  /* Garante que fique acima de outros elementos */
 }
 
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 80px; /* Increase height to accommodate skills */
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.skills-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 70%; /* Adjust width according to the number of skills */
+}
+
+.skill-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 0 5px;
+}
+
+.skill-icon img {
+    width: 40px;
+    margin-bottom: 5px;
+}
+
+.skill-cost {
+    font-size: 12px;
+    color: white;
+}
+
+.bottom-bar-icon {
+    margin: 0 10px;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+}
+
+
+
 .dice-result.rolling {
     animation: diceRoll 1.5s ease-in-out;
 }
@@ -325,19 +373,6 @@ body {
     margin: 2px 0;
 }
 
-/* Barra inferior */
-.bottom-bar {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 60px;
-    background-color: rgba(0, 0, 0, 0.9);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-}
-
 .bottom-bar-icon {
     margin: 0 10px;
     text-align: center;
@@ -415,9 +450,27 @@ body {
 
 @media (max-width: 768px) {
     .dice-result {
-        width: 30px;
-        height: 30px;
+        font-size: 2rem;  /* Adjust font size for smaller screens */
     }
+
+    .skills-bar {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .skill-icon img {
+        width: 35px;  /* Adjust for smaller screens */
+    }
+
+    .skill-icon span {
+        font-size: 12px;
+    }
+
+    .skill-cost {
+        font-size: 10px;
+    }
+
     .main-content {
         flex-direction: column;
         align-items: center;
@@ -460,6 +513,22 @@ body {
 }
 
 @media (max-width: 480px) {
+    .dice-result {
+        font-size: 1.5rem;
+    }
+
+    .skill-icon img {
+        width: 30px;
+    }
+
+    .skill-icon span {
+        font-size: 10px;
+    }
+
+    .skill-cost {
+        font-size: 8px;
+    }
+
     .character-frame {
         width: 80px;
         height: 80px;
