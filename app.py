@@ -39,6 +39,7 @@ app.config['SESSION_PROTECTION'] = 'strong'
 # app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379, db=0, password=None)
 app.config['SESSION_TYPE'] = 'filesystem' #for local host debug
 Session(app)
+
 CORS(app)
 sys.path.insert(0, '/home/angellnadalin/rpg_sys')
 db = connection()
@@ -154,12 +155,55 @@ def create_character_route():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
 
+    # Carregar dados do MongoDB
+    classes = list(db['classes.classes'].find())
+    races = list(db['races.races'].find())
+    abilities = list(db['abilities.abilities'].find())
+
+    habilidades_disponiveis = {
+        'race': [],
+        'class': []
+    }
+
+    # Populate race abilities
+    for race in races:
+        habilidades_race = []
+        for habilidade in abilities:
+            if race['_id'] in [ObjectId(id) for id in habilidade['related_to']['race_ids']]:
+                habilidades_race.append({
+                    'nome': habilidade['name'],
+                    'descricao': habilidade['description'],
+                    'custo_mana': habilidade['cost']['mana'],
+                    'custo_energia': habilidade['cost']['energy']
+                })
+        habilidades_disponiveis['race'].append({
+            'id': str(race['_id']),
+            'habilidades': habilidades_race
+        })
+
+    # Populate class abilities
+    for classe in classes:
+        habilidades_class = []
+        for habilidade in abilities:
+            if classe['_id'] in [ObjectId(id) for id in habilidade['related_to']['race_ids']]:
+                habilidades_class.append({
+                    'nome': habilidade['name'],
+                    'descricao': habilidade['description'],
+                    'custo_mana': habilidade['cost']['mana'],
+                    'custo_energia': habilidade['cost']['energy']
+                })
+        habilidades_disponiveis['class'].append({
+            'id': str(classe['_id']),
+            'habilidades': habilidades_class
+        })
+
     if request.method == 'POST':
+        # Processamento do formulário
         name = request.form['name']
-        class_id = request.form.get('class_id')  # Use .get() to avoid KeyError
+        class_id = request.form.get('class_id')
         race_id = request.form.get('race_id')
         origem = request.form['origem']
-        
+
         # Atributos
         forca = int(request.form['forca'])
         destreza = int(request.form['destreza'])
@@ -168,15 +212,22 @@ def create_character_route():
         sabedoria = int(request.form['sabedoria'])
         carisma = int(request.form['carisma'])
 
-        # Perícias
+        # Get selected skills and abilities
         pericias_selecionadas = request.form.getlist('pericias')
+        habilidades_selecionadas = request.form.getlist('habilidades')
+
+        print("Pericias : ", pericias_selecionadas)
+        print("Habilidades : ", habilidades_selecionadas)
+
+        if len(habilidades_selecionadas) > 5:
+            return "Você pode selecionar no máximo 5 habilidades.", 400
 
         ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
         def allowed_file(filename):
             return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-        
-        img_url = None  # Initialize img_url to None
+
+        img_url = None
         if 'img_url' in request.files:
             file = request.files['img_url']
             if file and allowed_file(file.filename):
@@ -187,16 +238,23 @@ def create_character_route():
             else:
                 return "Unsupported image format. Only PNG and JPG are supported.", 400
 
-        # Ensure that required fields are provided
         if not class_id or not race_id:
             return "Class ID and Race ID are required.", 400
 
-        create_character(db, session['userId'], name, class_id, race_id, img_url, forca, destreza, constituicao, inteligencia, sabedoria, carisma, origem, pericias_selecionadas)
+        # Chamar função para criar o personagem
+        create_character(
+            db, session['userId'], name, class_id, race_id, img_url,
+            forca, destreza, constituicao, inteligencia, sabedoria, carisma,
+            origem, pericias_selecionadas, habilidades_selecionadas
+        )
         return redirect(url_for('home'))
 
-    classes = db['classes.classes'].find()
-    races = db['races.races'].find()
-    return render_template('create_character.html', classes=classes, races=races)
+    # Renderizar o template com os dados
+    return render_template('create_character.html', classes=classes, races=races, habilidades_disponiveis=habilidades_disponiveis)
+
+
+
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}

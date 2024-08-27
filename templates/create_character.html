@@ -103,11 +103,6 @@
                 <input type="text" class="form-control" name="atuacao_custom1" id="atuacao_custom1">
             </div>
             <div class="form-check">
-                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Atuação" id="pericia-atuacao2">
-                <label class="form-check-label" for="pericia-atuacao2">Atuacao (________________)</label>
-                <input type="text" class="form-control" name="atuacao_custom2" id="atuacao_custom2">
-            </div>
-            <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Cavalgar" id="pericia-cavalgar">
                 <label class="form-check-label" for="pericia-cavalgar">Cavalgar</label>
             </div>
@@ -116,11 +111,7 @@
                 <label class="form-check-label" for="pericia-conhecimento1">Conhecimento (__________)</label>
                 <input type="text" class="form-control" name="conhecimento_custom1" id="conhecimento_custom1">
             </div>
-            <div class="form-check">
-                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Conhecimento" id="pericia-conhecimento2">
-                <label class="form-check-label" for="pericia-conhecimento2">Conhecimento (__________)</label>
-                <input type="text" class="form-control" name="conhecimento_custom2" id="conhecimento_custom2">
-            </div>
+
             <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Cura" id="pericia-cura">
                 <label class="form-check-label" for="pericia-cura">Cura</label>
@@ -167,11 +158,6 @@
                 <input type="text" class="form-control" name="oficio_custom1" id="oficio_custom1">
             </div>
             <div class="form-check">
-                <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Ofício" id="pericia-oficio2">
-                <label class="form-check-label" for="pericia-oficio2">Ofício (_________________)</label>
-                <input type="text" class="form-control" name="oficio_custom2" id="oficio_custom2">
-            </div>
-            <div class="form-check">
                 <input class="form-check-input pericia-checkbox" type="checkbox" name="pericias" value="Percepcão" id="pericia-percepcao">
                 <label class="form-check-label" for="pericia-percepcao">Percepcao</label>
             </div>
@@ -191,25 +177,8 @@
         <h2>6. Adicionar Habilidades</h2>
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#habilidadesModal">Adicionar Habilidades</button>
 
-        <!-- Modal para seleção de habilidades -->
-        <div class="modal fade" id="habilidadesModal" tabindex="-1" role="dialog" aria-labelledby="habilidadesModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="habilidadesModalLabel">Escolha 5 Habilidades</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="habilidadesForm">
-                <div id="habilidadesLista"></div>
-                <button type="submit" class="btn btn-primary">Confirmar</button>
-                </form>
-            </div>
-            </div>
-        </div>
-        </div>
+        <input type="hidden" id="habilidadesSelecionadas" name="habilidades_selecionadas">
+    
 
         <!-- Upload da Imagem -->
         <div class="form-group">
@@ -217,31 +186,218 @@
             <input type="file" id="img_url" name="img_url" class="form-control" accept="image/*" required>
         </div>
 
-
-        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i>  Criar</button>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Criar</button>
     </form>
 
-    <script>
-        const maxPontos = 10;
-        const pontosRestantesElem = document.getElementById('pontosRestantes');
-        const atributos = document.querySelectorAll('.atributo');
-        const basePontos = 10;
-        let pontosExtraHumano = 0;
+    <div class="modal fade" id="habilidadesModal" tabindex="-1" role="dialog" aria-labelledby="habilidadesModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="habilidadesModalLabel">Escolha 5 Habilidades</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="habilidadesLista"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="confirmarHabilidades()">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            const maxHabilidades = 5;  // Defina o máximo de habilidades que podem ser selecionadas
+            const habilidadesCheckboxes = document.querySelectorAll('#habilidadesLista input[type="checkbox"]');
+
+            function confirmarHabilidades() {
+                const selectedHabilidades = document.querySelectorAll('#habilidadesLista input[type="checkbox"]:checked');
+                if (selectedHabilidades.length > maxHabilidades) {
+                    alert("Você só pode selecionar até 5 habilidades.");
+                    return;
+                }
+        
+                const habilidadesSelecionadas = Array.from(selectedHabilidades).map(checkbox => checkbox.value);
+                console.log("Habilidades selecionadas:", habilidadesSelecionadas);
+        
+                // Atualizar o campo oculto com as habilidades selecionadas
+                document.getElementById('habilidadesSelecionadas').value = JSON.stringify(habilidadesSelecionadas);
+        
+                $('#habilidadesModal').modal('hide'); // Fechar o modal
+            }
+
+            document.querySelector('form').addEventListener('submit', function(event) {
+                confirmarHabilidades(); // Atualiza o campo oculto antes de enviar o formulário
+            });
+            
+            habilidadesCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const selected = document.querySelectorAll('#habilidadesLista input[type="checkbox"]:checked');
+                    if (selected.length > maxHabilidades) {
+                        this.checked = false;  // Desmarca a caixa se exceder o limite
+                        alert(`Você só pode selecionar até ${maxHabilidades} habilidades.`);
+                    }
+                });
+            });
+            atualizarHabilidades();
+            atualizarImagemRaça();
+            atualizarPontosRestantes();
+        });
+        const habilidadesDisponiveis = {{ habilidades_disponiveis|tojson }};
+        
+        function confirmarHabilidades() {
+            const selectedHabilidades = document.querySelectorAll('#habilidadesLista input[type="checkbox"]:checked');
+            if (selectedHabilidades.length > 5) {
+                alert("Você só pode selecionar até 5 habilidades.");
+                return;
+            }
+    
+            const habilidadesSelecionadas = Array.from(selectedHabilidades).map(checkbox => checkbox.value);
+        console.log("Habilidades selecionadas:", habilidadesSelecionadas);
+
+        // Atualizar o campo oculto com as habilidades selecionadas
+        document.getElementById('habilidadesSelecionadas').value = JSON.stringify(habilidadesSelecionadas);
+
+        $('#habilidadesModal').modal('hide'); // Fechar o modal
+    }
+
+        
+        function mostrarTooltip(selectElement, tooltipId) {
+            const tooltip = document.getElementById(tooltipId);
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const atributos = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma"];
+            let textoTooltip = "";
+        
+            atributos.forEach(attr => {
+                const bonus = selectedOption.getAttribute(`data-${attr}`);
+                textoTooltip += `${attr.charAt(0).toUpperCase() + attr.slice(1)}: ${bonus}<br>`;
+            });
+        
+            tooltip.innerHTML = textoTooltip;
+            tooltip.style.display = "block";
+        }
+    
+        // Função para ocultar tooltip
+        function ocultarTooltip(tooltipId) {
+            const tooltip = document.getElementById(tooltipId);
+            tooltip.style.display = "none";
+        }
+    
+        // Função para atualizar as habilidades disponíveis com base na raça e classe selecionadas
+        function atualizarHabilidades() {
+            const raceId = document.getElementById('race_id').value;
+            const classId = document.getElementById('class_id').value;
+            
+            console.log('Race ID selecionado:', raceId);
+            console.log('Class ID selecionado:', classId);
+            
+            if (!raceId || !classId) {
+                console.error('Race ID ou Class ID não estão definidos.');
+                return;
+            }
+            
+            const habilidadesRace = habilidadesDisponiveis.race.find(r => r.id === raceId)?.habilidades || [];
+            const habilidadesClass = habilidadesDisponiveis.class.find(c => c.id === classId)?.habilidades || [];
+            
+            console.log('Habilidades Race:', habilidadesRace);
+            console.log('Habilidades Class:', habilidadesClass);
+            
+            const habilidadesCombinadas = [...habilidadesRace, ...habilidadesClass];
+            
+            console.log('Habilidades combinadas:', habilidadesCombinadas);
+            
+            const habilidadesLista = document.getElementById('habilidadesLista');
+            habilidadesLista.innerHTML = '';  // Limpa a lista
+
+            habilidadesCombinadas.forEach(habilidade => {
+                habilidadesLista.innerHTML +=
+                    `<div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="habilidades" value="${habilidade.nome}" id="habilidade${habilidade.nome}">
+                        <label class="form-check-label" for="habilidade${habilidade.nome}">
+                            ${habilidade.nome} (Custo Mana: ${habilidade.custo_mana || 0}, Custo Energia: ${habilidade.custo_energia || 0})
+                        </label>
+                        <p>${habilidade.descricao}</p>
+                    </div>`;
+            });
+
+        if (habilidadesCombinadas.length === 0) {
+            habilidadesLista.innerHTML = '<p>Nenhuma habilidade disponível para essa combinação de raça e classe.</p>';
+        }
+    }
+        
+        
+    
+        // Função para alterar o valor dos atributos
+        function alterarValor(atributo, valor) {
+            const input = document.getElementById(atributo);
+            let atual = parseInt(input.value);
+            const novoValor = atual + valor;
+    
+            // Verifica os limites
+            if (novoValor >= 3 && novoValor <= 18) {
+                input.value = novoValor;
+                atualizarPontosRestantes();
+            }
+        }
+    
+        // Variável global para pontos extras de humanos
+        let pontosExtraHumano = 0; // Inicialize antes de qualquer uso
+    
+        // Função para atualizar a imagem da raça selecionada
+        function atualizarImagemRaça() {
+            const raceSelect = document.getElementById('race_id');
+            const selectedRace = raceSelect.options[raceSelect.selectedIndex];
+            const imageUrl = `/static/images/races/${selectedRace.getAttribute('data-nome').toLowerCase()}.png`;
+            const imageElement = document.getElementById('selected-image');
+    
+            // Reiniciar a animação removendo e adicionando a classe
+            imageElement.classList.remove('fade-in');
+            void imageElement.offsetWidth; // Força o reflow
+            imageElement.src = imageUrl;
+            imageElement.classList.add('fade-in');
+    
+            // Atualiza a descrição da raça
+            const raceDescription = selectedRace.getAttribute('data-resumo');
+            document.getElementById('race-description-text').textContent = raceDescription;
+    
+            // Verifica se a raça é humano
+            if (selectedRace.getAttribute('data-nome').toLowerCase() === 'humano') {
+                pontosExtraHumano = 3;
+            } else {
+                pontosExtraHumano = 0;
+            }
+    
+            const atributos = document.querySelectorAll('.atributo');
+            atributos.forEach(input => {
+                const bonus = parseInt(selectedRace.getAttribute(`data-${input.id}`)) || 0;
+                input.value = 10 + bonus;
+            });
+    
+            atualizarPontosRestantes();
+        }
+    
+        // Função para atualizar os pontos restantes dos atributos
         function atualizarPontosRestantes() {
+            const atributos = document.querySelectorAll('.atributo');
+            const pontosRestantesElem = document.getElementById('pontosRestantes');
+            const basePontos = 10;
             let total = 0;
+    
             atributos.forEach(input => {
                 total += parseInt(input.value);
             });
-        
+    
             const pontosRestantes = (basePontos + pontosExtraHumano) - (total - (atributos.length * 10));
-        
+    
             if (isNaN(pontosRestantes)) {
                 pontosRestantesElem.textContent = 'Erro';
             } else {
                 pontosRestantesElem.textContent = pontosRestantes;
             }
-        
+    
             if (pontosRestantes < 0) {
                 atributos.forEach(input => {
                     if (parseInt(input.value) > 10) {
@@ -251,126 +407,38 @@
                 atualizarPontosRestantes();
             }
         }
-
-        document.getElementById('habilidadesForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const habilidadesSelecionadas = document.querySelectorAll('input[name="habilidades"]:checked');
-            if (habilidadesSelecionadas.length > 5) {
-            alert('Você só pode selecionar até 5 habilidades.');
-            return;
-            }
-            // Processa as habilidades selecionadas
-            // Aqui, você pode enviar as habilidades selecionadas para o backend ou atualizar a interface conforme necessário
-            $('#habilidadesModal').modal('hide');
+    
+        // Inicializar evento para atualizar pontos restantes ao alterar os atributos
+        document.querySelectorAll('.atributo').forEach(input => {
+            input.addEventListener('input', atualizarPontosRestantes);
         });
-
-        const habilidadesDisponiveis = [
-    // Aqui seria preenchido com base na classe e raça selecionada
-            {id: 1, nome: "Ataque Preciso", descricao: "Aumenta a precisão dos ataques", custo_mana: 5},
-            {id: 2, nome: "Resistência a Dano", descricao: "Reduz o dano recebido", custo_energia: 3},
-            // Adicione mais habilidades
-        ];
-
-        const habilidadesLista = document.getElementById('habilidadesLista');
-        habilidadesDisponiveis.forEach(habilidade => {
-        habilidadesLista.innerHTML += `
-            <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="habilidades" value="${habilidade.id}" id="habilidade${habilidade.id}">
-            <label class="form-check-label" for="habilidade${habilidade.id}">
-                ${habilidade.nome} (Custo Mana: ${habilidade.custo_mana || 0}, Custo Energia: ${habilidade.custo_energia || 0})
-            </label>
-            <p>${habilidade.descricao}</p>
-            </div>
-        `;
+    
+        // Inicializar tooltips para a raça
+        document.getElementById('race_id').addEventListener('mouseover', function() {
+            mostrarTooltip(this, 'atributos-raca-tooltip');
         });
-        
-        function alterarValor(atributo, valor) {
-            const input = document.getElementById(atributo);
-            let atual = parseInt(input.value);
-            const novoValor = atual + valor;
-
-            // Verifica os limites
-            if (novoValor >= 3 && novoValor <= 18) {
-                input.value = novoValor;
-                atualizarPontosRestantes();
-            }
-        }
-
-        function atualizarImagemRaça() {
-            const raceSelect = document.getElementById('race_id');
-            const selectedRace = raceSelect.options[raceSelect.selectedIndex];
-            const imageUrl = `/static/images/races/${selectedRace.getAttribute('data-nome').toLowerCase()}.png`;
-            const imageElement = document.getElementById('selected-image');
-            
-            // Reiniciar a animação removendo e adicionando a classe
-            imageElement.classList.remove('fade-in');
-            
-            // Forçar um reflow para garantir que a classe seja removida e adicionada novamente
-            void imageElement.offsetWidth;
-            
-            imageElement.src = imageUrl;
-            imageElement.classList.add('fade-in');
-        
-            // Atualiza a descrição da raça
-            const raceDescription = selectedRace.getAttribute('data-resumo');
-            document.getElementById('race-description-text').textContent = raceDescription;
-        
-            // Verifica se a raça é humano
-            if (selectedRace.getAttribute('data-nome').toLowerCase() === 'humano') {
-                pontosExtraHumano = 3;
-            } else {
-                pontosExtraHumano = 0;
-            }
-        
-            atributos.forEach(input => {
-                const bonus = parseInt(selectedRace.getAttribute(`data-${input.id}`)) || 0; // Certifique-se de que bonus seja um número válido
-                input.value = 10 + bonus;
-            });
-        
-            atualizarPontosRestantes();
-        }        
-
-        function mostrarTooltip(selectElement, tooltipId) {
-            const tooltip = document.getElementById(tooltipId);
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const atributos = ["forca", "destreza", "constituicao", "inteligencia", "sabedoria", "carisma"];
-            let textoTooltip = "";
-
-            atributos.forEach(attr => {
-                const bonus = selectedOption.getAttribute(`data-${attr}`);
-                textoTooltip += `${attr.charAt(0).toUpperCase() + attr.slice(1)}: ${bonus}<br>`;
-            });
-
-            tooltip.innerHTML = textoTooltip;
-            tooltip.style.display = "block";
-        }
-
-        function ocultarTooltip(tooltipId) {
-            const tooltip = document.getElementById(tooltipId);
-            tooltip.style.display = "none";
-        }
-
-        const raceSelect = document.getElementById('race_id');
-        raceSelect.addEventListener('mouseover', function() {
-            mostrarTooltip(raceSelect, 'atributos-raca-tooltip');
-        });
-
-        raceSelect.addEventListener('mouseout', function() {
+    
+        document.getElementById('race_id').addEventListener('mouseout', function() {
             ocultarTooltip('atributos-raca-tooltip');
         });
 
-        atributos.forEach(input => {
-            input.addEventListener('input', atualizarPontosRestantes);
+        document.getElementById('race_id').addEventListener('change', function() {
+            atualizarHabilidades();
+            atualizarImagemRaça();
         });
-
-        atualizarPontosRestantes(); // Inicializa o contador
-        atualizarImagemRaça(); // Carrega a imagem inicial
-
+    
+        // Adicionar eventos para mudar habilidades ao selecionar raça ou classe
+        document.getElementById('race_id').addEventListener('change', function() {
+            atualizarHabilidades();
+            atualizarImagemRaça();
+        });
+    
+        document.getElementById('class_id').addEventListener('change', atualizarHabilidades);
+        
+    
         // Limite de 3 perícias selecionadas
         const maxPericias = 3;
-        const periciaCheckboxes = document.querySelectorAll('.pericia-checkbox');
-
-        periciaCheckboxes.forEach(checkbox => {
+        document.querySelectorAll('.pericia-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
                 const checkedCheckboxes = document.querySelectorAll('.pericia-checkbox:checked');
                 if (checkedCheckboxes.length > maxPericias) {
@@ -379,9 +447,41 @@
                 }
             });
         });
+    
     </script>
+    
 
     <style>
+        .modal-content {
+            background-color: #f8f9fa;
+            color: #000; /* Cor do texto preto */
+        }
+    
+        .modal-header {
+            border-bottom: 1px solid #dee2e6;
+        }
+    
+        .modal-title {
+            color: #000; /* Cor do título preto */
+        }
+    
+        .modal-body {
+            max-height: 400px; /* Limita a altura do modal */
+            overflow-y: auto; /* Permite rolagem se o conteúdo exceder a altura */
+        }
+        
+        .form-check {
+            margin-bottom: 10px; /* Espaçamento entre as opções */
+        }
+        .modal-footer {
+            border-top: 1px solid #dee2e6;
+        }
+    
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+    
         .tooltip-custom {
             display: none;
             position: absolute;

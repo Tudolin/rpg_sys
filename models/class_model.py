@@ -6,6 +6,8 @@ def create_default_classes(db):
     {
         "name": "Guerreiro",
         "hp": 20,
+        "mana": 5,
+        "energia": 10,
         "forca": 20,
         "destreza": 5,
         "defense": 5,
@@ -29,6 +31,8 @@ def create_default_classes(db):
     {
         "name": "Mago",
         "hp": 8,
+        "mana": 25,
+        "energia": 5,
         "forca": 5,
         "destreza": 10,
         "defense": 2,
@@ -50,6 +54,8 @@ def create_default_classes(db):
     {
         "name": "Ladino",
         "hp": 12,
+        "mana": 10,
+        "energia": 20,
         "forca": 10,
         "destreza": 15,
         "defense": 3,
@@ -73,6 +79,8 @@ def create_default_classes(db):
     {
         "name": "Clérigo",
         "hp": 16,
+        "mana": 15,
+        "energia": 8,
         "forca": 10,
         "destreza": 8,
         "defense": 4,
@@ -95,6 +103,8 @@ def create_default_classes(db):
     {
         "name": "Paladino",
         "hp": 18,
+        "mana": 10,
+        "energia": 10,
         "forca": 15,
         "destreza": 8,
         "defense": 6,
@@ -117,6 +127,8 @@ def create_default_classes(db):
     {
         "name": "Bardo",
         "hp": 14,
+        "mana": 15,
+        "energia": 10,
         "forca": 8,
         "destreza": 12,
         "defense": 3,
@@ -140,6 +152,8 @@ def create_default_classes(db):
     {
         "name": "Druida",
         "hp": 14,
+        "mana": 20,
+        "energia": 10,
         "forca": 12,
         "destreza": 10,
         "defense": 4,
@@ -162,6 +176,8 @@ def create_default_classes(db):
     {
         "name": "Monge",
         "hp": 14,
+        "mana": 10,
+        "energia": 15,
         "forca": 12,
         "destreza": 14,
         "defense": 5,
@@ -184,6 +200,8 @@ def create_default_classes(db):
     {
         "name": "Patrulheiro",
         "hp": 16,
+        "mana": 10,
+        "energia": 15,
         "forca": 12,
         "destreza": 14,
         "defense": 4,
@@ -206,6 +224,8 @@ def create_default_classes(db):
     {
         "name": "Bruxo",
         "hp": 14,
+        "mana": 20,
+        "energia": 10,
         "forca": 8,
         "destreza": 10,
         "defense": 3,
@@ -228,6 +248,8 @@ def create_default_classes(db):
     {
         "name": "Feiticeiro",
         "hp": 12,
+        "mana": 20,
+        "energia": 10,
         "forca": 8,
         "destreza": 12,
         "defense": 3,
@@ -250,6 +272,8 @@ def create_default_classes(db):
     {
         "name": "Bárbaro",
         "hp": 20,
+        "mana": 5,
+        "energia": 15,
         "forca": 18,
         "destreza": 12,
         "defense": 4,
@@ -271,6 +295,8 @@ def create_default_classes(db):
     {
         "name": "Cavaleiro",
         "hp": 18,
+        "mana": 8,
+        "energia": 10,
         "forca": 16,
         "destreza": 8,
         "defense": 6,
@@ -292,6 +318,8 @@ def create_default_classes(db):
     {
         "name": "Xamã",
         "hp": 14,
+        "mana": 18,
+        "energia": 8,
         "forca": 10,
         "destreza": 10,
         "defense": 3,
@@ -313,6 +341,8 @@ def create_default_classes(db):
     {
         "name": "Alquimista",
         "hp": 12,
+        "mana": 18,
+        "energia": 12,
         "forca": 8,
         "destreza": 14,
         "defense": 3,
@@ -332,30 +362,10 @@ def create_default_classes(db):
         }
     },
     {
-        "name": "Druida",
-        "hp": 14,
-        "forca": 12,
-        "destreza": 10,
-        "defense": 4,
-        "pericias": {
-            "Sobrevivência": "Sabedoria",
-            "Cura": "Sabedoria",
-            "Magia": "Sabedoria",
-            "Conhecimento (Natureza)": "Inteligência",
-            "Ofício": "Inteligência",
-            "Percepção": "Sabedoria",
-            "Cavalgar": "Destreza",
-            "Fortitude": "Constituição"
-        },
-        "habilidades_classe": {
-            "Forma Selvagem": "Permite transformar-se em animais.",
-            "Magia Natural": "Conjura magias relacionadas à natureza.",
-            "Companheiro Animal": "Possui um animal companheiro que o auxilia em combate."
-        }
-    },
-    {
         "name": "Samurai",
         "hp": 18,
+        "mana": 10,
+        "energia": 14,
         "forca": 16,
         "destreza": 12,
         "defense": 5,
@@ -377,6 +387,8 @@ def create_default_classes(db):
     {
         "name": "Metamorfo",
         "hp": 16,
+        "mana": 10,
+        "energia": 15,
         "forca": 14,
         "destreza": 12,
         "defense": 4,

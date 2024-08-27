@@ -16,7 +16,7 @@ def get_class_by_id(db, class_id):
 def get_race_by_id(db, race_id):
     return db['races.races'].find_one({"_id": ObjectId(race_id)})
 
-def create_character(db, user_id, name, class_id, race_id, img_url, forca, destreza, constituicao, inteligencia, sabedoria, carisma, mana, energia, origem, pericias_selecionadas):
+def create_character(db, user_id, name, class_id, race_id, img_url, forca, destreza, constituicao, inteligencia, sabedoria, carisma, mana, energia, origem, pericias_selecionadas, habilidades_selecionadas):
     selected_class = get_class_by_id(db, class_id)
     selected_race = get_race_by_id(db, race_id)
 
@@ -35,7 +35,39 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
     defesa = selected_class['defense'] + destreza
 
     # Adiciona as habilidades herdadas da classe e da raça
-    habilidades = {**selected_class.get('habilidades_classe', {}), **selected_race.get('habilidades_inatas', {})}
+    habilidades = {}
+    
+    # Adiciona habilidades da raça
+    habilidades_raca = selected_race.get('habilidades_inatas', {})
+    for habilidade_nome, descricao in habilidades_raca.items():
+        habilidade = db['abilities.abilities'].find_one({"name": habilidade_nome})
+        if habilidade:
+            habilidades[str(habilidade['_id'])] = {
+                'name': habilidade['name'],
+                'description': habilidade['description'],
+                'cost': habilidade['cost']
+            }
+
+    # Adiciona habilidades da classe
+    habilidades_classe = selected_class.get('habilidades_classe', {})
+    for habilidade_nome, descricao in habilidades_classe.items():
+        habilidade = db['abilities.abilities'].find_one({"name": habilidade_nome})
+        if habilidade:
+            habilidades[str(habilidade['_id'])] = {
+                'name': habilidade['name'],
+                'description': habilidade['description'],
+                'cost': habilidade['cost']
+            }
+
+    # Adiciona habilidades selecionadas manualmente
+    for habilidade_id in habilidades_selecionadas:
+        habilidade = db['abilities.abilities'].find_one({"_id": ObjectId(habilidade_id)})
+        if habilidade:
+            habilidades[habilidade_id] = {
+                'name': habilidade['name'],
+                'description': habilidade['description'],
+                'cost': habilidade['cost']
+            }
 
     pericias = {pericia: 4 for pericia in pericias_selecionadas}
 
@@ -62,6 +94,7 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
     }
 
     db.chars.insert_one(character)
+
 
 
 
