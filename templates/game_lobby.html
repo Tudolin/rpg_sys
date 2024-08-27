@@ -81,12 +81,22 @@
                             <p><strong>Classe:</strong> {{ character['class_name'] }}</p>
                             <p><strong>Raca:</strong> {{ character['race_name'] }}</p>
             
-                            <div class="health-mana-bars">
+                            <div class="health-mana-energy-bars">
                                 <div class="health-ball" data-character-id="{{ character['_id'] }}" data-max-hp="{{ character['hp'] }}">
                                     <div class="health-fill" style="height: {{ (character['current_hp'] | default(character['hp']) | int) / (character['hp'] | int) * 100 }}%"></div>
                                     <div class="health-text">{{ character['current_hp'] }} / {{ character['hp'] }}</div>
                                 </div>
+                                <div class="mana-ball" data-character-id="{{ character['_id'] }}" data-max-mana="{{ character['mana'] }}">
+                                    <div class="mana-fill" style="height: {{ (character['current_mana'] | default(character['mana']) | int) / (character['mana'] | int) * 100 }}%"></div>
+                                    <div class="mana-text">{{ character['current_mana'] }} / {{ character['mana'] }}</div>
+                                </div>
+                                <div class="energy-ball" data-character-id="{{ character['_id'] }}" data-max-energy="{{ character['energia'] }}">
+                                    <div class="energy-fill" style="height: {{ (character['current_energy'] | default(character['energia']) | int) / (character['energia'] | int) * 100 }}%"></div>
+                                    <div class="energy-text">{{ character['current_energy'] }} / {{ character['energia'] }}</div>
+                                </div>
                             </div>
+                            
+                            
                             <div class="bottom-bar-icon" id="roll-dice-button">
                                 <img src="/static/icons/dice.png" alt="Rolar Dado" class="bottom-bar-icon-img">
                                 <span>Rolar D20</span>
@@ -100,7 +110,16 @@
 
                 
             
-                <!-- Barra inferior -->
+                <div class="skills-bar">
+                    {% for habilidade in character['habilidades'] %}
+                        <div class="skill-icon" data-skill-id="{{ habilidade['id'] }}" data-skill-cost-mana="{{ habilidade['cost_mana'] }}" data-skill-cost-energy="{{ habilidade['cost_energy'] }}">
+                            <img src="{{ url_for('static', filename='images/skills/' + habilidade['name'] + '.png') }}" alt="{{ habilidade['name'] }}">
+                            <span>{{ habilidade['name'] }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                
                 <div class="bottom-bar">
                     <div class="bottom-bar-icon" id="profile-button">
                         <img src="{{ character['img_url'] }}" alt="Perfil" class="bottom-bar-icon-img">
@@ -138,9 +157,16 @@
                             <p><strong>Habilidades:</strong></p>
                             <ul>
                                 {% for habilidade in character['habilidades'] %}
-                                    <li>{{ habilidade }}</li>
+                                    <li>
+                                        <strong>{{ habilidade['name'] }}</strong>:
+                                        <span>{{ habilidade['description'] }}</span><br>
+                                        <small><em>Custo Mana: {{ habilidade['cost_mana'] }}, Custo Energia: {{ habilidade['cost_energy'] }}</em></small>
+                                    </li>
                                 {% endfor %}
                             </ul>
+                        </div>
+                        
+                        <div class="pericias">
                             <p><strong>Perícias:</strong></p>
                             <ul>
                                 {% for pericia, valor in character['pericias'].items() %}
@@ -148,7 +174,6 @@
                                 {% endfor %}
                             </ul>
                         </div>
-                    </div>
                 </div>
             
                 <div id="other-player-popup" class="popup">

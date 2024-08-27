@@ -187,6 +187,76 @@ body {
     margin: 20px auto;
 }
 
+.mana-ball {
+    width: 100px;
+    height: 100px;
+    background-color: #1a1a1a;
+    border-radius: 50%;
+    border: 5px solid #000066; /* Borda azul */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 20px auto;
+}
+
+.mana-fill {
+    background: radial-gradient(circle, #0000ff 0%, #000099 100%); /* Preenchimento azul */
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    transition: height 0.5s ease-in-out;
+    border-radius: 50%;
+}
+
+.mana-text {
+    position: absolute;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.energy-ball {
+    width: 100px;
+    height: 100px;
+    background-color: #1a1a1a;
+    border-radius: 50%;
+    border: 5px solid #666600; /* Borda amarela */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 20px auto;
+}
+
+.energy-fill {
+    background: radial-gradient(circle, #ffff00 0%, #999900 100%); /* Preenchimento amarelo */
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    transition: height 0.5s ease-in-out;
+    border-radius: 50%;
+}
+
+.energy-text {
+    position: absolute;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.health-mana-energy-bars {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+}
+
+
 .health-fill {
     background: radial-gradient(circle, #ff0000 0%, #990000 100%);
     width: 100%;
@@ -423,5 +493,31 @@ body {
 
     .player-stats p {
         font-size: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .mana-ball,
+    .energy-ball {
+        width: 80px;
+        height: 80px;
+    }
+
+    .mana-text,
+    .energy-text {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mana-ball,
+    .energy-ball {
+        width: 60px;
+        height: 60px;
+    }
+
+    .mana-text,
+    .energy-text {
+        font-size: 10px;
     }
 }

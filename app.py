@@ -261,7 +261,7 @@ def edit_character_route(character_id):
     character = db.chars.find_one({"_id": ObjectId(character_id)})
     if not character:
         return redirect(url_for('home'))
-    
+
     char_habilities = []
     for habilidade_id in character['habilidades']:
         print("Habilidade ID", habilidade_id)
@@ -471,34 +471,48 @@ def game_lobby():
     if not character:
         return redirect(url_for('home'))
 
-    if 'current_hp' not in character or character['current_hp'] is None:
-        character['current_hp'] = character['hp']
-        logging.debug(f"Set default current_hp for character: {character['_id']}")
+    # Set default values for current HP, Mana, and Energy if not set
+    character['current_hp'] = character.get('current_hp', character['hp'])
+    character['current_mana'] = character.get('current_mana', character['mana'])
+    character['current_energy'] = character.get('current_energy', character['energia'])
 
-    # Certifique-se de atualizar `current_hp` corretamente
+    # Update character's current state in the database
     db.chars.update_one(
         {"_id": ObjectId(character['_id'])},
-        {"$set": {"current_hp": character.get('current_hp', character['hp'])}}
+        {"$set": {
+            "current_hp": character['current_hp'],
+            "current_mana": character['current_mana'],
+            "current_energy": character['current_energy']
+        }}
     )
 
-    # Buscando informações de classe e raça
+    # Fetch class and race information
     class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
     race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
 
-    # Adicionando as informações de classe e raça ao personagem do usuário
     character['class_name'] = class_info['name'] if class_info else "Classe Desconhecida"
     character['race_name'] = race_info['name'] if race_info else "Raça Desconhecida"
-    character['habilidades'] = class_info.get('habilidades_classe', {}).copy() if class_info else {}
-    character['habilidades'].update(race_info.get('habilidades_inatas', {})) if race_info else {}
 
-    # Formatando habilidades para exibição
-    habilidades_formatadas = [f"{nome}: {descricao}" for nome, descricao in character['habilidades'].items()]
+    # Carregar as habilidades do personagem
+    habilidades = character.get('habilidades', {})
+
+    # Garantir que cada habilidade é um dicionário completo
+    habilidades_formatadas = []
+    for habilidade_id, habilidade_data in habilidades.items():
+        if isinstance(habilidade_data, dict):
+            habilidades_formatadas.append({
+                "id": habilidade_id,  # Adicionar o id da habilidade
+                "name": habilidade_data.get("name"),
+                "description": habilidade_data.get("description"),
+                "cost_mana": habilidade_data.get("cost", {}).get("mana", 0),
+                "cost_energy": habilidade_data.get("cost", {}).get("energy", 0)
+            })
+
     character['habilidades'] = habilidades_formatadas
 
-    # Perícias
     character['pericias'] = character.get('pericias', {})
 
-    # Carregando os personagens dos outros jogadores
+    # Load other players' characters
     other_characters = []
     for char_id in session_data.get('characters', []):
         if str(char_id) != str(character['_id']):
@@ -506,26 +520,69 @@ def game_lobby():
             if char:
                 char_class = db['classes.classes'].find_one({"_id": ObjectId(char['class_id'])})
                 char_race = db['races.races'].find_one({"_id": ObjectId(char['race_id'])})
-                
+
                 char['class_name'] = char_class['name'] if char_class else "Classe Desconhecida"
                 char['race_name'] = char_race['name'] if char_race else "Raça Desconhecida"
-                char['habilidades'] = char_class.get('habilidades_classe', {}).copy() if char_class else {}
-                char['habilidades'].update(char_race.get('habilidades_inatas', {})) if char_race else {}
-                
-                # Formatando habilidades para exibição
-                char['habilidades'] = [f"{nome}: {descricao}" for nome, descricao in char['habilidades'].items()]
+
+                # Carregar as habilidades do outro personagem
+                habilidades_char = char.get('habilidades', {})
+                char_habilidades_formatadas = []
+                for habilidade_id, habilidade_data in habilidades_char.items():
+                    if isinstance(habilidade_data, dict):
+                        char_habilidades_formatadas.append({
+                            "id": habilidade_id,
+                            "name": habilidade_data.get("name"),
+                            "description": habilidade_data.get("description"),
+                            "cost_mana": habilidade_data.get("cost", {}).get("mana", 0),
+                            "cost_energy": habilidade_data.get("cost", {}).get("energy", 0)
+                        })
+                char['habilidades'] = char_habilidades_formatadas
                 char['pericias'] = char.get('pericias', {})
-                
+
                 other_characters.append(char)
 
-    # Remova duplicatas do `other_characters`
-    other_characters = list({v['_id']:v for v in other_characters}.values())
+    # Remove duplicates
+    other_characters = list({v['_id']: v for v in other_characters}.values())
 
     return render_template('game_lobby.html', character=character, other_characters=other_characters, session_name=session_data['name'])
 
 
 
+@app.route('/use_skill', methods=['POST'])
+def use_skill():
+    data = request.get_json()
+    skill_id = data.get('skill_id')
+    mana_cost = data.get('mana_cost', 0)
+    energy_cost = data.get('energy_cost', 0)
+    char_id = data.get('char_id')
 
+    character = db.chars.find_one({"_id": ObjectId(char_id)})
+    if not character:
+        return jsonify({"success": False, "message": "Character not found"}), 404
+
+    # Verifica se o personagem tem Mana e Energia suficientes
+    if character['current_mana'] >= mana_cost and character['current_energy'] >= energy_cost:
+        new_mana = character['current_mana'] - mana_cost
+        new_energy = character['current_energy'] - energy_cost
+
+        # Atualiza os valores de Mana e Energia no banco de dados
+        db.chars.update_one(
+            {"_id": ObjectId(char_id)},
+            {"$set": {"current_mana": new_mana, "current_energy": new_energy}}
+        )
+
+        # Emitir atualização para todos os jogadores na sala
+        session_id = get_session_id_from_char(char_id)
+        if session_id:
+            socketio.emit('mana_energy_updated', {
+                'character_id': str(character['_id']),
+                'current_mana': new_mana,
+                'current_energy': new_energy
+            }, room=session_id)
+
+        return jsonify({"success": True, "current_mana": new_mana, "current_energy": new_energy})
+    else:
+        return jsonify({"success": False, "message": "Not enough Mana or Energy"}), 400
 
 
 @app.route('/get_player_details/<player_id>', methods=['GET'])
@@ -957,11 +1014,10 @@ def export_pdf(character_id):
         p.setFillColor(colors.darkred)
         p.drawCentredString(width / 2.0, height - 50, f"Ficha de Personagem: {character['name']}")
 
+        # If image exists, include it
         if character['img_url']:
             image_path = character['img_url']
-
             image_extension = os.path.splitext(image_path)[1].lower()
-
             try:
                 if image_extension in ['.png', '.jpg', '.jpeg', '.webp']:
                     img_x = width - 220
@@ -977,7 +1033,7 @@ def export_pdf(character_id):
             except Exception as e:
                 print(f"Error loading the image: {e}")
 
-        # Add character details with adjusted spacing
+        # Add character details
         p.setFont("MedievalFont", 16)
         text_x = 60
         text_y_start = height - 150
@@ -1029,31 +1085,21 @@ def export_pdf(character_id):
         p.setFillColor(colors.black)
         p.drawString(text_x + 100, text_y_start - 8 * line_height, f"{character['carisma']}")
 
-        # Add skills and abilities with headers and adjusted spacing
+        # Add abilities (Habilidades)
         p.setFont("MedievalFont", 18)
         p.setFillColor(colors.darkred)
-        p.drawString(text_x, text_y_start - 10 * line_height, "Habilidades de Classe:")
+        p.drawString(text_x, text_y_start - 10 * line_height, "Habilidades:")
 
         y = text_y_start - 11 * line_height
         p.setFont("MedievalFont", 14)
-        if class_info:
-            for habilidade, descricao in class_info.get("habilidades_classe", {}).items():
-                p.setFillColor(colors.black)
-                p.drawString(text_x + 20, y, f"{habilidade}: {descricao}")
-                y -= line_height
+        for habilidade_id, habilidade in character.get("habilidades", {}).items():
+            p.setFillColor(colors.black)
+            p.drawString(text_x + 20, y, f"{habilidade['name']}: {habilidade['description']}")
+            y -= line_height
+            p.drawString(text_x + 40, y, f"Custo Mana: {habilidade['cost']['mana']}, Custo Energia: {habilidade['cost']['energy']}")
+            y -= line_height
 
-        p.setFont("MedievalFont", 18)
-        p.setFillColor(colors.darkred)
-        p.drawString(text_x, y - line_height, "Habilidades Raciais:")
-
-        y -= 2 * line_height
-        p.setFont("MedievalFont", 14)
-        if race_info:
-            for habilidade, descricao in race_info.get("habilidades_inatas", {}).items():
-                p.setFillColor(colors.black)
-                p.drawString(text_x + 20, y, f"{habilidade}: {descricao}")
-                y -= line_height
-        
+        # Add skills (Perícias)
         p.setFont("MedievalFont", 18)
         p.setFillColor(colors.darkred)
         p.drawString(text_x, y - line_height, "Perícias:")
@@ -1090,6 +1136,7 @@ def export_pdf(character_id):
         return send_file(buffer, as_attachment=True, download_name=f'{character["name"]}_Ficha.pdf', mimetype='application/pdf')
     else:
         return "Character not found", 404
+
 
     
 if __name__ == '__main__':
