@@ -10,34 +10,19 @@
 
 <div class="characters-container">
     <h2>Personagens na Sessão</h2>
-    <div class="character-list">
-        {% for character in characters %}
-            <div class="character-card">
-                <form method="POST" class="character-form" data-char-id="{{ character['_id'] }}">
-                    <input type="hidden" name="char_id" value="{{ character['_id'] }}">
-                    <p><strong>{{ character['name'] }}</strong></p>
-                    <label>HP: <input type="number" name="hp" value="{{ character['current_hp'] }}" class="hp-input"></label><br>
-                    
-                    <!-- Nova seção de seleção de efeitos -->
-                    <!-- <label for="status-effect-select">Adicionar Efeito:</label>
-                    <select name="status_effect" class="status-effect-select">
-                        <option value="">Selecione um efeito</option>
-                        <option value="poison" data-description="Envenenamento (-3 de HP por rodada)" data-icon="poison icon.png">Envenenamento</option>
-                        <option value="sleep" data-description="Sono (Paralisado por uma rodada)" data-icon="sleep icon.png">Sono</option>
-                        <option value="confusion" data-description="Confusão (Ataca um aliado aleatório)" data-icon="confusion icon.png">Confusão</option>
-                        <option value="agility" data-description="Agilidade (+2 em Destreza)" data-icon="agility icon.png">Agilidade</option>
-                        <option value="rage" data-description="Fúria (+3 em Força, -2 em Defesa)" data-icon="rage icon.png">Fúria</option>
-                        <option value="curse" data-description="Maldição (-5 em todas as habilidades)" data-icon="curse icon.png">Maldição</option>
-                        <option value="silence" data-description="Silêncio (Impossibilitado de usar magia)" data-icon="silence icon.png">Silêncio</option>
-                        <option value="buff" data-description="Bônus de ataque (+2 em Força)" data-icon="buff icon.png">Bônus de ataque</option>
-                        <option value="debuff" data-description="Redução de ataque (-2 em Força)" data-icon="debuff icon.png">Redução de ataque</option>
-                    </select>
-                    <p class="effect-description"></p><br> -->
-                    <button type="button" class="remove-player-button" data-char-id="{{ character['_id'] }}">Remover</button>
-                    <button type="submit">Atualizar</button>
-                </form>
-            </div>
-        {% endfor %}
+{% for character in characters %}
+    <div class="character-card">
+        <p><strong>{{ character.name }}</strong></p>
+        <form method="POST" class="character-form" data-char-id="{{ character._id }}">
+            <input type="hidden" name="char_id" value="{{ character._id }}">
+            <label>HP: <input type="number" name="hp" value="{{ character.current_hp }}" class="hp-input"> / {{ character.hp }}</label><br>
+            <label>Mana: <input type="number" name="mana" value="{{ character.current_mana }}" class="mana-input"> / {{ character.mana }}</label><br>
+            <label>Energia: <input type="number" name="energia" value="{{ character.current_energy }}" class="energy-input"> / {{ character.energia }}</label><br>
+            <button type="submit">Atualizar</button>
+        </form>
+    </div>
+{% endfor %}
+
     </div>
 </div>
 

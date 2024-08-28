@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const maxMana = document.querySelector('.mana-ball[data-character-id="' + characterId + '"]').getAttribute('data-max-mana');
         const percentage = (newMana / maxMana) * 100;
         manaBall.style.height = percentage + '%';
-    
+
         const manaText = document.querySelector('.mana-ball[data-character-id="' + characterId + '"] .mana-text');
         manaText.textContent = newMana + ' / ' + maxMana;
     }
@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const maxEnergy = document.querySelector('.energy-ball[data-character-id="' + characterId + '"]').getAttribute('data-max-energy');
         const percentage = (newEnergy / maxEnergy) * 100;
         energyBall.style.height = percentage + '%';
-    
+
         const energyText = document.querySelector('.energy-ball[data-character-id="' + characterId + '"] .energy-text');
         energyText.textContent = newEnergy + ' / ' + maxEnergy;
     }
@@ -262,7 +262,6 @@ document.addEventListener("DOMContentLoaded", function () {
             updateEnergyBar(data.current_energy);
         }
     });    
-    
 
     socket.on('session_sync', function(data) {
         const playerList = document.querySelector('.other-players ul');

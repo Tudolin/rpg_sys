@@ -26,6 +26,17 @@ document.addEventListener("DOMContentLoaded", function() {
             console.warn('No characters found in session sync data.');
         }
     });
+
+    socket.on('mana_energy_updated_master', function(data) {
+        const playerElement = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);
+        if (playerElement) {
+            const manaField = playerElement.querySelector('.mana-input');
+            const energyField = playerElement.querySelector('.energy-input');
+            
+            if (manaField) manaField.value = data.current_mana;
+            if (energyField) energyField.value = data.current_energy;
+        }
+    });
     
 
     socket.on('new_player', function(data) {
@@ -66,7 +77,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 <form method="POST" class="character-form" data-char-id="${char._id}">
                     <input type="hidden" name="char_id" value="${char._id}">
                     <p><strong>${char.name}</strong></p>
-                    <label>HP: <input type="number" name="hp" value="${char.hp}" class="hp-input"></label><br>
+                    <label>HP: <input type="number" name="hp" value="${char.current_hp}" class="hp-input"></label><br>
+                    <label>Mana: <input type="number" name="mana" value="${char.current_mana}" class="mana-input"></label><br>
+                    <label>Energia: <input type="number" name="energia" value="${char.current_energy}" class="energy-input"></label><br>
                     <button type="submit">Atualizar</button>
                 </form>
             </div>
@@ -74,16 +87,21 @@ document.addEventListener("DOMContentLoaded", function() {
         playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
 
         const newForm = playerList.querySelector(`.character-form[data-char-id="${char._id}"]`);
-        newForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const charId = newForm.getAttribute('data-char-id');
-            const hp = newForm.querySelector('.hp-input').value;
+    newForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const charId = newForm.getAttribute('data-char-id');
+        const hp = newForm.querySelector('.hp-input').value;
+        const mana = newForm.querySelector('.mana-input').value;
+        const energy = newForm.querySelector('.energy-input').value;
 
-            socket.emit('update_health', {
-                character_id: charId,
-                new_health: hp
-            });
+        // Emite o evento de atualização de saúde, mana e energia via socket
+        socket.emit('update_character_status', {
+            character_id: charId,
+            new_health: hp,
+            new_mana: mana,
+            new_energy: energy
         });
+    });
     }
 
     function removePlayerFromList(charId) {
@@ -285,20 +303,34 @@ socket.on('player_removed', function(data) {
             `;
             playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
     
-            // Adiciona o novo formulário à lista de listeners para submissões
             const newForm = playerList.querySelector(`.character-form[data-char-id="${char._id}"]`);
             newForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-    
-                const charId = newForm.getAttribute('data-char-id');
-                const hp = newForm.querySelector('.hp-input').value;
-    
-                socket.emit('update_health', {
-                    character_id: charId,
-                    new_health: hp
-                });
+            event.preventDefault();
+            const charId = newForm.getAttribute('data-char-id');
+            const hp = newForm.querySelector('.hp-input').value;
+            const mana = newForm.querySelector('.mana-input').value;
+            const energy = newForm.querySelector('.energy-input').value;
+
+            // Emite o evento de atualização de saúde, mana e energia via socket
+            socket.emit('update_character_status', {
+                character_id: charId,
+                new_health: hp,
+                new_mana: mana,
+                new_energy: energy
             });
         });
+    });
+    });
+
+    socket.on('mana_energy_updated', function(data) {
+        const characterForm = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);
+        if (characterForm) {
+            const manaInput = characterForm.querySelector('.mana-input');
+            const energyInput = characterForm.querySelector('.energy-input');
+            
+            if (manaInput) manaInput.value = data.current_mana;
+            if (energyInput) energyInput.value = data.current_energy;
+        }
     });
     
     

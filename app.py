@@ -574,15 +574,18 @@ def use_skill():
         # Emitir atualização para todos os jogadores na sala
         session_id = get_session_id_from_char(char_id)
         if session_id:
-            socketio.emit('mana_energy_updated', {
+            update_data = {
                 'character_id': str(character['_id']),
                 'current_mana': new_mana,
                 'current_energy': new_energy
-            }, room=session_id)
+            }
+            socketio.emit('mana_energy_updated', update_data, room=session_id)
+            socketio.emit('mana_energy_updated_master', update_data, room=session_id)
 
         return jsonify({"success": True, "current_mana": new_mana, "current_energy": new_energy})
     else:
         return jsonify({"success": False, "message": "Not enough Mana or Energy"}), 400
+
 
 
 @app.route('/get_player_details/<player_id>', methods=['GET'])
@@ -736,25 +739,44 @@ def master_control(session_id):
     if request.method == 'POST':
         char_id = request.form['char_id']
         hp = int(request.form['hp'])
+        mana = int(request.form.get('mana', 0))  # Obtém o valor de mana do formulário
+        energy = int(request.form.get('energia', 0))  # Obtém o valor de energia do formulário
+        
+        # Atualizar os valores no banco de dados
         db.chars.update_one(
             {"_id": ObjectId(char_id)},
-            {"$set": {"current_hp": hp}}
+            {"$set": {
+                "current_hp": hp,
+                "current_mana": mana,
+                "current_energy": energy
+            }}
         )
 
         # Emitir atualização de vida via Socket.IO
         character = db.chars.find_one({"_id": ObjectId(char_id)})
         room = session_id
         if room:
+            # Emitir atualização de HP
             socketio.emit('health_updated', {
                 'character_id': str(character['_id']),
                 'new_health': character['current_hp'],
                 'max_health': character['hp']
             }, room=room)
 
+            # Emitir atualização de Mana e Energia
+            socketio.emit('mana_energy_updated', {
+                'character_id': str(character['_id']),
+                'current_mana': character['current_mana'],
+                'max_mana': character['mana'],
+                'current_energy': character['current_energy'],
+                'max_energy': character['energia']
+            }, room=room)
+
         flash("Status do personagem atualizado com sucesso!", "success")
         return redirect(url_for('master_control', session_id=session_id))
 
-    return render_template('master_control.html', characters=characters,session_data=session_data, session_name=session_data['name'])
+    return render_template('master_control.html', characters=characters, session_data=session_data, session_name=session_data['name'])
+
 
 
 @app.route('/update_character', methods=['POST'])
@@ -844,7 +866,6 @@ def upload_media():
 def get_music_tracks():
     tracks = []
     for filename in os.listdir(app.config['MUSIC_FOLDER']):
-        print(filename)
         if filename.lower().endswith(('mp3', 'wav', 'ogg')):
             tracks.append({
                 'name': filename.rsplit('.', 1)[0],
@@ -1059,6 +1080,41 @@ def handle_update_health(data):
             'character_id': character_id,
             'new_health': new_health
         }, room=session_id)
+
+@socketio.on('update_character_status')
+def handle_update_character_status(data):
+    character_id = data['character_id']
+    new_health = data.get('new_health')
+    new_mana = data.get('new_mana')
+    new_energy = data.get('new_energy')
+
+    print(f"Received update for character {character_id}: HP={new_health}, Mana={new_mana}, Energy={new_energy}")
+
+    # Atualizar os valores no banco de dados
+    update_fields = {}
+    if new_health is not None:
+        update_fields['current_hp'] = int(new_health)
+    if new_mana is not None:
+        update_fields['current_mana'] = int(new_mana)
+    if new_energy is not None:
+        update_fields['current_energy'] = int(new_energy)
+
+    if update_fields:
+        db.chars.update_one(
+            {"_id": ObjectId(character_id)},
+            {"$set": update_fields}
+        )
+
+    # Emitir atualizações para todos os clientes conectados na sessão
+    session_id = get_session_id_from_char(character_id)
+    if session_id:
+        emit('mana_energy_updated_master', {
+            'character_id': character_id,
+            'current_mana': new_mana,
+            'current_energy': new_energy
+        }, room=session_id)
+
+
 
 
 pdfmetrics.registerFont(TTFont('MedievalFont', 'static/fonts/Enchanted Land.otf'))
