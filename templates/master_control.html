@@ -10,7 +10,7 @@
 
 <div class="characters-container">
     <h2>Personagens na Sessão</h2>
-{% for character in characters %}
+    {% for character in characters %}
     <div class="character-card">
         <p><strong>{{ character.name }}</strong></p>
         <form method="POST" class="character-form" data-char-id="{{ character._id }}">
@@ -21,19 +21,39 @@
             <button type="submit">Atualizar</button>
         </form>
     </div>
-{% endfor %}
-
-    </div>
+    {% endfor %}
 </div>
+
+<h2>Adicionar Monstros</h2>
+<form id="add-monster-form">
+    <div class="monster-selection">
+        <label for="monster-select">Escolha o Monstro:</label>
+        <select id="monster-select">
+            {% for enemy in enemies %}
+            <option value="{{ enemy._id }}">{{ enemy.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="monster-quantity">
+        <label for="monster-quantity">Quantidade:</label>
+        <input type="number" id="monster-quantity" name="monster_quantity" min="1" value="1">
+    </div>
+    <button type="submit">Adicionar Monstro(s)</button>
+</form>
+
+<h2>Monstros na Sessão</h2>
+<ul id="monster-list">
+    <!-- Monstros adicionados aparecerão aqui -->
+</ul>
+
 
 <h2>Enviar Mídia</h2>
 <form id="media-form" enctype="multipart/form-data">
     <input type="file" name="media" id="media-input" required>
     <label for="display-time">Tempo de exibição (segundos):</label>
     <input type="number" id="display-time" name="display_time" min="1" required>
-    <button type="submit"><i class="bi bi-send"></i>  Enviar</button>
+    <button type="submit"><i class="bi bi-send"></i> Enviar</button>
 </form>
-
 
 <div id="media-preview"></div>
 
@@ -42,8 +62,8 @@
     <select id="music-select">
         <option value="">Selecione uma música</option>
     </select>
-    <button id="play-button"><i class="bi bi-play-circle"></i>  Play</button>
-    <button id="stop-button"><i class="bi bi-stop-circle"></i>  Stop</button>
+    <button id="play-button"><i class="bi bi-play-circle"></i> Play</button>
+    <button id="stop-button"><i class="bi bi-stop-circle"></i> Stop</button>
 </div>
 
 <div id="music-player">

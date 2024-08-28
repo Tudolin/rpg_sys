@@ -347,6 +347,31 @@ document.addEventListener("DOMContentLoaded", function () {
         healthText.textContent = data.new_health + ' / ' + maxHp;
     });
 
+    socket.on('monster_added', function(data) {
+        const boardCenter = document.querySelector('.board-center');
+
+        if (boardCenter) {
+            const monsterElement = document.createElement('div');
+            monsterElement.classList.add('enemy-card');
+            monsterElement.dataset.monsterId = data._id;
+            monsterElement.innerHTML = `
+                <h4>${data.name}</h4>
+                <p>HP: ${data.current_hp} / ${data.hp}</p>
+                <p>${data.resumo}</p>
+            `;
+            boardCenter.appendChild(monsterElement);
+        }
+    });
+
+    // Função para remover monstros da tela dos jogadores
+    socket.on('monster_removed', function(data) {
+        const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data._id}"]`);
+        if (monsterElement) {
+            monsterElement.remove();
+        }
+    });
+    
+
     socket.on('status_updated', function(data) {
         console.log('Status update received:', data);  // Log de depuração
         const statusField = document.querySelector(`.status-input[data-char-id="${data.character_id}"]`);

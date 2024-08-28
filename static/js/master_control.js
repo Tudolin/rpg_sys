@@ -11,6 +11,81 @@ document.addEventListener("DOMContentLoaded", function() {
     const musicSelect = document.getElementById('music-select');
     const currentTrackElement = document.getElementById('current-track');
     const playerList = document.querySelector('.characters-container .character-list');
+    const addMonsterForm = document.getElementById('add-monster-form');
+    const monsterSelect = document.getElementById('monster-select');
+    const monsterQuantityInput = document.getElementById('monster-quantity');
+    const monsterList = document.getElementById('monster-list');
+
+    if (addMonsterForm) {
+        addMonsterForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const monsterId = monsterSelect.value;
+            const quantity = parseInt(monsterQuantityInput.value);
+
+            console.log(`Attempting to add ${quantity} of monster with ID: ${monsterId}`);
+
+            if (monsterId && quantity > 0) {
+                for (let i = 0; i < quantity; i++) {
+                    socket.emit('add_monster', { monster_id: monsterId, session_id: sessionId });
+                }
+            }
+        });
+    }
+
+    socket.on('monster_added', function(data) {
+        console.log('Received monster_added event with data:', data);
+
+        const monsterElement = document.createElement('li');
+        monsterElement.dataset.monsterId = data._id;
+        monsterElement.innerHTML = `
+            <strong>${data.name}</strong> (HP: ${data.current_hp}/${data.hp})
+            <form class="monster-form" data-monster-id="${data._id}">
+                <label>HP: <input type="number" name="monster_hp" value="${data.current_hp}" class="monster-hp-input"> / ${data.hp}</label><br>
+                <button type="submit">Atualizar</button>
+                <button type="button" class="remove-monster-button" data-monster-id="${data._id}">Remover</button>
+            </form>
+        `;
+        monsterList.appendChild(monsterElement);
+
+        const form = monsterElement.querySelector('.monster-form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const monsterId = form.getAttribute('data-monster-id');
+            const newHp = form.querySelector('.monster-hp-input').value;
+
+            console.log(`Updating HP of monster with ID: ${monsterId} to ${newHp}`);
+
+            socket.emit('update_monster_hp', {
+                monster_id: monsterId,
+                new_hp: newHp,
+                session_id: sessionId
+            });
+        });
+
+        monsterElement.querySelector('.remove-monster-button').addEventListener('click', function() {
+            const monsterId = this.getAttribute('data-monster-id');
+            console.log(`Attempting to remove monster with ID: ${monsterId}`);
+            socket.emit('remove_monster', { monster_id: monsterId, session_id: sessionId });
+        });
+    });
+
+    socket.on('monster_removed', function(data) {
+        console.log('Received monster_removed event with data:', data);
+        const monsterElement = document.querySelector(`li[data-monster-id="${data._id}"]`);
+        if (monsterElement) {
+            monsterElement.remove();
+        }
+    });
+
+    socket.on('monster_hp_updated', function(data) {
+        console.log('Received monster_hp_updated event with data:', data);
+        const monsterElement = document.querySelector(`li[data-monster-id="${data._id}"]`);
+        if (monsterElement) {
+            const hpInput = monsterElement.querySelector('.monster-hp-input');
+            hpInput.value = data.current_hp;
+        }
+    });
 
     socket.on('connect', function() {
         console.log('Connected to the server, requesting session sync...');

@@ -36,9 +36,9 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get('SECRET_KEY') or 'a212d3b5e27f9cd2dfb8a9d18587ae51b2f88af9e1e95112'
 app.config['SESSION_PROTECTION'] = 'strong'
-# app.config['SESSION_TYPE'] = 'redis'
-# app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379, db=0, password=None)
-app.config['SESSION_TYPE'] = 'filesystem' #for local host debug
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379, db=0, password=None)
+# app.config['SESSION_TYPE'] = 'filesystem' #for local host debug
 Session(app)
 
 CORS(app)
@@ -737,47 +737,85 @@ def master_control(session_id):
             characters.append(character)
 
     if request.method == 'POST':
-        char_id = request.form['char_id']
-        hp = int(request.form['hp'])
-        mana = int(request.form.get('mana', 0))  # Obtém o valor de mana do formulário
-        energy = int(request.form.get('energia', 0))  # Obtém o valor de energia do formulário
-        
-        # Atualizar os valores no banco de dados
-        db.chars.update_one(
-            {"_id": ObjectId(char_id)},
-            {"$set": {
-                "current_hp": hp,
-                "current_mana": mana,
-                "current_energy": energy
-            }}
-        )
+        if 'char_id' in request.form:  # Atualizando personagens
+            char_id = request.form['char_id']
+            hp = int(request.form['hp'])
+            mana = int(request.form.get('mana', 0))  # Obtém o valor de mana do formulário
+            energy = int(request.form.get('energia', 0))  # Obtém o valor de energia do formulário
+            
+            # Atualizar os valores no banco de dados
+            db.chars.update_one(
+                {"_id": ObjectId(char_id)},
+                {"$set": {
+                    "current_hp": hp,
+                    "current_mana": mana,
+                    "current_energy": energy
+                }}
+            )
 
-        # Emitir atualização de vida via Socket.IO
-        character = db.chars.find_one({"_id": ObjectId(char_id)})
-        room = session_id
-        if room:
-            # Emitir atualização de HP
-            socketio.emit('health_updated', {
-                'character_id': str(character['_id']),
-                'new_health': character['current_hp'],
-                'max_health': character['hp']
-            }, room=room)
+            # Emitir atualização de vida via Socket.IO
+            character = db.chars.find_one({"_id": ObjectId(char_id)})
+            room = session_id
+            if room:
+                # Emitir atualização de HP
+                socketio.emit('health_updated', {
+                    'character_id': str(character['_id']),
+                    'new_health': character['current_hp'],
+                    'max_health': character['hp']
+                }, room=room)
 
-            # Emitir atualização de Mana e Energia
-            socketio.emit('mana_energy_updated', {
-                'character_id': str(character['_id']),
-                'current_mana': character['current_mana'],
-                'max_mana': character['mana'],
-                'current_energy': character['current_energy'],
-                'max_energy': character['energia']
-            }, room=room)
+                # Emitir atualização de Mana e Energia
+                socketio.emit('mana_energy_updated', {
+                    'character_id': str(character['_id']),
+                    'current_mana': character['current_mana'],
+                    'max_mana': character['mana'],
+                    'current_energy': character['current_energy'],
+                    'max_energy': character['energia']
+                }, room=room)
 
-        flash("Status do personagem atualizado com sucesso!", "success")
-        return redirect(url_for('master_control', session_id=session_id))
+            flash("Status do personagem atualizado com sucesso!", "success")
+            return redirect(url_for('master_control', session_id=session_id))
 
-    return render_template('master_control.html', characters=characters, session_data=session_data, session_name=session_data['name'])
+        elif 'monster_id' in request.form:  # Adicionando monstros
+            monster_id = request.form['monster_id']
+            quantity = int(request.form.get('quantity', 1))
 
+            for _ in range(quantity):
+                # Buscar o monstro no banco de dados
+                monster = db['enemies.enemies'].find_one({"_id": ObjectId(monster_id)})
 
+                if monster:
+                    # Criar uma cópia do monstro com um novo ID
+                    new_monster = {
+                        '_id': str(ObjectId()),
+                        'name': monster['name'],
+                        'hp': monster['hp'],
+                        'current_hp': monster['hp'],  # Começar com o HP completo
+                        'resumo': monster.get('resumo', '')
+                    }
+
+                    # Emitir o evento 'monster_added' para todos os clientes na sessão
+                    socketio.emit('monster_added', new_monster, room=session_id)
+
+            flash(f"{quantity} {monster['name']}(s) adicionado(s) à sessão.", "success")
+            return redirect(url_for('master_control', session_id=session_id))
+
+        elif 'monster_hp' in request.form:  # Atualizando vida dos monstros
+            monster_id = request.form['monster_id']
+            new_hp = int(request.form['monster_hp'])
+
+            # Emitir a atualização de HP para o monstro
+            socketio.emit('update_monster_health', {
+                'monster_id': monster_id,
+                'new_hp': new_hp
+            }, room=session_id)
+
+            flash("Vida do monstro atualizada com sucesso!", "success")
+            return redirect(url_for('master_control', session_id=session_id))
+
+    enemies = list(db['enemies.enemies'].find())
+
+    return render_template('master_control.html', characters=characters, session_data=session_data, session_name=session_data['name'], enemies=enemies)
 
 @app.route('/update_character', methods=['POST'])
 def update_character():
@@ -1114,7 +1152,52 @@ def handle_update_character_status(data):
             'current_energy': new_energy
         }, room=session_id)
 
+@socketio.on('add_monster')
+def handle_add_monster(data):
+    print(f"Received request to add monster: {data}")
+    monster_id = data.get('monster_id')
+    session_id = data.get('session_id')
 
+    print(f"Monster ID: {monster_id}, Session ID: {session_id}")
+
+    monster = db['enemies.enemies'].find_one({"_id": ObjectId(monster_id)})
+
+    if monster and session_id:
+        monster_data = {
+            '_id': str(ObjectId()),  # Unique ID for each instance of a monster
+            'name': monster['name'],
+            'hp': monster['hp'],
+            'current_hp': monster['hp'],  # Start with full HP
+            'resumo': monster.get('resumo', '')
+        }
+
+        print(f"Emitting 'monster_added' with data: {monster_data}")
+
+        # Emitir o evento 'monster_added' para todos os clientes na sessão
+        socketio.emit('monster_added', monster_data, room=session_id)
+    else:
+        print(f"Failed to add monster. Monster or session not found: monster={monster}, session_id={session_id}")
+
+
+@socketio.on('update_monster_hp')
+def handle_update_monster_hp(data):
+    monster_id = data.get('monster_id')
+    new_hp = int(data.get('new_hp'))
+    session_id = data.get('session_id')
+
+    # Emitir a atualização de HP do monstro
+    socketio.emit('monster_hp_updated', {
+        '_id': monster_id,
+        'current_hp': new_hp
+    }, room=session_id)
+
+@socketio.on('remove_monster')
+def handle_remove_monster(data):
+    monster_id = data.get('monster_id')
+    session_id = data.get('session_id')
+
+    if monster_id and session_id:
+        socketio.emit('monster_removed', {'_id': monster_id}, room=session_id)
 
 
 pdfmetrics.registerFont(TTFont('MedievalFont', 'static/fonts/Enchanted Land.otf'))

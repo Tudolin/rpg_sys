@@ -12,6 +12,42 @@
      }
 }
 
+.monster-selection {
+    margin-bottom: 10px;
+}
+
+.monster-quantity {
+    margin-bottom: 10px;
+}
+
+#added-monsters {
+    margin-top: 20px;
+}
+
+#monster-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#monster-list li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.remove-monster-button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #d9534f;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+
 .dice-result {
     position: fixed;
     bottom: 20%;  /* Ajuste para centralizar o dado verticalmente */
