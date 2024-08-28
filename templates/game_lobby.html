@@ -113,12 +113,20 @@
                 <div class="bottom-bar">
                     <div class="skills-bar">
                         {% for habilidade in character['habilidades'] %}
-                            <div class="skill-icon" data-skill-id="{{ habilidade['id'] }}" data-skill-cost-mana="{{ habilidade['cost_mana'] }}" data-skill-cost-energy="{{ habilidade['cost_energy'] }}">
-                                <img src="{{ url_for('static', filename='images/skills/' + habilidade['name'] + '.png') }}" alt="{{ habilidade['name'] }}">
-                                <span>{{ habilidade['name'] }}</span>
-                                <span style="color: aqua;" class="skill-cost">Mana: {{ habilidade['cost_mana'] }}, Energy: {{ habilidade['cost_energy'] }}</span>
-                            </div>
-                        {% endfor %}
+    {% if habilidade is string %}
+        <div class="skill-icon" data-skill-id="{{ loop.index }}">
+            <img src="{{ url_for('static', filename='images/skills/' + habilidade + '.png') }}" alt="{{ habilidade }}">
+            <span>{{ habilidade }}</span>
+        </div>
+    {% else %}
+        <div class="skill-icon" data-skill-id="{{ habilidade['id'] }}" data-skill-cost-mana="{{ habilidade['cost_mana'] }}" data-skill-cost-energy="{{ habilidade['cost_energy'] }}">
+            <img src="{{ url_for('static', filename='images/skills/' + habilidade['name'] + '.png') }}" alt="{{ habilidade['name'] }}">
+            <span>{{ habilidade['name'] }}</span>
+            <span style="color: aqua;" class="skill-cost">Mana: {{ habilidade['cost_mana'] }}, Energy: {{ habilidade['cost_energy'] }}</span>
+        </div>
+    {% endif %}
+{% endfor %}
+
                     </div>
                     <div class="bottom-bar-icon" id="profile-button">
                         <img src="{{ character['img_url'] }}" alt="Perfil" class="bottom-bar-icon-img">
