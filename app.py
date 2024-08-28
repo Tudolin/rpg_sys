@@ -548,7 +548,7 @@ def game_lobby():
 
 
 
-@app.route('/use_skill', methods=['POST'])
+@app.route('/use_skill', methods=['POST', 'GET'])
 def use_skill():
     data = request.get_json()
     skill_id = data.get('skill_id')
@@ -594,50 +594,126 @@ def get_player_details(player_id):
         class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
         race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
 
+        habilidades = []
+        if 'habilidades' in character:
+            for habilidade_id, habilidade_data in character['habilidades'].items():
+                mana_cost = habilidade_data.get("cost", {}).get("mana", 0)
+                energy_cost = habilidade_data.get("cost", {}).get("energy", 0)
+
+                # Se mana_cost ou energy_cost forem inteiros, usá-los diretamente
+                if isinstance(mana_cost, dict):
+                    mana_cost = mana_cost.get("$numberInt", 0)
+                if isinstance(energy_cost, dict):
+                    energy_cost = energy_cost.get("$numberInt", 0)
+
+                habilidades.append({
+                    "id": habilidade_id,
+                    "name": habilidade_data.get("name"),
+                    "description": habilidade_data.get("description"),
+                    "cost_mana": mana_cost,
+                    "cost_energy": energy_cost
+                })
+
+        # Processa as perícias
+        pericias = {}
+        if 'pericias' in character:
+            for pericia, valor in character['pericias'].items():
+                pericias[pericia] = valor.get("$numberInt", valor) if isinstance(valor, dict) else valor
+
         response = {
             "name": character['name'],
             "class_name": class_info['name'] if class_info else "Classe Desconhecida",
             "race_name": race_info['name'] if race_info else "Raça Desconhecida",
-            "forca": character['forca'],
-            "destreza": character['destreza'],
-            "constituicao": character['constituicao'],
-            "inteligencia": character['inteligencia'],
-            "sabedoria": character['sabedoria'],
-            "carisma": character['carisma'],
-            "habilidades": character['habilidades'],
-            "pericias": character['pericias'],
-            "img_url": character['img_url'] if 'img_url' in character else '/static/images/default.png'  # Adiciona a imagem
+            "forca": character['forca'].get("$numberInt", character['forca']) if isinstance(character['forca'], dict) else character['forca'],
+            "destreza": character['destreza'].get("$numberInt", character['destreza']) if isinstance(character['destreza'], dict) else character['destreza'],
+            "constituicao": character['constituicao'].get("$numberInt", character['constituicao']) if isinstance(character['constituicao'], dict) else character['constituicao'],
+            "inteligencia": character['inteligencia'].get("$numberInt", character['inteligencia']) if isinstance(character['inteligencia'], dict) else character['inteligencia'],
+            "sabedoria": character['sabedoria'].get("$numberInt", character['sabedoria']) if isinstance(character['sabedoria'], dict) else character['sabedoria'],
+            "carisma": character['carisma'].get("$numberInt", character['carisma']) if isinstance(character['carisma'], dict) else character['carisma'],
+            "hp": character['hp'].get("$numberInt", character['hp']) if isinstance(character['hp'], dict) else character['hp'],
+            "mana": character['mana'].get("$numberInt", character['mana']) if isinstance(character['mana'], dict) else character['mana'],
+            "energia": character['energia'].get("$numberInt", character['energia']) if isinstance(character['energia'], dict) else character['energia'],
+            "current_hp": character['current_hp'].get("$numberInt", character['hp']) if isinstance(character['current_hp'], dict) else character['current_hp'],
+            "current_mana": character['current_mana'].get("$numberInt", character['mana']) if isinstance(character['current_mana'], dict) else character['current_mana'],
+            "current_energy": character['current_energy'].get("$numberInt", character['energia']) if isinstance(character['current_energy'], dict) else character['current_energy'],
+            "habilidades": habilidades,
+            "pericias": pericias,
+            "img_url": character['img_url'] if 'img_url' in character else '/static/images/default.png'
         }
         return jsonify(response)
     else:
         return jsonify({"error": "Character not found"}), 404
 
+
+
 @app.route('/get_current_player_details', methods=['GET'])
 def get_current_player_details():
-    character = db.chars.find_one({"user_id": ObjectId(session['userId'])})
+    try:
+        if 'userId' not in session:
+            return jsonify({"error": "User not logged in"}), 401  # Retorna um erro 401 se o usuário não estiver logado
 
-    if character:
+        character = db.chars.find_one({"user_id": ObjectId(session['userId'])})
+
+        if not character:
+            return jsonify({"error": "Character not found"}), 404
+
         # Busca informações de classe e raça
         class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
         race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
 
+        # Processa as habilidades
+        habilidades = []
+        if 'habilidades' in character:
+            for habilidade_id, habilidade_data in character['habilidades'].items():
+                mana_cost = habilidade_data.get("cost", {}).get("mana", 0)
+                energy_cost = habilidade_data.get("cost", {}).get("energy", 0)
+
+                # Se mana_cost ou energy_cost forem inteiros, usá-los diretamente
+                if isinstance(mana_cost, dict):
+                    mana_cost = mana_cost.get("$numberInt", 0)
+                if isinstance(energy_cost, dict):
+                    energy_cost = energy_cost.get("$numberInt", 0)
+
+                habilidades.append({
+                    "id": habilidade_id,
+                    "name": habilidade_data.get("name"),
+                    "description": habilidade_data.get("description"),
+                    "cost_mana": mana_cost,
+                    "cost_energy": energy_cost
+                })
+
+        # Processa as perícias
+        pericias = {}
+        if 'pericias' in character:
+            for pericia, valor in character['pericias'].items():
+                pericias[pericia] = valor.get("$numberInt", valor) if isinstance(valor, dict) else valor
+
         response = {
             "name": character['name'],
             "class_name": class_info['name'] if class_info else "Classe Desconhecida",
             "race_name": race_info['name'] if race_info else "Raça Desconhecida",
-            "forca": character['forca'],
-            "destreza": character['destreza'],
-            "constituicao": character['constituicao'],
-            "inteligencia": character['inteligencia'],
-            "sabedoria": character['sabedoria'],
-            "carisma": character['carisma'],
-            "habilidades": character['habilidades'],
-            "pericias": character['pericias'],
-            "img_url": character['img_url'] if 'img_url' in character else '/static/images/default.png'  # Adiciona a imagem
+            "forca": character['forca'].get("$numberInt", character['forca']) if isinstance(character['forca'], dict) else character['forca'],
+            "destreza": character['destreza'].get("$numberInt", character['destreza']) if isinstance(character['destreza'], dict) else character['destreza'],
+            "constituicao": character['constituicao'].get("$numberInt", character['constituicao']) if isinstance(character['constituicao'], dict) else character['constituicao'],
+            "inteligencia": character['inteligencia'].get("$numberInt", character['inteligencia']) if isinstance(character['inteligencia'], dict) else character['inteligencia'],
+            "sabedoria": character['sabedoria'].get("$numberInt", character['sabedoria']) if isinstance(character['sabedoria'], dict) else character['sabedoria'],
+            "carisma": character['carisma'].get("$numberInt", character['carisma']) if isinstance(character['carisma'], dict) else character['carisma'],
+            "hp": character['hp'].get("$numberInt", character['hp']) if isinstance(character['hp'], dict) else character['hp'],
+            "mana": character['mana'].get("$numberInt", character['mana']) if isinstance(character['mana'], dict) else character['mana'],
+            "energia": character['energia'].get("$numberInt", character['energia']) if isinstance(character['energia'], dict) else character['energia'],
+            "current_hp": character['current_hp'].get("$numberInt", character['hp']) if isinstance(character['current_hp'], dict) else character['current_hp'],
+            "current_mana": character['current_mana'].get("$numberInt", character['mana']) if isinstance(character['current_mana'], dict) else character['current_mana'],
+            "current_energy": character['current_energy'].get("$numberInt", character['energia']) if isinstance(character['current_energy'], dict) else character['current_energy'],
+            "habilidades": habilidades,
+            "pericias": pericias,
+            "img_url": character['img_url'] if 'img_url' in character else '/static/images/default.png'
         }
         return jsonify(response)
-    else:
-        return jsonify({"error": "Character not found"}), 404
+    except Exception as e:
+        print(f"Error: {e}")  # Loga o erro no console do servidor
+        return jsonify({"error": "Internal Server Error"}), 500
+
+
 
 
 @app.route('/master_control/<session_id>', methods=['GET', 'POST'])

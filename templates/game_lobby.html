@@ -51,72 +51,72 @@
 -->
 <audio id="game-music-player" controls style="display: none;"></audio>
 
-            <div class="game-lobby-container">
-                <div class="main-content">
-                    <div class="other-players">
-                        <h3>Jogadores na Sessão</h3>
-                        <ul>
-                            {% for char in other_characters %}
-                                <li class="other-player" data-player-id="{{ char['_id'] }}">
-                                    <div class="character-frame-small">
-                                        <img src="{{ char['img_url'] }}" alt="{{ char['name'] }}" class="character-portrait-small">
-                                    </div>
-                                    <div class="player-stats">
-                                        <p>{{ char['name'] }}</p>
-                                        <p>Classe: {{ char['class_name'] }}</p>
-                                        <p>Raca: {{ char['race_name'] }}</p>
-                                        <p>HP: {{ char['hp'] }}</p>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
+<div class="game-lobby-container">
+    <div class="other-players">
+        <h3>Jogadores na Sessão</h3>
+        <ul>
+            {% for char in other_characters %}
+                <li class="other-player" data-player-id="{{ char['_id'] }}">
+                    <div class="character-frame-small">
+                        <img src="{{ char['img_url'] }}" alt="{{ char['name'] }}" class="character-portrait-small">
                     </div>
-            
-                    <div class="player-info">
-                        <div class="character-frame">
-                            <img src="{{ character['img_url'] }}" alt="{{ character['name'] }}" class="character-portrait">
-                        </div>
-                        <div class="stats-container">
-                            <h2>{{ character['name'] }}</h2>
-                            <p><strong>Classe:</strong> {{ character['class_name'] }}</p>
-                            <p><strong>Raca:</strong> {{ character['race_name'] }}</p>
-            
-                            <div class="health-mana-energy-bars">
-                                <div class="health-ball" data-character-id="{{ character['_id'] }}" data-max-hp="{{ character['hp'] }}">
-                                    <div class="health-fill" style="height: {{ (character['current_hp'] | default(character['hp']) | int) / (character['hp'] | int) * 100 }}%"></div>
-                                    <div class="health-text">{{ character['current_hp'] }} / {{ character['hp'] }}</div>
-                                </div>
-                                <div class="mana-ball" data-character-id="{{ character['_id'] }}" data-max-mana="{{ character['mana'] }}">
-                                    <div class="mana-fill" style="height: {{ (character['current_mana'] | default(character['mana']) | int) / (character['mana'] | int) * 100 }}%"></div>
-                                    <div class="mana-text">{{ character['current_mana'] }} / {{ character['mana'] }}</div>
-                                </div>
-                                <div class="energy-ball" data-character-id="{{ character['_id'] }}" data-max-energy="{{ character['energia'] }}">
-                                    <div class="energy-fill" style="height: {{ (character['current_energy'] | default(character['energia']) | int) / (character['energia'] | int) * 100 }}%"></div>
-                                    <div class="energy-text">{{ character['current_energy'] }} / {{ character['energia'] }}</div>
-                                </div>
-                            </div>
-                            
-                            
-                            <div class="bottom-bar-icon" id="roll-dice-button">
-                                <img src="/static/icons/dice.png" alt="Rolar Dado" class="bottom-bar-icon-img">
-                                <span>Rolar D20</span>
-                            </div>
-                            <div id="dice-result" class="dice-result">🎲</div>
-                            
-                            <div id="dice-result" class="dice-result hidden"></div>
-                        </div>
+                    <div class="player-stats">
+                        <p>{{ char['name'] }}</p>
+                        <p>Classe: {{ char['class_name'] }}</p>
+                        <p>HP: {{ char['current_hp'] }} / {{ char['hp'] }}</p>
+                        <p>Mana: {{ char['current_mana'] }} / {{ char['mana'] }}</p>
+                        <p>Energia: {{ char['current_energy'] }} / {{ char['energia'] }}</p>
                     </div>
-                </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 
-                
+    <div class="player-info">
+        <div class="character-frame">
+            <img src="{{ character['img_url'] }}" alt="{{ character['name'] }}" class="character-portrait">
+        </div>
+        <div class="stats-container">
+            <h2>{{ character['name'] }}</h2>
+            <p><strong>Classe:</strong> {{ character['class_name'] }}</p>
+            <p><strong>Raca:</strong> {{ character['race_name'] }}</p>
+
+            <div class="health-mana-energy-bars">
+                <div class="health-ball" data-character-id="{{ character['_id'] }}" data-max-hp="{{ character['hp'] }}">
+                    <div class="health-fill" style="height: {{ (character['current_hp'] | default(character['hp']) | int) / (character['hp'] | int) * 100 }}%"></div>
+                    <div class="health-text">{{ character['current_hp'] }} / {{ character['hp'] }}</div>
+                </div>
+                <div class="mana-ball" data-character-id="{{ character['_id'] }}" data-max-mana="{{ character['mana'] }}">
+                    <div class="mana-fill" style="height: {{ (character['current_mana'] | default(character['mana']) | int) / (character['mana'] | int) * 100 }}%"></div>
+                    <div class="mana-text">{{ character['current_mana'] }} / {{ character['mana'] }}</div>
+                </div>
+                <div class="energy-ball" data-character-id="{{ character['_id'] }}" data-max-energy="{{ character['energia'] }}">
+                    <div class="energy-fill" style="height: {{ (character['current_energy'] | default(character['energia']) | int) / (character['energia'] | int) * 100 }}%"></div>
+                    <div class="energy-text">{{ character['current_energy'] }} / {{ character['energia'] }}</div>
+                </div>
+            </div>
             
+            
+            <div class="bottom-bar-icon" id="roll-dice-button">
+                <img src="/static/icons/dice.png" alt="Rolar Dado" class="bottom-bar-icon-img">
+                <span>Rolar D20</span>
+            </div>
+            <div id="dice-result" class="dice-result">🎲</div>
+            
+            <div id="dice-result" class="dice-result hidden"></div>
+        </div>
+    </div>
+</div>
+
+
+
                 <div class="bottom-bar">
                     <div class="skills-bar">
                         {% for habilidade in character['habilidades'] %}
                             <div class="skill-icon" data-skill-id="{{ habilidade['id'] }}" data-skill-cost-mana="{{ habilidade['cost_mana'] }}" data-skill-cost-energy="{{ habilidade['cost_energy'] }}">
                                 <img src="{{ url_for('static', filename='images/skills/' + habilidade['name'] + '.png') }}" alt="{{ habilidade['name'] }}">
                                 <span>{{ habilidade['name'] }}</span>
-                                <span class="skill-cost">Mana: {{ habilidade['cost_mana'] }}, Energy: {{ habilidade['cost_energy'] }}</span>
+                                <span style="color: aqua;" class="skill-cost">Mana: {{ habilidade['cost_mana'] }}, Energy: {{ habilidade['cost_energy'] }}</span>
                             </div>
                         {% endfor %}
                     </div>
@@ -125,6 +125,9 @@
                         <span>Perfil</span>
                     </div>
                 </div>
+
+                                
+            
                 
                 <!-- Popups -->
                 <div id="media-popup" class="popup media-popup" style="display: none;">
@@ -156,16 +159,9 @@
                             <p><strong>Habilidades:</strong></p>
                             <ul>
                                 {% for habilidade in character['habilidades'] %}
-                                    <li>
-                                        <strong>{{ habilidade['name'] }}</strong>:
-                                        <span>{{ habilidade['description'] }}</span><br>
-                                        <small><em>Custo Mana: {{ habilidade['cost_mana'] }}, Custo Energia: {{ habilidade['cost_energy'] }}</em></small>
-                                    </li>
+                                    <li>{{ habilidade }}</li>
                                 {% endfor %}
                             </ul>
-                        </div>
-                        
-                        <div class="pericias">
                             <p><strong>Perícias:</strong></p>
                             <ul>
                                 {% for pericia, valor in character['pericias'].items() %}
@@ -173,6 +169,7 @@
                                 {% endfor %}
                             </ul>
                         </div>
+                    </div>
                 </div>
             
                 <div id="other-player-popup" class="popup">
@@ -186,9 +183,9 @@
             </div>
             
             
+
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
 <script type="text/javascript">
     const characterId = "{{ character['_id'] }}";
 </script>
-            
-<script src="{{ url_for('static', filename='js/game.js') }}"></script>
 {% endblock %}
