@@ -493,15 +493,15 @@ def game_lobby():
     character['class_name'] = class_info['name'] if class_info else "Classe Desconhecida"
     character['race_name'] = race_info['name'] if race_info else "Raça Desconhecida"
 
-    # Carregar as habilidades do personagem
+    # Load the character's abilities
     habilidades = character.get('habilidades', {})
 
-    # Garantir que cada habilidade é um dicionário completo
+    # Ensure each ability is a complete dictionary
     habilidades_formatadas = []
     for habilidade_id, habilidade_data in habilidades.items():
         if isinstance(habilidade_data, dict):
             habilidades_formatadas.append({
-                "id": habilidade_id,  # Adicionar o id da habilidade
+                "id": habilidade_id,  # Add the ability id
                 "name": habilidade_data.get("name"),
                 "description": habilidade_data.get("description"),
                 "cost_mana": habilidade_data.get("cost", {}).get("mana", 0),
@@ -524,7 +524,7 @@ def game_lobby():
                 char['class_name'] = char_class['name'] if char_class else "Classe Desconhecida"
                 char['race_name'] = char_race['name'] if char_race else "Raça Desconhecida"
 
-                # Carregar as habilidades do outro personagem
+                # Load the abilities of the other character
                 habilidades_char = char.get('habilidades', {})
                 char_habilidades_formatadas = []
                 for habilidade_id, habilidade_data in habilidades_char.items():
@@ -544,7 +544,11 @@ def game_lobby():
     # Remove duplicates
     other_characters = list({v['_id']: v for v in other_characters}.values())
 
-    return render_template('game_lobby.html', character=character, other_characters=other_characters, session_name=session_data['name'])
+    # Load monsters for the session
+    monsters = session_data.get('monsters', [])
+
+    return render_template('game_lobby.html', character=character, other_characters=other_characters, session_name=session_data['name'], monsters=monsters)
+
 
 @app.route('/add_monster_to_session', methods=['POST'])
 def add_monster_to_session():
