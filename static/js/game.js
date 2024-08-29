@@ -266,6 +266,14 @@ document.addEventListener("DOMContentLoaded", function () {
     socket.on('session_sync', function(data) {
         const playerList = document.querySelector('.other-players ul');
         playerList.innerHTML = ''; // Limpa a lista existente
+
+        const monsters = data;
+
+        monsters.forEach(monster => {
+            addMonsterToDOM(monster);
+        });
+
+        document.querySelector('.board-center').innerHTML = '';
     
         data.characters.forEach(char => {
             const newPlayerHTML = `
@@ -365,14 +373,34 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
     
-
+    socket.on('monster_hp_updated', function(data) {
+        const monsterElement = document.querySelector(`div[data-monster-id="${data.monster_id}"]`);
+        if (monsterElement) {
+            const hpElement = monsterElement.querySelector('.monster-hp');
+            hpElement.textContent = `HP: ${data.new_hp}`;
+        }
+    });
     // Função para remover monstros da tela dos jogadores
     socket.on('monster_removed', function(data) {
-        const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data._id}"]`);
+        const monsterElement = document.querySelector(`div[data-monster-id="${data._id}"]`);
         if (monsterElement) {
             monsterElement.remove();
         }
     });
+
+    function addMonsterToDOM(monster) {
+        const monsterCard = `
+        <div class="enemy-card" data-monster-id="${monster._id}">
+            <h4>${monster.name}</h4>
+            <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
+            <p class="monster-hp">HP: ${monster.current_hp} / ${monster.hp}</p>
+            <p>Mana: ${monster.current_mana} / ${monster.mana}</p>
+            <p>Energia: ${monster.current_energia} / ${monster.energia}</p>
+            <p>${monster.resumo}</p>
+        </div>
+        `;
+        document.querySelector('.board-center').insertAdjacentHTML('beforeend', monsterCard);
+    }
     
 
     socket.on('status_updated', function(data) {

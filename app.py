@@ -576,7 +576,7 @@ def add_monster_to_session():
                 'resumo': monster.get('resumo', ''),
                 'ataque': monster.get('ataque', 0),
                 'defesa': monster.get('defesa', 0),
-                'img_url': '/static/images/monsters/default.png'  # Defina um caminho padrão ou específico para as imagens dos monstros
+                'img_url': monster.get('img_url', '/static/images/monsters/default.png')  # Usar URL de imagem do monstro
             }
             monsters.append(new_monster)
 
@@ -590,7 +590,6 @@ def add_monster_to_session():
             socketio.emit('monster_added', new_monster, room=session_id)
 
     return jsonify({"success": True})
-
 
 
 @app.route('/use_skill', methods=['POST', 'GET'])
@@ -1083,10 +1082,11 @@ def handle_new_media(data):
 
 def get_current_session_data(session_id):
     session_data = get_session_by_id(db, session_id)
-    app.logger.info(f"Session Data: {session_data}")
 
     if session_data:
         characters = []
+        monsters = session_data.get('monsters', [])
+
         for char_id in session_data.get('characters', []):
             character = db.chars.find_one({"_id": ObjectId(char_id)})
             if character:
@@ -1102,15 +1102,15 @@ def get_current_session_data(session_id):
                     'img_url': character.get('img_url', '/static/images/default.png')
                 }
                 characters.append(character_info)
-                app.logger.info(f"Character info added to session sync: {character_info}")
-        
+
         session_sync_data = {
             'session_id': session_id,
-            'characters': characters
+            'characters': characters,
+            'monsters': monsters
         }
-        app.logger.info(f"Session sync data: {session_sync_data}")
         return session_sync_data
     return {}
+
 
 
 
