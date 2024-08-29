@@ -196,16 +196,14 @@ document.addEventListener("DOMContentLoaded", function() {
             <button class="remove-monster-button" data-monster-id="${monster._id}">Remover</button>
         </li>`;
         
-        document.getElementById('monster-list').addEventListener('click', function (e) {
-            if (e.target.classList.contains('remove-monster-button')) {
-                const monsterId = e.target.getAttribute('data-monster-id');
-                socket.emit('remove_monster', {
-                    monster_id: monsterId,
-                    session_id: sessionId
-                });
-            }
-        });
     }
+
+    document.getElementById('monster-list').addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-monster-button')) {
+            const monsterId = e.target.getAttribute('data-monster-id');
+            socket.emit('remove_monster', { monster_id: monsterId, session_id: sessionId });
+        }
+    });
 
     function addOrUpdatePlayer(char) {
         let existingPlayer = playerList.querySelector(`.character-form[data-char-id="${char._id}"]`);

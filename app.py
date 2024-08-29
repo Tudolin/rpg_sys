@@ -867,7 +867,7 @@ def master_control(session_id):
         session_data=session_data,
         session_name=session_data['name'],
         enemies=enemies,
-        monsters=monsters  # Passar os monstros para o template
+        monsters=monsters
     )
 
 @app.route('/update_character', methods=['POST'])
@@ -1131,6 +1131,7 @@ def get_current_session_data(session_id):
 
 
 
+
 def get_session_id_from_char(character_id):
     session = db.sessions.find_one({"characters": ObjectId(character_id)})
     if session:
@@ -1161,7 +1162,8 @@ def handle_player_removed(data):
 def handle_session_sync(data):
     session_id = data.get('session_id')
     if session_id:
-        emit('session_sync', get_current_session_data(session_id), room=session_id)
+        session_data = get_current_session_data(session_id)
+        emit('session_sync', session_data, room=session_id)
 
 
 @socketio.on('update_health')

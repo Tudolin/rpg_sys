@@ -263,11 +263,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });    
 
-    socket.on('session_sync', function(data) {
+    ssocket.on('session_sync', function(data) {
         const playerList = document.querySelector('.other-players ul');
         playerList.innerHTML = ''; // Limpa a lista existente
-
-        const monsters = data;
+    
+        const boardCenter = document.querySelector('.board-center');
+        boardCenter.innerHTML = ''; // Limpa a lista de monstros
 
         monsters.forEach(monster => {
             addMonsterToDOM(monster);
