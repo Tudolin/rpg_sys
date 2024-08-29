@@ -33,6 +33,24 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    socket.emit('request_master_sync', { session_id: sessionId });
+
+    socket.on('master_sync', function(data) {
+        updatePlayersList(data.characters);
+        updateMonstersList(data.monsters);
+    });
+
+    socket.on('monster_added', function(monster) {
+        addMonsterToDOM(monster);
+    });
+
+    socket.on('monster_removed', function(data) {
+        const monsterElement = document.querySelector(`div[data-monster-id="${data._id}"]`);
+        if (monsterElement) {
+            monsterElement.remove();
+        }
+    });
+
     socket.on('monster_added', function(data) {
         const monsterList = document.getElementById('monster-list');
         const monsterElement = document.createElement('li');
@@ -92,14 +110,6 @@ document.addEventListener("DOMContentLoaded", function() {
         .catch(error => console.error('Erro:', error));
     }
 
-    socket.on('monster_removed', function(data) {
-        console.log('Received monster_removed event with data:', data);
-        const monsterElement = document.querySelector(`li[data-monster-id="${data._id}"]`);
-        if (monsterElement) {
-            monsterElement.remove();
-        }
-    });
-
     socket.on('monster_hp_updated', function(data) {
         console.log('Received monster_hp_updated event with data:', data);
         const monsterElement = document.querySelector(`li[data-monster-id="${data._id}"]`);
@@ -141,15 +151,50 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     socket.on('player_left', function(data) {
-        removePlayerFromList(data._id);
+        const playerElement = document.querySelector(`div[data-player-id="${data._id}"]`);
+        if (playerElement) {
+            playerElement.remove();
+        }
     });
 
-    function updatePlayerList(characters) {
-        playerList.innerHTML = ''; // Clear the current list
-        
-        characters.forEach(char => {
-            addOrUpdatePlayer(char);
+    function updatePlayersList(players) {
+        const playersContainer = document.querySelector('.characters-container');
+        playersContainer.innerHTML = '';
+        players.forEach(player => {
+            const playerCard = `
+            <div class="character-card" data-player-id="${player._id}">
+                <p><strong>${player.name}</strong></p>
+                <form method="POST" class="character-form" data-char-id="${player._id}">
+                    <input type="hidden" name="char_id" value="${player._id}">
+                    <label>HP: <input type="number" name="hp" value="${player.current_hp}" class="hp-input"> / ${player.hp}</label><br>
+                    <label>Mana: <input type="number" name="mana" value="${player.current_mana}" class="mana-input"> / ${player.mana}</label><br>
+                    <label>Energia: <input type="number" name="energia" value="${player.current_energy}" class="energy-input"> / ${player.energia}</label><br>
+                    <button type="submit">Atualizar</button>
+                </form>
+            </div>`;
+            playersContainer.insertAdjacentHTML('beforeend', playerCard);
         });
+    }
+
+    function updateMonstersList(monsters) {
+        const monsterList = document.getElementById('monster-list');
+        monsterList.innerHTML = '';
+        monsters.forEach(monster => {
+            addMonsterToDOM(monster);
+        });
+    }
+
+    function addMonsterToDOM(monster) {
+        const monsterCard = `
+        <li class="enemy-card" data-monster-id="${monster._id}">
+            <h4>${monster.name}</h4>
+            <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
+            <p>HP: ${monster.current_hp} / ${monster.hp}</p>
+            <p>Mana: ${monster.current_mana} / ${monster.mana}</p>
+            <p>Energia: ${monster.current_energia} / ${monster.energia}</p>
+            <p>${monster.resumo}</p>
+        </li>`;
+        document.getElementById('monster-list').insertAdjacentHTML('beforeend', monsterCard);
     }
 
     function addOrUpdatePlayer(char) {

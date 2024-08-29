@@ -43,7 +43,16 @@
 
 <h2>Monstros na Sessão</h2>
 <ul id="monster-list">
-    <!-- Monstros adicionados serão exibidos aqui -->
+    {% for monster in monsters %}
+    <li class="enemy-card" data-monster-id="{{ monster._id }}">
+        <h4>{{ monster.name }}</h4>
+        <img src="{{ monster.img_url }}" alt="{{ monster.name }}" class="monster-image">
+        <p>HP: {{ monster.current_hp }} / {{ monster.hp }}</p>
+        <p>Mana: {{ monster.current_mana }} / {{ monster.mana }}</p>
+        <p>Energia: {{ monster.current_energia }} / {{ monster.energia }}</p>
+        <p>{{ monster.resumo }}</p>
+    </li>
+    {% endfor %}
 </ul>
 
 <h2>Enviar Mídia</h2>

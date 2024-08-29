@@ -775,6 +775,8 @@ def master_control(session_id):
         return redirect(url_for('home'))
 
     characters = []
+    monsters = session_data.get('monsters', []) 
+
     for char_id in session_data['characters']:
         character = db.chars.find_one({"_id": ObjectId(char_id)})
         if character:
@@ -859,7 +861,14 @@ def master_control(session_id):
 
     enemies = list(db['enemies.enemies'].find())
 
-    return render_template('master_control.html', characters=characters, session_data=session_data, session_name=session_data['name'], enemies=enemies)
+    return render_template(
+        'master_control.html',
+        characters=characters,
+        session_data=session_data,
+        session_name=session_data['name'],
+        enemies=enemies,
+        monsters=monsters  # Passar os monstros para o template
+    )
 
 @app.route('/update_character', methods=['POST'])
 def update_character():
@@ -1036,6 +1045,14 @@ def handle_disconnect():
 
             # Notifique os outros jogadores, incluindo o mestre, que o jogador saiu
             socketio.emit('player_left', {'_id': str(character['_id'])}, room=room)
+
+@socketio.on('request_master_sync')
+def handle_master_sync(data):
+    session_id = data.get('session_id')
+    if session_id:
+        session_data = get_current_session_data(session_id)
+        emit('master_sync', session_data, room=session_id)
+
 
 @socketio.on('connect')
 def on_connect():
