@@ -560,6 +560,7 @@ def add_monster_to_session():
     if session_data['created_by'] != ObjectId(session['userId']):
         return jsonify({"success": False, "message": "Apenas o mestre da sessão pode adicionar monstros"}), 403
 
+    monsters = []
     for _ in range(quantity):
         monster = db['enemies.enemies'].find_one({"_id": ObjectId(monster_id)})
         if monster:
@@ -574,12 +575,22 @@ def add_monster_to_session():
                 'current_energia': monster.get('energia', 0),
                 'resumo': monster.get('resumo', ''),
                 'ataque': monster.get('ataque', 0),
-                'defesa': monster.get('defesa', 0)
+                'defesa': monster.get('defesa', 0),
+                'img_url': '/static/images/monsters/default.png'  # Defina um caminho padrão ou específico para as imagens dos monstros
             }
-            # Emit the event to add the monster to all players
+            monsters.append(new_monster)
+
+            # Adicionar o monstro à sessão no banco de dados
+            db.sessions.update_one(
+                {"_id": ObjectId(session_id)},
+                {"$push": {"monsters": new_monster}}
+            )
+            
+            # Emitir o evento para adicionar o monstro a todos os jogadores na sala
             socketio.emit('monster_added', new_monster, room=session_id)
 
     return jsonify({"success": True})
+
 
 
 @app.route('/use_skill', methods=['POST', 'GET'])
@@ -1211,6 +1222,28 @@ def handle_add_monster(data):
         socketio.emit('monster_added', monster_data, room=session_id)
     else:
         print(f"Failed to add monster. Monster or session not found: monster={monster}, session_id={session_id}")
+
+@app.route('/update_monster_hp', methods=['POST'])
+def update_monster_hp():
+    data = request.get_json()
+    session_id = data.get('session_id')
+    monster_id = data.get('monster_id')
+    new_hp = int(data.get('new_hp'))
+
+    session_data = get_session_by_id(db, session_id)
+    if session_data:
+        # Atualiza a vida do monstro na sessão
+        db.sessions.update_one(
+            {"_id": ObjectId(session_id), "monsters._id": monster_id},
+            {"$set": {"monsters.$.current_hp": new_hp}}
+        )
+        # Emitir a atualização para todos na sessão
+        socketio.emit('monster_hp_updated', {
+            'monster_id': monster_id,
+            'new_hp': new_hp
+        }, room=session_id)
+
+    return jsonify({"success": True})
 
 
 @socketio.on('update_monster_hp')

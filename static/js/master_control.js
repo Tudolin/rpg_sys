@@ -34,17 +34,16 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     socket.on('monster_added', function(data) {
-        console.log('Received monster_added event with data:', data);
-
+        const monsterList = document.getElementById('monster-list');
         const monsterElement = document.createElement('li');
         monsterElement.dataset.monsterId = data._id;
         monsterElement.innerHTML = `
-            <strong>${data.name}</strong> (HP: ${data.current_hp}/${data.hp})
-            <form class="monster-form" data-monster-id="${data._id}">
-                <label>HP: <input type="number" name="monster_hp" value="${data.current_hp}" class="monster-hp-input"> / ${data.hp}</label><br>
-                <button type="submit">Atualizar</button>
-                <button type="button" class="remove-monster-button" data-monster-id="${data._id}">Remover</button>
-            </form>
+            <div class="enemy-card">
+                <img src="${data.img_url}" alt="${data.name}" class="monster-image">
+                <h4>${data.name}</h4>
+                <p>HP: <span class="monster-hp">${data.current_hp}</span> / ${data.hp}</p>
+                <button class="remove-monster-button" onclick="removeMonster('${data._id}')">Remover</button>
+            </div>
         `;
         monsterList.appendChild(monsterElement);
 
@@ -69,6 +68,29 @@ document.addEventListener("DOMContentLoaded", function() {
             socket.emit('remove_monster', { monster_id: monsterId, session_id: sessionId });
         });
     });
+
+    function removeMonster(monsterId) {
+        fetch('/remove_monster', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                session_id: sessionId,
+                monster_id: monsterId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const monsterElement = document.querySelector(`li[data-monster-id="${monsterId}"]`);
+                if (monsterElement) {
+                    monsterElement.remove();
+                }
+            }
+        })
+        .catch(error => console.error('Erro:', error));
+    }
 
     socket.on('monster_removed', function(data) {
         console.log('Received monster_removed event with data:', data);

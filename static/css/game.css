@@ -49,6 +49,8 @@
 
 
 /* Adicionei esta seção para a exibição dos monstros */
+/* CSS fornecido */
+
 .enemy-card {
     background-color: #444;
     border: 2px solid #222;
@@ -68,6 +70,14 @@
     margin: 5px 0;
 }
 
+.monster-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Resto do CSS fornecido */
 
 .dice-result {
     position: fixed;
