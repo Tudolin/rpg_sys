@@ -44,13 +44,6 @@ document.addEventListener("DOMContentLoaded", function() {
         addMonsterToDOM(monster);
     });
 
-    socket.on('monster_removed', function(data) {
-        const monsterElement = document.querySelector(`li[data-monster-id="${data._id}"]`);
-        if (monsterElement) {
-            monsterElement.remove();
-        }
-    });
-
     socket.on('monster_added', function(data) {
         const monsterList = document.getElementById('monster-list');
         const monsterElement = document.createElement('li');
@@ -204,6 +197,14 @@ document.addEventListener("DOMContentLoaded", function() {
             socket.emit('remove_monster', { monster_id: monsterId, session_id: sessionId });
         }
     });
+    
+    socket.on('monster_removed', function(data) {
+        const monsterElement = document.querySelector(`li[data-monster-id="${data._id}"]`);
+        if (monsterElement) {
+            monsterElement.remove();
+        }
+    });
+    
 
     function addOrUpdatePlayer(char) {
         let existingPlayer = playerList.querySelector(`.character-form[data-char-id="${char._id}"]`);

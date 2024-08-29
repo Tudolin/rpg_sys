@@ -1283,14 +1283,16 @@ def handle_remove_monster(data):
     session_id = data.get('session_id')
 
     if monster_id and session_id:
-        # Remove o monstro da sessão no banco de dados
         db.sessions.update_one(
             {"_id": ObjectId(session_id)},
             {"$pull": {"monsters": {"_id": monster_id}}}
         )
         
-        # Notifica todos os clientes na sala da remoção do monstro
         socketio.emit('monster_removed', {'_id': monster_id}, room=session_id)
+
+        return jsonify({"success": True})
+    return jsonify({"success": False}), 400
+
 
 
 pdfmetrics.registerFont(TTFont('MedievalFont', 'static/fonts/Enchanted Land.otf'))
