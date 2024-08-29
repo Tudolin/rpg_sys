@@ -12,6 +12,14 @@
      }
 }
 
+.board-center {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .monster-selection {
     margin-bottom: 10px;
 }
@@ -56,10 +64,52 @@
     border: 2px solid #222;
     border-radius: 10px;
     padding: 10px;
-    margin: 10px 0;
+    margin: 10px 10px; /* Adjusted margin */
     color: white;
-    width: 200px;
+    width: 150px; /* Adjust width */
     text-align: center;
+    position: relative; /* Relative positioning */
+    z-index: 2; /* Ensure it's above other elements */
+    flex: 0 0 auto; /* Allow it to stay in a row */
+}
+
+/* New health bar similar to players for monsters */
+.enemy-card .health-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #1a1a1a;
+    border-radius: 5px;
+    border: 1px solid #660000;
+    position: relative;
+    margin-top: 10px;
+}
+
+.enemy-card .health-bar .health-fill {
+    background: radial-gradient(circle, #ff0000 0%, #990000 100%);
+    height: 100%;
+    width: 100%; /* Default width */
+    position: absolute;
+    bottom: 0;
+    transition: width 0.5s ease-in-out;
+    border-radius: 5px;
+}
+
+.enemy-card .health-bar .health-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.monster-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
 }
 
 .enemy-card h4 {
@@ -541,6 +591,10 @@ body {
     .player-info {
         width: 90%;
         max-width: 100%;
+    }
+
+    .enemy-card {
+        width: 120px; /* Adjust width for smaller screens */
     }
 
     .other-players {

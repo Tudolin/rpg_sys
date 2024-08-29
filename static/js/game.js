@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeButtons = document.querySelectorAll(".close-button");
     const rollDiceButton = document.getElementById("roll-dice-button");
     const diceResult = document.getElementById("dice-result");
+    const volumeControl = document.getElementById('volume-control');
+    const player = document.getElementById('game-music-player');
     const socket = io.connect('wss://familyrpg.servebeer.com', {
         transports: ['websocket']
     });
@@ -16,6 +18,12 @@ document.addEventListener("DOMContentLoaded", function () {
         return confirmationMessage; // For some other browsers
     });
 
+    volumeControl.addEventListener('input', function() {
+        player.volume = this.value;
+    });
+    
+    player.volume = volumeControl.value;
+    
     socket.on('new_media', function(data) {
         const mediaPopup = document.getElementById('media-popup');
         const mediaContainer = document.getElementById('media-container');
@@ -160,7 +168,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     
-
+    function updateMonsterHealth(monsterId, newHp) {
+        const healthBar = document.querySelector(`.health-bar[data-monster-id="${monsterId}"] .health-fill`);
+        const maxHp = document.querySelector(`.health-bar[data-monster-id="${monsterId}"]`).getAttribute('data-max-hp');
+        const percentage = (newHp / maxHp) * 100;
+        healthBar.style.width = percentage + '%';
+    
+        const healthText = document.querySelector(`.health-bar[data-monster-id="${monsterId}"] .health-text`);
+        healthText.textContent = `${newHp} / ${maxHp}`;
+    }
+    
     function updateManaBar(newMana) {
         const manaBall = document.querySelector('.mana-ball[data-character-id="' + characterId + '"] .mana-fill');
         const maxMana = document.querySelector('.mana-ball[data-character-id="' + characterId + '"]').getAttribute('data-max-mana');
@@ -269,7 +286,8 @@ document.addEventListener("DOMContentLoaded", function () {
         
         const boardCenter = document.querySelector('.board-center');
         boardCenter.innerHTML = ''; // Limpa a lista de monstros
-    
+        
+        if (data.characters && Array.isArray(data.characters)) {
         data.characters.forEach(char => {
             const newPlayerHTML = `
                 <li class="other-player" data-player-id="${char._id}">
@@ -291,6 +309,9 @@ document.addEventListener("DOMContentLoaded", function () {
             playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
             attachPlayerClickEvent(playerList.querySelector(`.other-player[data-player-id="${char._id}"]`));
         });
+    } else {
+        console.error('characters data is undefined or not an array');
+    }
     
         // Adicionar monstros ao DOM
         data.monsters.forEach(monster => {
@@ -335,8 +356,19 @@ document.addEventListener("DOMContentLoaded", function () {
     
     socket.on('play_music', function(data) {
         const player = document.getElementById('game-music-player');
-        player.src = data.track_url; // Set the source of the music to be played
-        player.play(); // Start playing the music
+        if (player.src !== data.track_url) {
+            player.pause();  // Pause the player before changing the source
+            player.src = data.track_url;
+            player.play().catch(error => {
+                console.error('Failed to play the music:', error);
+            });
+        }
+    });
+
+    socket.on('stop_music', function() {
+        const player = document.getElementById('game-music-player');
+        player.pause();  // Ensure the player is paused
+        player.src = '';  // Clear the source to fully stop the music
     });
 
     socket.on('player_left', function (data) {

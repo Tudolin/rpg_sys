@@ -7,8 +7,24 @@
 <script src="{{ url_for('static', filename='js/game.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
 <div class="game-lobby-container">
+    <div class="music-controls">
+        <audio id="game-music-player" controls style="display: none;"></audio>
+        <label for="volume-control">Volume:</label>
+        <input type="range" id="volume-control" min="0" max="1" step="0.01" value="0.5">
+    </div>    
     <div class="board-center">
-        <!-- Aqui os monstros serão exibidos -->
+        <div class="enemy-card" data-monster-id="{{ monster._id }}">
+            <h4>{{ monster.name }}</h4>
+            <img src="{{ monster.img_url }}" alt="{{ monster.name }}" class="monster-image">
+            <div class="health-bar" data-monster-id="{{ monster._id }}" data-max-hp="{{ monster.hp }}">
+                <div class="health-fill" style="width: {{ (monster.current_hp | default(monster.hp) | int) / (monster.hp | int) * 100 }}%"></div>
+                <div class="health-text">{{ monster.current_hp }} / {{ monster.hp }}</div>
+            </div>
+            <p>Mana: {{ monster.current_mana }} / {{ monster.mana }}</p>
+            <p>Energia: {{ monster.current_energia }} / {{ monster.energia }}</p>
+            <p>{{ monster.resumo }}</p>
+        </div>
+        
     </div>
 
             <!--<div class="status-effects">
