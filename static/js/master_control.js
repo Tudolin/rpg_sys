@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     socket.on('monster_removed', function(data) {
-        const monsterElement = document.querySelector(`div[data-monster-id="${data._id}"]`);
+        const monsterElement = document.querySelector(`li[data-monster-id="${data._id}"]`);
         if (monsterElement) {
             monsterElement.remove();
         }
@@ -193,8 +193,18 @@ document.addEventListener("DOMContentLoaded", function() {
             <p>Mana: ${monster.current_mana} / ${monster.mana}</p>
             <p>Energia: ${monster.current_energia} / ${monster.energia}</p>
             <p>${monster.resumo}</p>
+            <button class="remove-monster-button" data-monster-id="${monster._id}">Remover</button>
         </li>`;
-        document.getElementById('monster-list').insertAdjacentHTML('beforeend', monsterCard);
+        
+        document.getElementById('monster-list').addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-monster-button')) {
+                const monsterId = e.target.getAttribute('data-monster-id');
+                socket.emit('remove_monster', {
+                    monster_id: monsterId,
+                    session_id: sessionId
+                });
+            }
+        });
     }
 
     function addOrUpdatePlayer(char) {

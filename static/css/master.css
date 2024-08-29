@@ -37,6 +37,16 @@
     margin: 0 0 10px;
 }
 
+.remove-monster-button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #d9534f;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
 .enemy-card p {
     margin: 5px 0;
 }

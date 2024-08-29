@@ -41,7 +41,6 @@
     <button type="submit">Adicionar Monstro(s)</button>
 </form>
 
-<h2>Monstros na Sessão</h2>
 <ul id="monster-list">
     {% for monster in monsters %}
     <li class="enemy-card" data-monster-id="{{ monster._id }}">
@@ -51,9 +50,11 @@
         <p>Mana: {{ monster.current_mana }} / {{ monster.mana }}</p>
         <p>Energia: {{ monster.current_energia }} / {{ monster.energia }}</p>
         <p>{{ monster.resumo }}</p>
+        <button class="remove-monster-button" data-monster-id="{{ monster._id }}">Remover</button>
     </li>
     {% endfor %}
 </ul>
+
 
 <h2>Enviar Mídia</h2>
 <form id="media-form" enctype="multipart/form-data">
