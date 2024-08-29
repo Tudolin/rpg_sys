@@ -438,6 +438,16 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    function updateMonstersList(monsters) {
+        const boardCenter = document.querySelector('.board-center');
+        boardCenter.innerHTML = ''; // Limpa a lista de monstros existente
+    
+        monsters.forEach(monster => {
+            addMonsterToDOM(monster);
+        });
+    }
+
+    
     function addMonsterToDOM(monster) {
         const monsterList = document.getElementById('monster-list');
         const monsterElement = document.createElement('li');
