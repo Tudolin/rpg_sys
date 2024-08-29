@@ -579,6 +579,34 @@ socket.on('player_removed', function(data) {
     window.addEventListener('beforeunload', saveMusicState);
     window.addEventListener('unload', saveMusicState);
     
+    document.querySelectorAll('.monster-form').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const monsterId = form.getAttribute('data-monster-id');
+            const formData = new FormData(form);
+
+            fetch('/update_monster_stats', {
+                method: 'POST',
+                body: JSON.stringify({
+                    monster_id: monsterId,
+                    hp: formData.get('monster_hp'),
+                    mana: formData.get('monster_mana'),
+                    energia: formData.get('monster_energia')
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Monstro atualizado com sucesso!");
+                } else {
+                    alert("Erro ao atualizar o monstro.");
+                }
+            });
+        });
+    });
+    
     forms.forEach(function(form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();

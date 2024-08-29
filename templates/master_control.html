@@ -41,14 +41,19 @@
     <button type="submit">Adicionar Monstro(s)</button>
 </form>
 
+<h2>Monstros na Sessão</h2>
 <ul id="monster-list">
     {% for monster in monsters %}
     <li class="enemy-card" data-monster-id="{{ monster._id }}">
         <h4>{{ monster.name }}</h4>
         <img src="{{ monster.img_url }}" alt="{{ monster.name }}" class="monster-image">
-        <p>HP: <span id="monster-hp-{{ monster._id }}">{{ monster.current_hp }}</span> / {{ monster.hp }}</p>
-        <p>Mana: <span id="monster-mana-{{ monster._id }}">{{ monster.current_mana }}</span> / {{ monster.mana }}</p>
-        <p>Energia: <span id="monster-energia-{{ monster._id }}">{{ monster.current_energia }}</span> / {{ monster.energia }}</p>
+        <form method="POST" class="monster-form" data-monster-id="{{ monster._id }}">
+            <input type="hidden" name="monster_id" value="{{ monster._id }}">
+            <label>HP: <input type="number" name="monster_hp" value="{{ monster.current_hp }}" class="hp-input"> / {{ monster.hp }}</label><br>
+            <label>Mana: <input type="number" name="monster_mana" value="{{ monster.current_mana }}" class="mana-input"> / {{ monster.mana }}</label><br>
+            <label>Energia: <input type="number" name="monster_energia" value="{{ monster.current_energia }}" class="energia-input"> / {{ monster.energia }}</label><br>
+            <button type="submit">Atualizar</button>
+        </form>
         <p>{{ monster.resumo }}</p>
         <button class="remove-monster-button" data-monster-id="{{ monster._id }}">Remover</button>
     </li>
