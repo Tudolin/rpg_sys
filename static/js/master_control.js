@@ -275,17 +275,23 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ monster_id: monsterId, stat: stat, value: value })
+            body: JSON.stringify({
+                monster_id: monsterId,
+                session_id: sessionId,  // Adicione o session_id aqui
+                [stat]: value
+            })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 console.log(`Monster ${stat} updated successfully`);
             } else {
-                console.error('Failed to update monster stats');
+                console.error('Failed to update monster stats:', data.message);
             }
-        });
+        })
+        .catch(error => console.error('Error:', error));
     }
+    
 
     function updatePlayersList(players) {
         const playersContainer = document.querySelector('.characters-container');
