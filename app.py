@@ -867,7 +867,8 @@ def master_control(session_id):
         session_data=session_data,
         session_name=session_data['name'],
         enemies=enemies,
-        monsters=monsters
+        monsters=monsters,
+        session_id=session_id
     )
 
 @app.route('/update_character', methods=['POST'])
