@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     
     player.volume = volumeControl.value;
-    
+
     socket.on('new_media', function(data) {
         const mediaPopup = document.getElementById('media-popup');
         const mediaContainer = document.getElementById('media-container');
@@ -388,22 +388,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     socket.on('monster_added', function(data) {
-        const boardCenter = document.querySelector('.board-center');
-        
-        if (boardCenter) {
-            const monsterElement = document.createElement('div');
-            monsterElement.classList.add('enemy-card');
-            monsterElement.dataset.monsterId = data._id;
-            monsterElement.innerHTML = `
-                <h4>${data.name}</h4>
-                <p>HP: ${data.current_hp} / ${data.hp}</p>
-                <p>Mana: ${data.current_mana} / ${data.mana}</p>
-                <p>Energia: ${data.current_energia} / ${data.energia}</p>
-                <p>${data.resumo}</p>
-            `;
-            boardCenter.appendChild(monsterElement);
-        }
-    });
+    const boardCenter = document.querySelector('.board-center');
+
+    if (boardCenter) {
+        const monsterElement = document.createElement('div');
+        monsterElement.classList.add('enemy-card');
+        monsterElement.dataset.monsterId = data._id;
+        monsterElement.innerHTML = `
+            <h4>${data.name}</h4>
+            <img src="${data.img_url}" alt="${data.name}" class="monster-image">
+            <div class="health-bar">
+                <div class="health-fill" style="width: ${(data.current_hp / data.hp) * 100}%"></div>
+                <div class="health-text">HP: ${data.current_hp} / ${data.hp}</div>
+            </div>
+            <p>${data.resumo}</p>
+        `;
+        boardCenter.appendChild(monsterElement);
+    }
+});
+
     
     socket.on('monster_hp_updated', function(data) {
         const monsterElement = document.querySelector(`div[data-monster-id="${data.monster_id}"]`);

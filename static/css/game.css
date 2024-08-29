@@ -13,11 +13,11 @@
 }
 
 .board-center {
-    position: relative;
+    flex: 1;
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: flex-start;
 }
 
 .monster-selection {
@@ -64,15 +64,41 @@
     border: 2px solid #222;
     border-radius: 10px;
     padding: 10px;
-    margin: 10px 10px; /* Adjusted margin */
+    margin: 10px;
     color: white;
-    width: 150px; /* Adjust width */
+    width: 150px;
     text-align: center;
-    position: relative; /* Relative positioning */
-    z-index: 2; /* Ensure it's above other elements */
-    flex: 0 0 auto; /* Allow it to stay in a row */
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
 }
 
+.health-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #1a1a1a;
+    border-radius: 5px;
+    margin-top: 10px;
+    position: relative;
+}
+
+.health-bar .health-fill {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #ff0000 0%, #990000 100%);
+    border-radius: 5px;
+    position: absolute;
+    transition: width 0.5s ease-in-out;
+}
+
+.health-bar .health-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+    z-index: 1;
+}
 /* New health bar similar to players for monsters */
 .enemy-card .health-bar {
     width: 100%;
@@ -229,8 +255,9 @@ body {
 
 .game-lobby-container {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
     width: 100%;
     min-height: 100vh;
     background-image: url('/static/images/rpg_background.jpg');
@@ -245,6 +272,7 @@ body {
     justify-content: space-between;
     width: 100%;
     max-width: 1200px;
+    flex-wrap: wrap;
 }
 
 /* Seção de informações do jogador */
@@ -253,7 +281,7 @@ body {
     background-color: rgba(0, 0, 0, 0.85);
     padding: 20px;
     border-radius: 15px;
-    width: 60%;
+    width: 45%;
     max-width: 600px;
     box-sizing: border-box;
     text-align: center;
@@ -445,7 +473,8 @@ body {
     background-color: rgba(0, 0, 0, 0.85);
     padding: 20px;
     border-radius: 15px;
-    width: 30%;
+    width: 25%;
+    margin-right: 20px;
     max-width: 300px;
     box-sizing: border-box;
     margin: 20px;
