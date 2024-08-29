@@ -17,11 +17,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const monsterList = document.getElementById('monster-list');
 
     if (addMonsterForm) {
-        addMonsterForm.addEventListener('submit', function (event) {
+        addMonsterForm.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            const monsterId = monsterSelect.value;
-            const quantity = parseInt(monsterQuantityInput.value);
+            const monsterId = document.getElementById('monster-select').value;
+            const quantity = parseInt(document.getElementById('monster-quantity').value);
 
             if (monsterId && quantity > 0) {
                 for (let i = 0; i < quantity; i++) {
@@ -34,33 +34,31 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelectorAll('.enemy-card').forEach(function (monsterCard) {
             const monsterId = monsterCard.getAttribute('data-monster-id');
 
-            const hpElement = document.querySelector(`#monster-hp-${monsterId}`);
-            const manaElement = document.querySelector(`#monster-mana-${monsterId}`);
-            const energiaElement = document.querySelector(`#monster-energia-${monsterId}`);
+            const hpElement = monsterCard.querySelector(`input[name="monster_hp"]`);
+            const manaElement = monsterCard.querySelector(`input[name="monster_mana"]`);
+            const energiaElement = monsterCard.querySelector(`input[name="monster_energia"]`);
 
             if (hpElement) {
                 hpElement.addEventListener('input', function () {
-                    updateMonsterStats(monsterId, 'hp', hpElement.textContent);
+                    updateMonsterStats(monsterId, 'hp', hpElement.value);
                 });
             }
 
             if (manaElement) {
                 manaElement.addEventListener('input', function () {
-                    updateMonsterStats(monsterId, 'mana', manaElement.textContent);
+                    updateMonsterStats(monsterId, 'mana', manaElement.value);
                 });
             }
 
             if (energiaElement) {
                 energiaElement.addEventListener('input', function () {
-                    updateMonsterStats(monsterId, 'energia', energiaElement.textContent);
+                    updateMonsterStats(monsterId, 'energia', energiaElement.value);
                 });
             }
 
-            // Verifica se o botão de remover monstro existe antes de adicionar o listener
             const removeButton = monsterCard.querySelector('.remove-monster-button');
             if (removeButton) {
                 removeButton.addEventListener('click', function () {
-                    const monsterId = this.getAttribute('data-monster-id');
                     removeMonster(monsterId);
                 });
             }
@@ -138,10 +136,6 @@ document.addEventListener("DOMContentLoaded", function() {
             socket.emit('remove_monster', { monster_id: monsterId, session_id: sessionId });
         });
     });
-
-    function updateMonsterHp(monsterId, newHp) {
-        socket.emit('update_monster_hp', { monster_id: monsterId, new_hp: newHp });
-    }
 
     function removeMonster(monsterId) {
         fetch('/remove_monster', {
