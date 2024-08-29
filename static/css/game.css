@@ -48,6 +48,27 @@
 }
 
 
+/* Adicionei esta seção para a exibição dos monstros */
+.enemy-card {
+    background-color: #444;
+    border: 2px solid #222;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0;
+    color: white;
+    width: 200px;
+    text-align: center;
+}
+
+.enemy-card h4 {
+    margin: 0 0 10px;
+}
+
+.enemy-card p {
+    margin: 5px 0;
+}
+
+
 .dice-result {
     position: fixed;
     bottom: 20%;  /* Ajuste para centralizar o dado verticalmente */

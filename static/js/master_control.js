@@ -254,6 +254,34 @@ document.querySelectorAll('.remove-player-button').forEach(button => {
     });
 });
 
+document.getElementById('add-monster-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const monsterId = document.getElementById('monster-select').value;
+    const quantity = document.getElementById('monster-quantity').value;
+
+    fetch('/add_monster_to_session', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            session_id: sessionId,
+            monster_id: monsterId,
+            quantity: quantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Monstro adicionado com sucesso');
+        } else {
+            console.error('Erro ao adicionar monstro:', data.message);
+        }
+    })
+    .catch(error => console.error('Erro:', error));
+});
+
+
 // Recebe notificação de jogador removido e remove da lista
 socket.on('player_removed', function(data) {
     const characterForm = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);

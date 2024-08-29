@@ -546,6 +546,40 @@ def game_lobby():
 
     return render_template('game_lobby.html', character=character, other_characters=other_characters, session_name=session_data['name'])
 
+@app.route('/add_monster_to_session', methods=['POST'])
+def add_monster_to_session():
+    if not session.get('logged_in'):
+        return jsonify({"success": False, "message": "Usuário não logado"}), 401
+
+    data = request.get_json()
+    session_id = data.get('session_id')
+    monster_id = data.get('monster_id')
+    quantity = int(data.get('quantity', 1))
+
+    session_data = get_session_by_id(db, session_id)
+    if session_data['created_by'] != ObjectId(session['userId']):
+        return jsonify({"success": False, "message": "Apenas o mestre da sessão pode adicionar monstros"}), 403
+
+    for _ in range(quantity):
+        monster = db['enemies.enemies'].find_one({"_id": ObjectId(monster_id)})
+        if monster:
+            new_monster = {
+                '_id': str(ObjectId()),  # Unique ID for each instance of a monster
+                'name': monster['name'],
+                'hp': monster['hp'],
+                'current_hp': monster['hp'],
+                'mana': monster.get('mana', 0),
+                'current_mana': monster.get('mana', 0),
+                'energia': monster.get('energia', 0),
+                'current_energia': monster.get('energia', 0),
+                'resumo': monster.get('resumo', ''),
+                'ataque': monster.get('ataque', 0),
+                'defesa': monster.get('defesa', 0)
+            }
+            # Emit the event to add the monster to all players
+            socketio.emit('monster_added', new_monster, room=session_id)
+
+    return jsonify({"success": True})
 
 
 @app.route('/use_skill', methods=['POST', 'GET'])

@@ -349,7 +349,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     socket.on('monster_added', function(data) {
         const boardCenter = document.querySelector('.board-center');
-
+        
         if (boardCenter) {
             const monsterElement = document.createElement('div');
             monsterElement.classList.add('enemy-card');
@@ -357,11 +357,14 @@ document.addEventListener("DOMContentLoaded", function () {
             monsterElement.innerHTML = `
                 <h4>${data.name}</h4>
                 <p>HP: ${data.current_hp} / ${data.hp}</p>
+                <p>Mana: ${data.current_mana} / ${data.mana}</p>
+                <p>Energia: ${data.current_energia} / ${data.energia}</p>
                 <p>${data.resumo}</p>
             `;
             boardCenter.appendChild(monsterElement);
         }
     });
+    
 
     // Função para remover monstros da tela dos jogadores
     socket.on('monster_removed', function(data) {
