@@ -286,6 +286,11 @@ document.addEventListener("DOMContentLoaded", function () {
         
         const boardCenter = document.querySelector('.board-center');
         boardCenter.innerHTML = ''; // Limpa a lista de monstros
+    
+        // Atualiza a lista de monstros
+        if (data && data.monsters && data.monsters.length > 0) {
+            updateMonstersList(data.monsters);
+        }
         
         if (data.characters && Array.isArray(data.characters)) {
         data.characters.forEach(char => {
@@ -388,6 +393,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     socket.on('monster_added', function(data) {
+        const existingMonster = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
+        if (!existingMonster) {
+            addMonsterToDOM(monster);
+        }
         const boardCenter = document.querySelector('.board-center');
         
         if (boardCenter && !document.querySelector(`[data-monster-id="${data._id}"]`)) {
@@ -425,18 +434,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function addMonsterToDOM(monster) {
-        const monsterCard = `
-        <div class="enemy-card" data-monster-id="${monster._id}">
+        const monsterList = document.getElementById('monster-list');
+        const monsterElement = document.createElement('li');
+        monsterElement.classList.add('enemy-card');
+        monsterElement.dataset.monsterId = monster._id;
+        monsterElement.innerHTML = `
             <h4>${monster.name}</h4>
             <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
-            <p class="monster-hp">HP: ${monster.current_hp} / ${monster.hp}</p>
+            <p>HP: ${monster.current_hp} / ${monster.hp}</p>
             <p>Mana: ${monster.current_mana} / ${monster.mana}</p>
             <p>Energia: ${monster.current_energia} / ${monster.energia}</p>
             <p>${monster.resumo}</p>
-        </div>
+            <button class="remove-monster-button" data-monster-id="${monster._id}">Remover</button>
         `;
-        document.querySelector('.board-center').insertAdjacentHTML('beforeend', monsterCard);
+        monsterList.appendChild(monsterElement);
     }
+    
     
 
     socket.on('status_updated', function(data) {
