@@ -160,7 +160,34 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+    document.querySelectorAll('.remove-monster-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const monsterId = this.getAttribute('data-monster-id');
+    
+            fetch('/remove_monster', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    monster_id: monsterId,
+                    session_id: sessionId // Passando o sessionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remover o elemento DOM correspondente ao monstro removido
+                    document.querySelector(`li[data-monster-id="${monsterId}"]`).remove();
+                } else {
+                    console.error('Failed to remove monster:', data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
 
+    
     document.querySelectorAll('.enemy-card').forEach(function (monsterCard) {
         const monsterId = monsterCard.getAttribute('data-monster-id');
     

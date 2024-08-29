@@ -903,22 +903,41 @@ def update_character():
 def remove_monster():
     data = request.get_json()
     monster_id = data.get('monster_id')
+    session_id = data.get('session_id')  # Captura o session_id enviado do cliente
+
+    if not session_id:
+        app.logger.error("No session ID provided")
+        return jsonify({'success': False, 'message': 'No session ID provided'}), 400
+
+    app.logger.debug(f"Removing monster from session {session_id}")
 
     if monster_id:
-        session_data = get_session_by_id(db, session['game_session_id'])
+        try:
+            session_data = get_session_by_id(db, session_id)
+        except Exception as e:
+            app.logger.error(f"Failed to retrieve session data for session_id {session_id}: {e}")
+            return jsonify({'success': False, 'message': 'Failed to retrieve session data'}), 500
+
         # Filtra a lista de monstros removendo o que possui o ID fornecido
         session_data['monsters'] = [m for m in session_data['monsters'] if str(m['_id']) != monster_id]
 
-        # Atualiza a sessão no banco de dados
-        db.sessions.update_one(
-            {"_id": ObjectId(session['game_session_id'])},
-            {"$set": {"monsters": session_data['monsters']}}
-        )
+        try:
+            # Atualiza a sessão no banco de dados
+            db.sessions.update_one(
+                {"_id": ObjectId(session_id)},
+                {"$set": {"monsters": session_data['monsters']}}
+            )
+        except Exception as e:
+            app.logger.error(f"Failed to update session in database for session_id {session_id}: {e}")
+            return jsonify({'success': False, 'message': 'Failed to update session data'}), 500
 
         # Emite o evento para remover o monstro na interface dos jogadores
-        socketio.emit('monster_removed', {'monster_id': monster_id}, room=session['game_session_id'])
+        socketio.emit('monster_removed', {'monster_id': monster_id}, room=session_id)
         return jsonify({'success': True})
-    return jsonify({'success': False}), 400
+
+    app.logger.error("Monster ID not provided or invalid")
+    return jsonify({'success': False, 'message': 'Invalid monster ID'}), 400
+
 
 
 @app.route('/remove_player/<char_id>', methods=['POST'])
