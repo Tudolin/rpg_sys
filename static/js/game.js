@@ -450,6 +450,10 @@ document.addEventListener("DOMContentLoaded", function () {
     
     function addMonsterToDOM(monster) {
         const monsterList = document.getElementById('monster-list');
+        if (!monsterList) {
+            console.error('monster-list element not found');
+            return;
+        }
         const monsterElement = document.createElement('li');
         monsterElement.classList.add('enemy-card');
         monsterElement.dataset.monsterId = monster._id;
@@ -464,6 +468,7 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         monsterList.appendChild(monsterElement);
     }
+    
     
     
 
