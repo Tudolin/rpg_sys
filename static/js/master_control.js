@@ -17,19 +17,78 @@ document.addEventListener("DOMContentLoaded", function() {
     const monsterList = document.getElementById('monster-list');
 
     if (addMonsterForm) {
-        addMonsterForm.addEventListener('submit', function(event) {
+        addMonsterForm.addEventListener('submit', function (event) {
             event.preventDefault();
 
             const monsterId = monsterSelect.value;
             const quantity = parseInt(monsterQuantityInput.value);
-
-            console.log(`Attempting to add ${quantity} of monster with ID: ${monsterId}`);
 
             if (monsterId && quantity > 0) {
                 for (let i = 0; i < quantity; i++) {
                     socket.emit('add_monster', { monster_id: monsterId, session_id: sessionId });
                 }
             }
+        });
+    }
+    if (monsterList) {
+        document.querySelectorAll('.enemy-card').forEach(function (monsterCard) {
+            const monsterId = monsterCard.getAttribute('data-monster-id');
+
+            const hpElement = document.querySelector(`#monster-hp-${monsterId}`);
+            const manaElement = document.querySelector(`#monster-mana-${monsterId}`);
+            const energiaElement = document.querySelector(`#monster-energia-${monsterId}`);
+
+            if (hpElement) {
+                hpElement.addEventListener('input', function () {
+                    updateMonsterStats(monsterId, 'hp', hpElement.textContent);
+                });
+            }
+
+            if (manaElement) {
+                manaElement.addEventListener('input', function () {
+                    updateMonsterStats(monsterId, 'mana', manaElement.textContent);
+                });
+            }
+
+            if (energiaElement) {
+                energiaElement.addEventListener('input', function () {
+                    updateMonsterStats(monsterId, 'energia', energiaElement.textContent);
+                });
+            }
+
+            // Verifica se o botão de remover monstro existe antes de adicionar o listener
+            const removeButton = monsterCard.querySelector('.remove-monster-button');
+            if (removeButton) {
+                removeButton.addEventListener('click', function () {
+                    const monsterId = this.getAttribute('data-monster-id');
+                    removeMonster(monsterId);
+                });
+            }
+        });
+    }
+    if (playerList) {
+        const forms = document.querySelectorAll('.character-form');
+        forms.forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const charId = form.getAttribute('data-char-id');
+                const hp = form.querySelector('.hp-input').value;
+                const mana = form.querySelector('.mana-input').value;
+                const energy = form.querySelector('.energy-input').value;
+
+                socket.emit('update_character_status', {
+                    character_id: charId,
+                    new_health: hp,
+                    new_mana: mana,
+                    new_energy: energy
+                });
+            });
+        });
+    }
+
+    if (mediaForm) {
+        mediaForm.addEventListener('submit', function(event) {
+            event.preventDefault();
         });
     }
 
@@ -606,7 +665,7 @@ socket.on('player_removed', function(data) {
             });
         });
     });
-    
+
     forms.forEach(function(form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
