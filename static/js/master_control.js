@@ -163,30 +163,37 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.querySelectorAll('.enemy-card').forEach(function (monsterCard) {
         const monsterId = monsterCard.getAttribute('data-monster-id');
-        
-        // Add input fields or sliders for updating HP, Mana, and Energia
-        // You can use inputs or range sliders here depending on your preference
-        const hpElement = document.querySelector(`#monster-hp-${monsterId}`);
-        const manaElement = document.querySelector(`#monster-mana-${monsterId}`);
-        const energiaElement = document.querySelector(`#monster-energia-${monsterId}`);
-
-        hpElement.addEventListener('input', function () {
-            updateMonsterStats(monsterId, 'hp', hpElement.textContent);
-        });
-
-        manaElement.addEventListener('input', function () {
-            updateMonsterStats(monsterId, 'mana', manaElement.textContent);
-        });
-
-        energiaElement.addEventListener('input', function () {
-            updateMonsterStats(monsterId, 'energia', energiaElement.textContent);
-        });
-
-        // Handle removal of monster
-        monsterCard.querySelector('.remove-monster-button').addEventListener('click', function () {
-            const monsterId = this.getAttribute('data-monster-id');
-            removeMonster(monsterId);
-        });
+    
+        const hpElement = monsterCard.querySelector(`input[name="monster_hp"]`);
+        const manaElement = monsterCard.querySelector(`input[name="monster_mana"]`);
+        const energiaElement = monsterCard.querySelector(`input[name="monster_energia"]`);
+    
+        if (hpElement) {
+            hpElement.addEventListener('input', function () {
+                updateMonsterStats(monsterId, 'hp', hpElement.value);
+            });
+        } else {
+            console.warn(`hpElement for monster ${monsterId} not found.`);
+        }
+    
+        if (manaElement) {
+            manaElement.addEventListener('input', function () {
+                updateMonsterStats(monsterId, 'mana', manaElement.value);
+            });
+        }
+    
+        if (energiaElement) {
+            energiaElement.addEventListener('input', function () {
+                updateMonsterStats(monsterId, 'energia', energiaElement.value);
+            });
+        }
+    
+        const removeButton = monsterCard.querySelector('.remove-monster-button');
+        if (removeButton) {
+            removeButton.addEventListener('click', function () {
+                removeMonster(monsterId);
+            });
+        }
     });
     
     socket.on('monster_hp_updated', function(data) {
