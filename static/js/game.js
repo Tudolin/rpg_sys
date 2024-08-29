@@ -263,18 +263,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });    
 
-    ssocket.on('session_sync', function(data) {
+    socket.on('session_sync', function(data) {
         const playerList = document.querySelector('.other-players ul');
         playerList.innerHTML = ''; // Limpa a lista existente
-    
+        
         const boardCenter = document.querySelector('.board-center');
         boardCenter.innerHTML = ''; // Limpa a lista de monstros
-
-        monsters.forEach(monster => {
-            addMonsterToDOM(monster);
-        });
-
-        document.querySelector('.board-center').innerHTML = '';
     
         data.characters.forEach(char => {
             const newPlayerHTML = `
@@ -288,17 +282,22 @@ document.addEventListener("DOMContentLoaded", function () {
                         <p>${char.name}</p>
                         <p>Classe: ${char.class_name}</p>
                         <p>Raça: ${char.race_name}</p>
-                        <p>HP: ${data.current_hp} / ${char.hp}</p>
+                        <p>HP: ${char.current_hp} / ${char.hp}</p>
                         <p>Mana: ${char.current_mana} / ${char.mana}</p>
                         <p>Energia: ${char.current_energy} / ${char.energia}</p>
                     </div>
                 </li>
             `;
             playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
-            // Re-anexar eventos de clique
             attachPlayerClickEvent(playerList.querySelector(`.other-player[data-player-id="${char._id}"]`));
         });
+    
+        // Adicionar monstros ao DOM
+        data.monsters.forEach(monster => {
+            addMonsterToDOM(monster);
+        });
     });
+    
     
     
 

@@ -80,35 +80,62 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    function updateMonsterHp(monsterId, newHp) {
+        socket.emit('update_monster_hp', { monster_id: monsterId, new_hp: newHp });
+    }
+
     function removeMonster(monsterId) {
         fetch('/remove_monster', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                session_id: sessionId,
-                monster_id: monsterId
-            })
+            body: JSON.stringify({ monster_id: monsterId })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const monsterElement = document.querySelector(`li[data-monster-id="${monsterId}"]`);
-                if (monsterElement) {
-                    monsterElement.remove();
-                }
+                document.querySelector(`.enemy-card[data-monster-id="${monsterId}"]`).remove();
+                console.log(`Monster ${monsterId} removed successfully`);
+            } else {
+                console.error('Failed to remove monster');
             }
-        })
-        .catch(error => console.error('Erro:', error));
+        });
     }
 
+    document.querySelectorAll('.enemy-card').forEach(function (monsterCard) {
+        const monsterId = monsterCard.getAttribute('data-monster-id');
+        
+        // Add input fields or sliders for updating HP, Mana, and Energia
+        // You can use inputs or range sliders here depending on your preference
+        const hpElement = document.querySelector(`#monster-hp-${monsterId}`);
+        const manaElement = document.querySelector(`#monster-mana-${monsterId}`);
+        const energiaElement = document.querySelector(`#monster-energia-${monsterId}`);
+
+        hpElement.addEventListener('input', function () {
+            updateMonsterStats(monsterId, 'hp', hpElement.textContent);
+        });
+
+        manaElement.addEventListener('input', function () {
+            updateMonsterStats(monsterId, 'mana', manaElement.textContent);
+        });
+
+        energiaElement.addEventListener('input', function () {
+            updateMonsterStats(monsterId, 'energia', energiaElement.textContent);
+        });
+
+        // Handle removal of monster
+        monsterCard.querySelector('.remove-monster-button').addEventListener('click', function () {
+            const monsterId = this.getAttribute('data-monster-id');
+            removeMonster(monsterId);
+        });
+    });
+    
     socket.on('monster_hp_updated', function(data) {
-        console.log('Received monster_hp_updated event with data:', data);
-        const monsterElement = document.querySelector(`li[data-monster-id="${data._id}"]`);
+        const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data.monster_id}"]`);
         if (monsterElement) {
-            const hpInput = monsterElement.querySelector('.monster-hp-input');
-            hpInput.value = data.current_hp;
+            const hpElement = monsterElement.querySelector('.monster-hp');
+            hpElement.textContent = `HP: ${data.new_hp} / ${data.max_hp}`;
         }
     });
 
@@ -149,6 +176,24 @@ document.addEventListener("DOMContentLoaded", function() {
             playerElement.remove();
         }
     });
+
+    function updateMonsterStats(monsterId, stat, value) {
+        fetch('/update_monster_stats', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ monster_id: monsterId, stat: stat, value: value })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log(`Monster ${stat} updated successfully`);
+            } else {
+                console.error('Failed to update monster stats');
+            }
+        });
+    }
 
     function updatePlayersList(players) {
         const playersContainer = document.querySelector('.characters-container');

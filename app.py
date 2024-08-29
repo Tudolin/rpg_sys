@@ -899,6 +899,28 @@ def update_character():
     
     return jsonify({"success": False}), 400
 
+@app.route('/remove_monster', methods=['POST'])
+def remove_monster():
+    data = request.get_json()
+    monster_id = data.get('monster_id')
+
+    if monster_id:
+        session_data = get_session_by_id(db, session['game_session_id'])
+        # Filtra a lista de monstros removendo o que possui o ID fornecido
+        session_data['monsters'] = [m for m in session_data['monsters'] if str(m['_id']) != monster_id]
+
+        # Atualiza a sessão no banco de dados
+        db.sessions.update_one(
+            {"_id": ObjectId(session['game_session_id'])},
+            {"$set": {"monsters": session_data['monsters']}}
+        )
+
+        # Emite o evento para remover o monstro na interface dos jogadores
+        socketio.emit('monster_removed', {'monster_id': monster_id}, room=session['game_session_id'])
+        return jsonify({'success': True})
+    return jsonify({'success': False}), 400
+
+
 @app.route('/remove_player/<char_id>', methods=['POST'])
 def remove_player(char_id):
     if not session.get('logged_in'):
@@ -1021,6 +1043,11 @@ def on_join(data):
                 'class_name': class_info['name'] if class_info else "Classe Desconhecida",
                 'race_name': race_info['name'] if race_info else "Raça Desconhecida",
                 'hp': character['hp'],
+                'current_hp': character.get('current_hp', character['hp']),
+                'mana': character['mana'],
+                'current_mana': character.get('current_mana', character['mana']),
+                'energia': character['energia'],
+                'current_energia': character.get('current_energia', character['energia']),
                 'img_url': character['img_url']
             }
 
@@ -1029,7 +1056,7 @@ def on_join(data):
             if str(character['_id']) not in [str(c_id) for c_id in session_data.get('characters', [])]:
                 add_character_to_session(db, room, character['_id'])
 
-            # Emite a lista atualizada de todos os personagens para sincronização completa
+            # Emite a lista atualizada de todos os personagens e monstros para sincronização completa
             emit('session_sync', get_current_session_data(room), room=room)
 
 
@@ -1116,9 +1143,20 @@ def get_current_session_data(session_id):
                     'class_name': class_info['name'] if class_info else 'Classe Desconhecida',
                     'race_name': race_info['name'] if race_info else 'Raça Desconhecida',
                     'hp': character['hp'],
+                    'current_hp': character.get('current_hp', character['hp']),
+                    'mana': character['mana'],
+                    'current_mana': character.get('current_mana', character['mana']),
+                    'energia': character['energia'],
+                    'current_energia': character.get('current_energia', character['energia']),
                     'img_url': character.get('img_url', '/static/images/default.png')
                 }
                 characters.append(character_info)
+
+        # Assegurar que cada monstro tenha todos os campos necessários
+        for monster in monsters:
+            monster['current_hp'] = monster.get('current_hp', monster['hp'])
+            monster['current_mana'] = monster.get('current_mana', monster['mana'])
+            monster['current_energia'] = monster.get('current_energia', monster['energia'])
 
         session_sync_data = {
             'session_id': session_id,
@@ -1126,7 +1164,9 @@ def get_current_session_data(session_id):
             'monsters': monsters
         }
         return session_sync_data
+    
     return {}
+
 
 
 
@@ -1242,6 +1282,34 @@ def handle_add_monster(data):
     else:
         print(f"Failed to add monster. Monster or session not found: monster={monster}, session_id={session_id}")
 
+@app.route('/update_monster_stats', methods=['POST'])
+def update_monster_stats():
+    data = request.get_json()
+    monster_id = data.get('monster_id')
+    stat = data.get('stat')
+    value = data.get('value')
+
+    if monster_id and stat in ['hp', 'mana', 'energia']:
+        session_data = get_session_by_id(db, session['game_session_id'])
+        # Encontre o monstro na sessão
+        monsters = session_data.get('monsters', [])
+        for monster in monsters:
+            if str(monster['_id']) == monster_id:
+                monster[f'current_{stat}'] = int(value)
+                break
+
+        # Atualize a sessão no banco de dados
+        db.sessions.update_one(
+            {"_id": ObjectId(session['game_session_id'])},
+            {"$set": {"monsters": monsters}}
+        )
+
+        # Emita um evento para atualizar a interface dos jogadores
+        socketio.emit('monster_hp_updated', {'monster_id': monster_id, 'new_hp': next(m['current_hp'] for m in monsters if str(m['_id']) == monster_id)}, room=session['game_session_id'])
+        return jsonify({'success': True})
+    return jsonify({'success': False}), 400
+
+
 @app.route('/update_monster_hp', methods=['POST'])
 def update_monster_hp():
     data = request.get_json()
@@ -1268,14 +1336,30 @@ def update_monster_hp():
 @socketio.on('update_monster_hp')
 def handle_update_monster_hp(data):
     monster_id = data.get('monster_id')
-    new_hp = int(data.get('new_hp'))
-    session_id = data.get('session_id')
+    new_hp = data.get('new_hp')
+    session_id = session.get('game_session_id')
 
-    # Emitir a atualização de HP do monstro
-    socketio.emit('monster_hp_updated', {
-        '_id': monster_id,
-        'current_hp': new_hp
-    }, room=session_id)
+    if monster_id and new_hp and session_id:
+        session_data = get_session_by_id(db, session_id)
+        monsters = session_data.get('monsters', [])
+
+        for monster in monsters:
+            if monster['_id'] == monster_id:
+                monster['current_hp'] = int(new_hp)
+                break
+        
+        # Atualizar sessão no banco de dados
+        db.sessions.update_one(
+            {"_id": ObjectId(session_id)},
+            {"$set": {"monsters": monsters}}
+        )
+
+        # Emitir atualização para todos os jogadores
+        socketio.emit('monster_hp_updated', {
+            'monster_id': monster_id,
+            'new_hp': new_hp
+        }, room=session_id)
+
 
 @socketio.on('remove_monster')
 def handle_remove_monster(data):
