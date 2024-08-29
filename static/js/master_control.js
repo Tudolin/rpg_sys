@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+
     if (monsterList) {
         document.querySelectorAll('.enemy-card').forEach(function (monsterCard) {
             const monsterId = monsterCard.getAttribute('data-monster-id');
@@ -64,6 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+
     if (playerList) {
         const forms = document.querySelectorAll('.character-form');
         forms.forEach(function (form) {
@@ -148,8 +150,11 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                document.querySelector(`.enemy-card[data-monster-id="${monsterId}"]`).remove();
-                console.log(`Monster ${monsterId} removed successfully`);
+                const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${monsterId}"]`);
+                if (monsterElement) {
+                    monsterElement.remove();
+                    console.log(`Monster ${monsterId} removed successfully`);
+                }
             } else {
                 console.error('Failed to remove monster');
             }
