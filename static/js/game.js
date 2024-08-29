@@ -288,8 +288,10 @@ document.addEventListener("DOMContentLoaded", function () {
         boardCenter.innerHTML = ''; // Limpa a lista de monstros
     
         // Atualiza a lista de monstros
-        if (data && data.monsters && data.monsters.length > 0) {
+        if (data && data.monsters && Array.isArray(data.monsters) && data.monsters.length > 0) {
             updateMonstersList(data.monsters);
+        } else {
+            console.error('Monsters data is undefined or not an array');
         }
         
         if (data.characters && Array.isArray(data.characters)) {
@@ -319,10 +321,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
         // Adicionar monstros ao DOM
-        data.monsters.forEach(monster => {
-            addMonsterToDOM(monster);
-        });
+        if (data.monsters && Array.isArray(data.monsters)) {
+            data.monsters.forEach(monster => {
+                addMonsterToDOM(monster);
+            });
+        }
     });
+    
     
     
     
@@ -395,7 +400,7 @@ document.addEventListener("DOMContentLoaded", function () {
     socket.on('monster_added', function(data) {
         const existingMonster = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
         if (!existingMonster) {
-            addMonsterToDOM(monster);
+            addMonsterToDOM(data);
         }
         const boardCenter = document.querySelector('.board-center');
         

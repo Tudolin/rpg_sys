@@ -1056,31 +1056,8 @@ def on_join(data):
     if room:
         join_room(room)
         character = db.chars.find_one({"user_id": ObjectId(session['userId'])})
-        
         if character:
-            class_info = db['classes.classes'].find_one({"_id": ObjectId(character['class_id'])})
-            race_info = db['races.races'].find_one({"_id": ObjectId(character['race_id'])})
-            
-            character_data = {
-                '_id': str(character['_id']),
-                'name': character['name'],
-                'class_name': class_info['name'] if class_info else "Classe Desconhecida",
-                'race_name': race_info['name'] if race_info else "Raça Desconhecida",
-                'hp': character['hp'],
-                'current_hp': character.get('current_hp', character['hp']),
-                'mana': character['mana'],
-                'current_mana': character.get('current_mana', character['mana']),
-                'energia': character['energia'],
-                'current_energia': character.get('current_energia', character['energia']),
-                'img_url': character['img_url']
-            }
-
-            # Verificar se o personagem já está na lista de personagens da sessão
-            session_data = get_session_by_id(db, room)
-            if str(character['_id']) not in [str(c_id) for c_id in session_data.get('characters', [])]:
-                add_character_to_session(db, room, character['_id'])
-
-            # Emite a lista atualizada de todos os personagens e monstros para sincronização completa
+            add_character_if_not_in_session(room, character)
             emit('session_sync', get_current_session_data(room), room=room)
 
 
@@ -1111,33 +1088,16 @@ def on_connect():
     if room:
         join_room(room)
         character = db.chars.find_one({"user_id": ObjectId(session['userId'])})
-
         if character:
             # Adiciona o personagem à sessão se ele não estiver nela
-            session_data = get_session_by_id(db, room)
-            if str(character['_id']) not in [str(c_id) for c_id in session_data.get('characters', [])]:
-                add_character_to_session(db, room, character['_id'])
+            add_character_if_not_in_session(room, character)
+            # Emite a sincronização completa da sessão
+            emit('session_sync', get_current_session_data(room), room=room)
 
-            # Enviar a lista atualizada de todos os jogadores na sessão
-            all_characters = session_data.get('characters', [])
-            all_character_data = []
-            for char_id in all_characters:
-                char = db.chars.find_one({"_id": ObjectId(char_id)})
-                if char:  # Garante que o personagem foi encontrado
-                    char_class_info = db['classes.classes'].find_one({"_id": ObjectId(char['class_id'])})
-                    char_race_info = db['races.races'].find_one({"_id": ObjectId(char['race_id'])})
-                    all_character_data.append({
-                        '_id': str(char['_id']),
-                        'name': char['name'],
-                        'class_name': char_class_info['name'] if char_class_info else "Classe Desconhecida",
-                        'race_name': char_race_info['name'] if char_race_info else "Raça Desconhecida",
-                        'hp': char['hp'],
-                        'img_url': char['img_url']
-                    })
-
-            emit('session_sync', {'characters': all_character_data}, room=room)
-
-
+def add_character_if_not_in_session(room, character):
+    session_data = get_session_by_id(db, room)
+    if str(character['_id']) not in [str(c_id) for c_id in session_data.get('characters', [])]:
+        add_character_to_session(db, room, character['_id'])
 
 @socketio.on('new_media')
 def handle_new_media(data):
@@ -1150,7 +1110,6 @@ def handle_new_media(data):
 
 def get_current_session_data(session_id):
     session_data = get_session_by_id(db, session_id)
-
     if session_data:
         characters = []
         monsters = session_data.get('monsters', [])
