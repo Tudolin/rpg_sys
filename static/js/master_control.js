@@ -313,26 +313,35 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function updateMonstersList(monsters) {
-        const monsterList = document.getElementById('monster-list');
-        monsterList.innerHTML = '';
         monsters.forEach(monster => {
             addMonsterToDOM(monster);
         });
     }
+    
 
     function addMonsterToDOM(monster) {
-        const monsterCard = `
-        <li class="enemy-card" data-monster-id="${monster._id}">
-            <h4>${monster.name}</h4>
-            <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
-            <p>HP: ${monster.current_hp} / ${monster.hp}</p>
-            <p>Mana: ${monster.current_mana} / ${monster.mana}</p>
-            <p>Energia: ${monster.current_energia} / ${monster.energia}</p>
-            <p>${monster.resumo}</p>
-            <button class="remove-monster-button" data-monster-id="${monster._id}">Remover</button>
-        </li>`;
+        const boardCenter = document.querySelector('.board-center');
         
+        if (boardCenter) {  // Verifique se o elemento existe
+            const monsterElement = document.createElement('div');
+            monsterElement.classList.add('enemy-card');
+            monsterElement.dataset.monsterId = monster._id;
+            monsterElement.innerHTML = `
+                <h4>${monster.name}</h4>
+                <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
+                <div class="health-bar">
+                    <div class="health-fill" style="width: ${(monster.current_hp / monster.hp) * 100}%"></div>
+                    <div class="health-text">HP: ${monster.current_hp} / ${monster.hp}</div>
+                </div>
+                <p>${monster.resumo}</p>
+                <button class="remove-monster-button" data-monster-id="${monster._id}">Remover</button>
+            `;
+            boardCenter.appendChild(monsterElement);
+        } else {
+            console.error('Elemento board-center não encontrado no DOM.');
+        }
     }
+    
 
     document.getElementById('monster-list').addEventListener('click', function (e) {
         if (e.target.classList.contains('remove-monster-button')) {
