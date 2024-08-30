@@ -1,15 +1,27 @@
 @font-face {
     font-family: Enchanted Land;
     src: url(/static/fonts/Seagram\ tfb.ttf);
- }
+}
 
- @keyframes fadeInAnimation {
+@keyframes fadeInAnimation {
     0% {
         opacity: 0.3;
     }
     100% {
         opacity: 1;
-     }
+    }
+}
+
+body {
+    font-family: Enchanted Land;
+    color: #e0e0e0;
+    background-color: #202020;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    animation: fadeInAnimation ease 2s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
 }
 
 .board-center {
@@ -19,42 +31,6 @@
     justify-content: space-around;
     align-items: flex-start;
 }
-
-.monster-selection {
-    margin-bottom: 10px;
-}
-
-.monster-quantity {
-    margin-bottom: 10px;
-}
-
-#added-monsters {
-    margin-top: 20px;
-}
-
-#monster-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-#monster-list li {
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.remove-monster-button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    background-color: #d9534f;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
 
 .enemy-card {
     background-color: #444;
@@ -83,43 +59,50 @@
 
 .monster-health-bar {
     width: 100%;
-    height: 20px; /* Altura da barra de vida */
+    height: 20px;
     background-color: #1a1a1a;
     border-radius: 5px;
     margin-top: 10px;
     position: relative;
     border: 1px solid #660000;
-    overflow: hidden; /* Garante que o preenchimento não transborde */
+    overflow: hidden;
 }
 
 .monster-health-fill {
-    height: 100%; /* A altura deve ocupar 100% da barra */
-    width: 0; /* Largura inicial */
-    background: linear-gradient(to right, #ff0000, #990000); /* Gradiente para a barra de vida */
+    height: 100%;
+    width: 0;
+    background: linear-gradient(to right, #ff0000, #990000);
     position: absolute;
-    transition: width 0.5s ease-in-out; /* Animação suave ao atualizar a vida */
+    transition: width 0.5s ease-in-out;
     top: 0;
     left: 0;
 }
 
 .monster-health-text {
-    position: relative; /* Mantém o texto no topo do health-fill */
+    position: relative;
     z-index: 1;
     width: 100%;
     text-align: center;
     color: #fff;
     font-size: 12px;
     font-weight: bold;
-    line-height: 20px; /* Alinha o texto verticalmente na barra */
+    line-height: 20px;
 }
 
+.monster-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
 
 .dice-result {
     position: fixed;
-    bottom: 20%;  /* Ajuste para centralizar o dado verticalmente */
+    bottom: 20%;
     left: 50%;
     transform: translate(-50%, 0);
-    font-size: 3rem;  /* Aumenta o tamanho da fonte para maior visibilidade */
+    font-size: 3rem;
     background-color: rgba(0, 0, 0, 0.8);
     color: white;
     padding: 15px 30px;
@@ -129,14 +112,14 @@
     justify-content: center;
     transition: opacity 0.3s ease;
     opacity: 1;
-    z-index: 100;  /* Garante que fique acima de outros elementos */
+    z-index: 100;
 }
 
 .bottom-bar {
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 80px; /* Increase height to accommodate skills */
+    height: 80px;
     background-color: rgba(0, 0, 0, 0.9);
     display: flex;
     justify-content: space-between;
@@ -150,7 +133,7 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    width: 70%; /* Adjust width according to the number of skills */
+    width: 70%;
 }
 
 .skill-icon {
@@ -178,63 +161,28 @@
     cursor: pointer;
 }
 
-
-
 .dice-result.rolling {
     animation: diceRoll 1.5s ease-in-out;
 }
 
-
 @keyframes diceRoll {
-    0% { transform: translateX(-50%) rotate(0); }
-    25% { transform: translateX(-50%) rotate(180deg); }
-    50% { transform: translateX(-50%) rotate(360deg); }
-    75% { transform: translateX(-50%) rotate(540deg); }
-    100% { transform: translateX(-50%) rotate(720deg); }
+    0% {
+        transform: translateX(-50%) rotate(0);
+    }
+    25% {
+        transform: translateX(-50%) rotate(180deg);
+    }
+    50% {
+        transform: translateX(-50%) rotate(360deg);
+    }
+    75% {
+        transform: translateX(-50%) rotate(540deg);
+    }
+    100% {
+        transform: translateX(-50%) rotate(720deg);
+    }
 }
 
-
-
-body {
-    font-family: Enchanted Land;
-    color: #e0e0e0;
-    background-color: #202020;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    animation: fadeInAnimation ease 2s;
-    animation-iteration-count: 1;
-    animation-fill-mode: forwards;
-}
-.navbar-toggler {
-    background-color: #c25757; /* Cor de fundo do botão */
-    border-color: #c25757; /* Cor da borda do botão */
-    transition: background-color 0.3s ease; /* Animação de transição */
-}
-
-.game-lobby-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    width: 100%;
-    min-height: 100vh;
-    background-image: url('/static/images/rpg_background.jpg');
-    background-size: cover;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-/* Adiciona a estrutura do layout principal */
-.main-content {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 1200px;
-    flex-wrap: wrap;
-}
-
-/* Seção de informações do jogador */
 .player-info {
     border: 2px solid #660000;
     background-color: rgba(0, 0, 0, 0.85);
@@ -273,6 +221,12 @@ body {
     overflow: hidden;
 }
 
+.character-portrait-small {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
 .profile-header {
     display: flex;
     align-items: center;
@@ -282,36 +236,28 @@ body {
 .profile-image {
     border-radius: 50%;
     overflow: hidden;
-    width: 50px; /* Tamanho desejado para a imagem */
-    height: 50px; /* Tamanho desejado para a imagem */
-    margin-right: 10px; /* Espaço entre a imagem e o nome */
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
     flex-shrink: 0;
 }
 
 .character-portrait-popup {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Garante que a imagem seja redimensionada corretamente */
+    object-fit: cover;
 }
 
 .profile-header h2 {
     margin: 0;
-    font-size: 1.5rem; /* Ajuste o tamanho da fonte conforme necessário */
+    font-size: 1.5rem;
 }
-
 
 .character-portrait {
-    width: 85%;  /* Ajuste o tamanho da imagem para caber na moldura */
-    height: 85%; /* Ajuste o tamanho da imagem para caber na moldura */
+    width: 85%;
+    height: 85%;
     border-radius: 50%;
-    object-fit: cover; /* Garante que a imagem seja redimensionada corretamente */
-}
-
-.character-portrait-small {
-    width: 85%; /* Ajuste o tamanho da imagem para caber na moldura */
-    height: 85%; /* Ajuste o tamanho da imagem para caber na moldura */
-    border-radius: 50%;
-    object-fit: cover; /* Garante que a imagem seja redimensionada corretamente */
+    object-fit: cover;
 }
 
 .stats-container h2 {
@@ -319,63 +265,19 @@ body {
     margin-bottom: 10px;
 }
 
-
 .stats-container p {
     font-size: 16px;
     margin: 5px 0;
 }
 
-.health-ball {
-    width: 100px;
-    height: 100px;
-    background-color: #1a1a1a;
-    border-radius: 50%;
-    border: 5px solid #660000;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    margin: 20px auto;
-}
-
-.mana-ball {
-    width: 100px;
-    height: 100px;
-    background-color: #1a1a1a;
-    border-radius: 50%;
-    border: 5px solid #000066; /* Borda azul */
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    margin: 20px auto;
-}
-
-.mana-fill {
-    background: radial-gradient(circle, #0000ff 0%, #000099 100%); /* Preenchimento azul */
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    transition: height 0.5s ease-in-out;
-    border-radius: 50%;
-}
-
-.mana-text {
-    position: absolute;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 1;
-}
-
+.health-ball,
+.mana-ball,
 .energy-ball {
     width: 100px;
     height: 100px;
     background-color: #1a1a1a;
     border-radius: 50%;
-    border: 5px solid #666600; /* Borda amarela */
+    border: 5px solid;
     position: relative;
     display: flex;
     align-items: center;
@@ -384,8 +286,21 @@ body {
     margin: 20px auto;
 }
 
+.health-ball {
+    border-color: #660000;
+}
+
+.mana-ball {
+    border-color: #000066;
+}
+
+.energy-ball {
+    border-color: #666600;
+}
+
+.health-fill,
+.mana-fill,
 .energy-fill {
-    background: radial-gradient(circle, #ffff00 0%, #999900 100%); /* Preenchimento amarelo */
     width: 100%;
     position: absolute;
     bottom: 0;
@@ -393,6 +308,20 @@ body {
     border-radius: 50%;
 }
 
+.health-fill {
+    background: radial-gradient(circle, #ff0000 0%, #990000 100%);
+}
+
+.mana-fill {
+    background: radial-gradient(circle, #0000ff 0%, #000099 100%);
+}
+
+.energy-fill {
+    background: radial-gradient(circle, #ffff00 0%, #999900 100%);
+}
+
+.health-text,
+.mana-text,
 .energy-text {
     position: absolute;
     color: #ffffff;
@@ -401,32 +330,6 @@ body {
     z-index: 1;
 }
 
-.health-mana-energy-bars {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin-top: 20px;
-}
-
-
-.health-fill {
-    background: radial-gradient(circle, #ff0000 0%, #990000 100%);
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    transition: height 0.5s ease-in-out;
-    border-radius: 50%;
-}
-
-.health-text {
-    position: absolute;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 1;
-}
-
-/* Seção de outros jogadores */
 .other-players {
     border: 2px solid #660000;
     background-color: rgba(0, 0, 0, 0.85);
@@ -456,20 +359,6 @@ body {
     align-items: center;
     margin-bottom: 10px;
     transition: transform 0.2s ease-in-out;
-}
-
-.character-frame-small {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-    background: url('/static/images/character_frame_small.png') no-repeat center center;
-    background-size: contain;
-}
-
-.character-portrait-small {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
 }
 
 .player-stats p {
@@ -532,25 +421,18 @@ body {
     cursor: pointer;
 }
 
-.close-button:hover,
-.close-button:focus {
-    color: white;
-    text-decoration: none;
-    cursor: pointer;
-}
-
 .media-popup .media-content img,
 .media-popup .media-content video {
     max-width: 100%;
-    max-height: 80vh; /* Limit height to 80% of viewport height */
+    max-height: 80vh;
     display: block;
     margin: 0 auto;
 }
 
-
+/* Responsividade */
 @media (max-width: 768px) {
     .dice-result {
-        font-size: 2rem;  /* Adjust font size for smaller screens */
+        font-size: 2rem;
     }
 
     .skills-bar {
@@ -560,7 +442,7 @@ body {
     }
 
     .skill-icon img {
-        width: 35px;  /* Adjust for smaller screens */
+        width: 35px;
     }
 
     .skill-icon span {
@@ -582,7 +464,7 @@ body {
     }
 
     .enemy-card {
-        width: 120px; /* Adjust width for smaller screens */
+        width: 120px;
     }
 
     .other-players {
@@ -601,7 +483,9 @@ body {
         height: 35px;
     }
 
-    .health-ball {
+    .health-ball,
+    .mana-ball,
+    .energy-ball {
         width: 80px;
         height: 80px;
     }
