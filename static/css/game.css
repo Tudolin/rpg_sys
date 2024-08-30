@@ -56,8 +56,13 @@
 }
 
 
-/* Adicionei esta seção para a exibição dos monstros */
-/* CSS fornecido */
+.monster-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
 
 .enemy-card {
     background-color: #444;
@@ -75,10 +80,13 @@
 
 .enemy-card h4 {
     margin: 0 0 10px;
+    font-size: 16px;
 }
 
 .enemy-card p {
     margin: 5px 0;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 .health-bar {
@@ -91,8 +99,7 @@
     border: 1px solid #660000;
 }
 
-.health-bar .health-fill {
-    width: 100%;
+.health-fill {
     height: 100%;
     background: radial-gradient(circle, #ff0000 0%, #990000 100%);
     border-radius: 5px;
@@ -100,22 +107,14 @@
     transition: width 0.5s ease-in-out;
 }
 
-.health-bar .health-text {
+.health-text {
     position: absolute;
     width: 100%;
     text-align: center;
     color: #fff;
     font-size: 12px;
     font-weight: bold;
-    z-index: 1;
-}
-
-/* Ensure the text and the fill bar stack properly */
-.health-bar .health-fill {
-    z-index: 0;
-}
-
-.health-bar .health-text {
+    line-height: 20px; /* vertically center the text */
     z-index: 1;
 }
 
@@ -125,33 +124,8 @@
     object-fit: cover;
     border-radius: 50%;
     margin-bottom: 10px;
+    background-color: #333; /* Placeholder background */
 }
-
-
-.monster-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-bottom: 10px;
-}
-
-.enemy-card h4 {
-    margin: 0 0 10px;
-}
-
-.enemy-card p {
-    margin: 5px 0;
-}
-
-.monster-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 50%;
-}
-
-/* Resto do CSS fornecido */
 
 .dice-result {
     position: fixed;

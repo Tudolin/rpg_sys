@@ -407,10 +407,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data.monster_id}"]`);
         if (monsterElement) {
             const healthFill = monsterElement.querySelector('.health-fill');
-            const healthText = monsterElement.querySelector('.health-bar');
+            const healthText = monsterElement.querySelector('.health-text');
             if (healthFill && healthText) {
                 const newHp = data.new_hp;
-                const maxHp = healthFill.dataset.maxHp;
+                const maxHp = monsterElement.getAttribute('data-max-hp');
                 const percentage = (newHp / maxHp) * 100;
                 healthFill.style.width = `${percentage}%`;
                 healthText.textContent = `HP: ${newHp} / ${maxHp}`;
@@ -436,53 +436,41 @@ document.addEventListener("DOMContentLoaded", function () {
         let monsterElement = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
     
         if (!monsterElement) {
-            // Se o elemento não existir, cria-o
             const boardCenter = document.querySelector('.board-center');
             monsterElement = document.createElement('div');
             monsterElement.classList.add('enemy-card');
             monsterElement.dataset.monsterId = monster._id;
+            monsterElement.setAttribute('data-max-hp', monster.hp);  // set max HP data attribute
             boardCenter.appendChild(monsterElement);
         }
     
-        // Atualiza a imagem do monstro
-        const monsterImage = monsterElement.querySelector('.monster-image');
-        if (monsterImage) {
-            monsterImage.src = monster.img_url;
-        } else {
-            // Se a imagem ainda não existe, cria-a
-            const imgElement = document.createElement('img');
-            imgElement.classList.add('monster-image');
-            imgElement.src = monster.img_url;
-            imgElement.alt = monster.name;
-            monsterElement.appendChild(imgElement);
-        }
-    
-        // Atualiza ou cria a barra de vida
-        let healthFill = monsterElement.querySelector('.health-fill');
-        if (!healthFill) {
-            healthFill = document.createElement('div');
-            healthFill.classList.add('health-fill');
-            monsterElement.appendChild(healthFill);
-        }
+        const healthFill = monsterElement.querySelector('.health-fill');
+        const healthText = monsterElement.querySelector('.health-text');
         const healthPercentage = (monster.current_hp / monster.hp) * 100;
-        healthFill.style.width = `${healthPercentage}%`;
     
-        // Atualiza ou cria o texto de vida
-        let healthText = monsterElement.querySelector('.health-bar');
-        if (!healthText) {
-            healthText = document.createElement('div');
-            healthText.classList.add('health-bar');
-            monsterElement.appendChild(healthText);
+        if (healthFill) {
+            healthFill.style.width = `${healthPercentage}%`;
+        } else {
+            const fillElement = document.createElement('div');
+            fillElement.classList.add('health-fill');
+            fillElement.style.width = `${healthPercentage}%`;
+            monsterElement.appendChild(fillElement);
         }
-        healthText.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
     
-        // Atualiza o resumo do monstro
-        let monsterResumo = monsterElement.querySelector('p');
-        if (!monsterResumo) {
-            monsterResumo = document.createElement('p');
+        if (healthText) {
+            healthText.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
+        } else {
+            const textElement = document.createElement('div');
+            textElement.classList.add('health-text');
+            textElement.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
+            monsterElement.appendChild(textElement);
+        }
+    
+        const monsterResumo = monsterElement.querySelector('p') || document.createElement('p');
+        monsterResumo.textContent = monster.resumo;
+        if (!monsterElement.contains(monsterResumo)) {
             monsterElement.appendChild(monsterResumo);
         }
-        monsterResumo.textContent = monster.resumo;
     }
     
     
