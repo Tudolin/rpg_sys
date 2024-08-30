@@ -438,6 +438,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     
     function updateMonsterInDOM(monster) {
+        // Select the existing monster element or create a new one if it doesn't exist
         let monsterElement = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
     
         if (!monsterElement) {
@@ -445,38 +446,21 @@ document.addEventListener("DOMContentLoaded", function () {
             monsterElement = document.createElement('div');
             monsterElement.classList.add('enemy-card');
             monsterElement.dataset.monsterId = monster._id;
-            monsterElement.setAttribute('data-max-hp', monster.hp);  // set max HP data attribute
             boardCenter.appendChild(monsterElement);
         }
     
-        const healthFill = monsterElement.querySelector('.monster-health-fill');
-        const healthText = monsterElement.querySelector('.monster-health-text');
-        const healthPercentage = (monster.current_hp / monster.hp) * 100;
-    
-        if (healthFill) {
-            healthFill.style.width = `${healthPercentage}%`;
-        } else {
-            const fillElement = document.createElement('div');
-            fillElement.classList.add('monster-health-fill');
-            fillElement.style.width = `${healthPercentage}%`;
-            monsterElement.appendChild(fillElement);
-        }
-    
-        if (healthText) {
-            healthText.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
-        } else {
-            const textElement = document.createElement('div');
-            textElement.classList.add('monster-health-text');
-            textElement.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
-            monsterElement.appendChild(textElement);
-        }
-    
-        const monsterResumo = monsterElement.querySelector('p') || document.createElement('p');
-        monsterResumo.textContent = monster.resumo;
-        if (!monsterElement.contains(monsterResumo)) {
-            monsterElement.appendChild(monsterResumo);
-        }
+        // Clear out any existing content to avoid duplication
+        monsterElement.innerHTML = `
+            <h4>${monster.name}</h4>
+            <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
+            <div class="monster-health-bar">
+                <div class="monster-health-fill" style="width: ${(monster.current_hp / monster.hp) * 100}%;"></div>
+                <div class="monster-health-text">HP: ${monster.current_hp} / ${monster.hp}</div>
+            </div>
+            <p>${monster.resumo}</p>
+        `;
     }
+    
     
     
     

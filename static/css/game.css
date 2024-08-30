@@ -68,6 +68,17 @@
 }
 
 
+.monster-image {
+    width: 60px; /* Define the width of the image */
+    height: 60px; /* Define the height of the image */
+    object-fit: cover; /* Ensure the image fills the container while maintaining aspect ratio */
+    border-radius: 50%; /* Round the image corners */
+    margin-bottom: 10px; /* Space between the image and the following element */
+    display: block; /* Display the image as a block-level element */
+    margin-left: auto; /* Center the image horizontally */
+    margin-right: auto; /* Center the image horizontally */
+}
+
 .enemy-card {
     background-color: #444;
     border: 2px solid #222;
@@ -82,48 +93,37 @@
     flex: 0 0 auto;
 }
 
-.enemy-card h4 {
-    margin: 0 0 10px;
-    font-size: 16px;
-}
-
-.enemy-card p {
-    margin: 5px 0;
-    font-size: 14px;
-    line-height: 1.4;
-}
-
 .monster-health-bar {
     width: 100%;
-    height: 25px; /* Altura da barra de vida */
+    height: 25px; /* Height of the health bar */
     background-color: #1a1a1a;
     border-radius: 5px;
     margin-top: 10px;
     position: relative;
     border: 1px solid #660000;
-    overflow: hidden; /* Garante que o preenchimento não transborde */
+    overflow: hidden; /* Ensure the fill doesn't overflow */
 }
 
 .monster-health-fill {
-    height: 10%; /* A altura deve ocupar 100% da barra */
-    width: 0; /* Largura inicial */
-    background: linear-gradient(to right, #ff0000, #990000); /* Gradiente para a barra de vida */
+    height: 100%; /* Fill height should occupy 100% of the bar */
+    background: linear-gradient(to right, #ff0000, #990000); /* Gradient for health fill */
     position: absolute;
-    transition: width 0.5s ease-in-out; /* Animação suave ao atualizar a vida */
+    transition: width 0.5s ease-in-out; /* Smooth width transition */
     top: 0;
     left: 0;
 }
 
 .monster-health-text {
-    position: relative; /* Mantém o texto no topo do health-fill */
+    position: relative; /* Keep text on top of the fill */
     z-index: 1;
     width: 100%;
     text-align: center;
     color: #fff;
     font-size: 12px;
     font-weight: bold;
-    line-height: 20px; /* Alinha o texto verticalmente na barra */
+    line-height: 25px; /* Vertically center the text in the bar */
 }
+
 
 
 .dice-result {
