@@ -289,44 +289,49 @@ document.addEventListener("DOMContentLoaded", function () {
     
         // Atualiza a lista de monstros
         if (data && data.monsters && Array.isArray(data.monsters) && data.monsters.length > 0) {
-            updateMonstersList(data.monsters);
+            updateMonstersList(data.monsters);  // Usando a função updateMonstersList
         } else {
             console.error('Monsters data is undefined or not an array');
         }
         
         if (data.characters && Array.isArray(data.characters)) {
-        data.characters.forEach(char => {
-            const newPlayerHTML = `
-                <li class="other-player" data-player-id="${char._id}">
-                    <div class="profile-header">
-                        <div class="profile-image">
-                            <img src="${char.img_url}" alt="${char.name}" class="character-portrait-popup">
+            data.characters.forEach(char => {
+                const newPlayerHTML = `
+                    <li class="other-player" data-player-id="${char._id}">
+                        <div class="profile-header">
+                            <div class="profile-image">
+                                <img src="${char.img_url}" alt="${char.name}" class="character-portrait-popup">
+                            </div>
                         </div>
-                    </div>
-                    <div class="player-stats">
-                        <p>${char.name}</p>
-                        <p>Classe: ${char.class_name}</p>
-                        <p>Raça: ${char.race_name}</p>
-                        <p>HP: ${char.current_hp} / ${char.hp}</p>
-                        <p>Mana: ${char.current_mana} / ${char.mana}</p>
-                        <p>Energia: ${char.current_energy} / ${char.energia}</p>
-                    </div>
-                </li>
-            `;
-            playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
-            attachPlayerClickEvent(playerList.querySelector(`.other-player[data-player-id="${char._id}"]`));
-        });
-    } else {
-        console.error('characters data is undefined or not an array');
-    }
-    
+                        <div class="player-stats">
+                            <p>${char.name}</p>
+                            <p>Classe: ${char.class_name}</p>
+                            <p>Raça: ${char.race_name}</p>
+                            <p>HP: ${char.current_hp} / ${char.hp}</p>
+                            <p>Mana: ${char.current_mana} / ${char.mana}</p>
+                            <p>Energia: ${char.current_energy} / ${char.energia}</p>
+                        </div>
+                    </li>
+                `;
+                playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
+                attachPlayerClickEvent(playerList.querySelector(`.other-player[data-player-id="${char._id}"]`));
+            });
+        } else {
+            console.error('characters data is undefined or not an array');
+        }
+        
         // Adicionar monstros ao DOM
         if (data.monsters && Array.isArray(data.monsters)) {
             data.monsters.forEach(monster => {
-                addMonsterToDOM(monster);
+                updateMonsterInDOM(monster);  // Usando a função updateMonsterInDOM
             });
         }
     });
+    
+    socket.on('monster_added', function(data) {
+        updateMonsterInDOM(data);  // Usando updateMonsterInDOM ao invés de addMonsterToDOM
+    });
+    
     
     
     
@@ -397,10 +402,6 @@ document.addEventListener("DOMContentLoaded", function () {
         healthText.textContent = data.new_health + ' / ' + maxHp;
     });
 
-    socket.on('monster_added', function(data) {
-        updateMonsterInDOM(data);
-    });
-
     
     socket.on('monster_hp_updated', function(data) {
         const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data.monster_id}"]`);
@@ -432,37 +433,58 @@ document.addEventListener("DOMContentLoaded", function () {
 
     
     function updateMonsterInDOM(monster) {
-        const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
+        let monsterElement = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
     
-        if (monsterElement) {
-            // Atualiza a imagem do monstro
-            const monsterImage = monsterElement.querySelector('.monster-image');
-            if (monsterImage) {
-                monsterImage.src = monster.img_url;
-            }
-    
-            // Atualiza a barra de vida
-            const healthFill = monsterElement.querySelector('.health-fill');
-            if (healthFill) {
-                const healthPercentage = (monster.current_hp / monster.hp) * 100;
-                healthFill.style.width = `${healthPercentage}%`;
-            }
-    
-            // Atualiza o texto de vida
-            const healthText = monsterElement.querySelector('.health-text');
-            if (healthText) {
-                healthText.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
-            }
-    
-            // Atualiza o resumo do monstro
-            const monsterResumo = monsterElement.querySelector('p');
-            if (monsterResumo) {
-                monsterResumo.textContent = monster.resumo;
-            }
-        } else {
-            console.error(`Elemento do monstro com ID ${monster._id} não encontrado no DOM.`);
+        if (!monsterElement) {
+            // Se o elemento não existir, cria-o
+            const boardCenter = document.querySelector('.board-center');
+            monsterElement = document.createElement('div');
+            monsterElement.classList.add('enemy-card');
+            monsterElement.dataset.monsterId = monster._id;
+            boardCenter.appendChild(monsterElement);
         }
+    
+        // Atualiza a imagem do monstro
+        const monsterImage = monsterElement.querySelector('.monster-image');
+        if (monsterImage) {
+            monsterImage.src = monster.img_url;
+        } else {
+            // Se a imagem ainda não existe, cria-a
+            const imgElement = document.createElement('img');
+            imgElement.classList.add('monster-image');
+            imgElement.src = monster.img_url;
+            imgElement.alt = monster.name;
+            monsterElement.appendChild(imgElement);
+        }
+    
+        // Atualiza ou cria a barra de vida
+        let healthFill = monsterElement.querySelector('.health-fill');
+        if (!healthFill) {
+            healthFill = document.createElement('div');
+            healthFill.classList.add('health-fill');
+            monsterElement.appendChild(healthFill);
+        }
+        const healthPercentage = (monster.current_hp / monster.hp) * 100;
+        healthFill.style.width = `${healthPercentage}%`;
+    
+        // Atualiza ou cria o texto de vida
+        let healthText = monsterElement.querySelector('.health-text');
+        if (!healthText) {
+            healthText = document.createElement('div');
+            healthText.classList.add('health-text');
+            monsterElement.appendChild(healthText);
+        }
+        healthText.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
+    
+        // Atualiza o resumo do monstro
+        let monsterResumo = monsterElement.querySelector('p');
+        if (!monsterResumo) {
+            monsterResumo = document.createElement('p');
+            monsterElement.appendChild(monsterResumo);
+        }
+        monsterResumo.textContent = monster.resumo;
     }
+    
     
     
     
