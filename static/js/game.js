@@ -174,25 +174,28 @@ document.addEventListener("DOMContentLoaded", function () {
             const healthFill = monsterElement.querySelector('.monster-health-fill');
             const healthText = monsterElement.querySelector('.monster-health-text');
     
+            // Retrieve maxHp from the dataset
             let maxHp = parseInt(monsterElement.getAttribute('data-max-hp'), 10);
             
-            // Recheck or reset maxHp if it’s not valid
-            if (isNaN(maxHp) || maxHp === null) {
-                // Fetch maxHp from the server-side rendered data or set it directly if available.
-                maxHp = monsterElement.dataset.maxHp = /* Fallback value or new fetch from server */;
-                console.error('maxHp was null or invalid, reset to:', maxHp);
+            // If maxHp is still null or invalid, handle it appropriately
+            if (isNaN(maxHp) || maxHp === null || maxHp <= 0) {
+                console.error('maxHp is invalid:', maxHp);
+                healthText.textContent = 'HP: ??? / ???'; // Display a fallback if maxHp is invalid
+                return;
             }
     
-            if (typeof newHp === 'number' && !isNaN(newHp) && maxHp > 0) {
+            // Calculate and update the health bar
+            if (typeof newHp === 'number' && !isNaN(newHp)) {
                 const percentage = (newHp / maxHp) * 100;
                 healthFill.style.width = `${percentage}%`;
                 healthText.textContent = `HP: ${newHp} / ${maxHp}`;
             } else {
-                console.error('Invalid new HP value or max HP:', newHp, maxHp);
-                healthText.textContent = 'HP: 0 / ???';  // Fallback display
+                console.error('Invalid new HP value:', newHp);
+                healthText.textContent = `HP: 0 / ${maxHp}`;  // Fallback display
             }
         }
     }
+    
     
     
     function updateManaBar(newMana) {
@@ -458,7 +461,10 @@ document.addEventListener("DOMContentLoaded", function () {
             monsterElement = document.createElement('div');
             monsterElement.classList.add('enemy-card');
             monsterElement.dataset.monsterId = monster._id;
+            monsterElement.setAttribute('data-max-hp', monster.hp); // Set the max HP attribute here
             boardCenter.appendChild(monsterElement);
+        } else {
+            monsterElement.setAttribute('data-max-hp', monster.hp); // Ensure max HP is always updated
         }
     
         // Clear out any existing content to avoid duplication
@@ -471,13 +477,10 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <p>${monster.resumo}</p>
         `;
-    }
+    }    
     
     
-    
-    
-    
-    
+
 
     socket.on('status_updated', function(data) {
         console.log('Status update received:', data);  // Log de depuração
