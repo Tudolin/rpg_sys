@@ -100,50 +100,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     socket.on('monster_added', function(data) {
-        // Check if the monster already exists in the DOM
-        let existingMonster = document.querySelector(`.enemy-card[data-monster-id="${data._id}"]`);
-        if (existingMonster) {
-            console.log(`Monster with ID ${data._id} already exists. Skipping duplicate render.`);
-            return;
-        }
-    
-        // If not, create and add the monster to the DOM
-        const monsterList = document.getElementById('monster-list');
-        const monsterElement = document.createElement('li');
-        monsterElement.dataset.monsterId = data._id;
-        monsterElement.innerHTML = `
-            <div class="enemy-card">
-                <img src="${data.img_url}" alt="${data.name}" class="monster-image">
-                <h4>${data.name}</h4>
-                <p>HP: <span class="monster-hp">${data.current_hp}</span> / ${data.hp}</p>
-                <button class="remove-monster-button" onclick="removeMonster('${data._id}')">Remover</button>
-            </div>
-        `;
-        monsterList.appendChild(monsterElement);
-    
-        // Handle HP form submission (if applicable)
-        const form = monsterElement.querySelector('.monster-form');
-        if (form) {
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-                const monsterId = form.getAttribute('data-monster-id');
-                const newHp = form.querySelector('.monster-hp-input').value;
-    
-                console.log(`Updating HP of monster with ID: ${monsterId} to ${newHp}`);
-    
-                socket.emit('update_monster_hp', {
-                    monster_id: monsterId,
-                    new_hp: newHp,
-                    session_id: sessionId
-                });
-            });
-        }
-
-        monsterElement.querySelector('.remove-monster-button').addEventListener('click', function() {
-            const monsterId = this.getAttribute('data-monster-id');
-            console.log(`Attempting to remove monster with ID: ${monsterId}`);
-            socket.emit('remove_monster', { monster_id: monsterId, session_id: sessionId });
-        });
+        // After adding a monster, immediately refresh and update the monster list
+        console.log(`Monster added with ID ${data._id}. Requesting session sync...`);
+        socket.emit('request_master_sync', { session_id: sessionId });
     });
 
     function removeMonster(monsterId) {
@@ -167,6 +126,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+
     document.querySelectorAll('.remove-monster-button').forEach(button => {
         button.addEventListener('click', function() {
             const monsterId = this.getAttribute('data-monster-id');
@@ -242,7 +202,6 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log('Connected to the server, requesting session sync...');
         socket.emit('request_session_sync', { session_id: sessionId });
     });
-    
 
     socket.on('session_sync', function(data) {
         console.log('Received session sync:', data);
@@ -263,7 +222,6 @@ document.addEventListener("DOMContentLoaded", function() {
             if (energyField) energyField.value = data.current_energy;
         }
     });
-    
 
     socket.on('new_player', function(data) {
         addOrUpdatePlayer(data);
@@ -320,25 +278,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
 
-    function updatePlayersList(players) {
-        const playersContainer = document.querySelector('.characters-container');
-        playersContainer.innerHTML = '';
-        players.forEach(player => {
-            const playerCard = `
-            <div class="character-card" data-player-id="${player._id}">
-                <p><strong>${player.name}</strong></p>
-                <form method="POST" class="character-form" data-char-id="${player._id}">
-                    <input type="hidden" name="char_id" value="${player._id}">
-                    <label>HP: <input type="number" name="hp" value="${player.current_hp}" class="hp-input"> / ${player.hp}</label><br>
-                    <label>Mana: <input type="number" name="mana" value="${player.current_mana}" class="mana-input"> / ${player.mana}</label><br>
-                    <label>Energia: <input type="number" name="energia" value="${player.current_energy}" class="energy-input"> / ${player.energia}</label><br>
-                    <button type="submit">Atualizar</button>
-                </form>
-            </div>`;
-            playersContainer.insertAdjacentHTML('beforeend', playerCard);
-        });
-    }
-
     function updateMonstersList(monsters) {
         monsters.forEach(monster => {
             let existingMonster = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
@@ -349,7 +288,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
-    
 
     function addMonsterToDOM(monster) {
         const boardCenter = document.querySelector('.board-center');
@@ -373,7 +311,6 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error('Elemento board-center não encontrado no DOM.');
         }
     }
-    
 
     document.getElementById('monster-list').addEventListener('click', function (e) {
         if (e.target.classList.contains('remove-monster-button')) {
@@ -388,7 +325,6 @@ document.addEventListener("DOMContentLoaded", function() {
             monsterElement.remove();
         }
     });
-    
 
     function addOrUpdatePlayer(char) {
         let existingPlayer = playerList.querySelector(`.character-form[data-char-id="${char._id}"]`);
@@ -534,6 +470,8 @@ document.getElementById('add-monster-form').addEventListener('submit', function(
     .then(data => {
         if (data.success) {
             console.log('Monstro adicionado com sucesso');
+            // Immediately request session sync to refresh the monster list
+            socket.emit('request_master_sync', { session_id: sessionId });
         } else {
             console.error('Erro ao adicionar monstro:', data.message);
         }
