@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     const mediaForm = document.getElementById('media-form');
+    
     const effectSelects = document.querySelectorAll('.status-effect-select');
     const audioPlayer = document.getElementById('audio-player');
     const forms = document.querySelectorAll(`.character-form[data-session-id="${sessionId}"]`);
@@ -18,20 +19,17 @@ document.addEventListener("DOMContentLoaded", function() {
     if (addMonsterForm) {
         addMonsterForm.addEventListener('submit', function(event) {
             event.preventDefault();
-    
+
             const monsterId = document.getElementById('monster-select').value;
             const quantity = parseInt(document.getElementById('monster-quantity').value);
-    
+
             if (monsterId && quantity > 0) {
                 for (let i = 0; i < quantity; i++) {
                     socket.emit('add_monster', { monster_id: monsterId, session_id: sessionId });
                 }
             }
-    
-            // Emitir um evento para solicitar a sincronização completa após adicionar o monstro
-            socket.emit('request_master_sync', { session_id: sessionId });
         });
-    }    
+    }
 
     if (monsterList) {
         document.querySelectorAll('.enemy-card').forEach(function (monsterCard) {
@@ -102,51 +100,44 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     socket.on('monster_added', function(data) {
-        // Verifique se o monstro já existe no DOM
+        // Check if the monster already exists in the DOM
         let existingMonster = document.querySelector(`.enemy-card[data-monster-id="${data._id}"]`);
         if (existingMonster) {
             console.log(`Monster with ID ${data._id} already exists. Skipping duplicate render.`);
             return;
         }
     
-        // Adicione o monstro ao DOM
-        addMonsterToDOM(data);
+        // If not, create and add the monster to the DOM
+        const monsterList = document.getElementById('monster-list');
+        const monsterElement = document.createElement('li');
+        monsterElement.dataset.monsterId = data._id;
+        monsterElement.innerHTML = `
+            <div class="enemy-card">
+                <img src="${data.img_url}" alt="${data.name}" class="monster-image">
+                <h4>${data.name}</h4>
+                <p>HP: <span class="monster-hp">${data.current_hp}</span> / ${data.hp}</p>
+                <button class="remove-monster-button" onclick="removeMonster('${data._id}')">Remover</button>
+            </div>
+        `;
+        monsterList.appendChild(monsterElement);
     
-        // Emitir um evento para solicitar a sincronização completa
-        socket.emit('request_master_sync', { session_id: sessionId });
-    });
+        // Handle HP form submission (if applicable)
+        const form = monsterElement.querySelector('.monster-form');
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const monsterId = form.getAttribute('data-monster-id');
+                const newHp = form.querySelector('.monster-hp-input').value;
     
-    socket.emit('request_master_sync', { session_id: sessionId });
-    // If not, create and add the monster to the DOM
-    const monsterElement = document.createElement('li');
-    monsterElement.dataset.monsterId = data._id;
-    monsterElement.innerHTML = `
-        <div class="enemy-card">
-            <img src="${data.img_url}" alt="${data.name}" class="monster-image">
-            <h4>${data.name}</h4>
-            <p>HP: <span class="monster-hp">${data.current_hp}</span> / ${data.hp}</p>
-            <button class="remove-monster-button" onclick="removeMonster('${data._id}')">Remover</button>
-        </div>
-    `;
-    monsterList.appendChild(monsterElement);
-
-    // Handle HP form submission (if applicable)
-    const form = monsterElement.querySelector('.monster-form');
-    if (form) {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const monsterId = form.getAttribute('data-monster-id');
-            const newHp = form.querySelector('.monster-hp-input').value;
-
-            console.log(`Updating HP of monster with ID: ${monsterId} to ${newHp}`);
-
-            socket.emit('update_monster_hp', {
-                monster_id: monsterId,
-                new_hp: newHp,
-                session_id: sessionId
+                console.log(`Updating HP of monster with ID: ${monsterId} to ${newHp}`);
+    
+                socket.emit('update_monster_hp', {
+                    monster_id: monsterId,
+                    new_hp: newHp,
+                    session_id: sessionId
+                });
             });
-        });
-    }
+        }
 
         monsterElement.querySelector('.remove-monster-button').addEventListener('click', function() {
             const monsterId = this.getAttribute('data-monster-id');
@@ -161,10 +152,7 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ 
-                monster_id: monsterId,
-                session_id: sessionId  // Assegure-se de que sessionId está sendo passado
-            })
+            body: JSON.stringify({ monster_id: monsterId })
         })
         .then(response => response.json())
         .then(data => {
@@ -177,10 +165,8 @@ document.addEventListener("DOMContentLoaded", function() {
             } else {
                 console.error('Failed to remove monster');
             }
-        })
-        .catch(error => console.error('Error:', error));
+        });
     }
-    
     document.querySelectorAll('.remove-monster-button').forEach(button => {
         button.addEventListener('click', function() {
             const monsterId = this.getAttribute('data-monster-id');
@@ -366,65 +352,27 @@ document.addEventListener("DOMContentLoaded", function() {
     
 
     function addMonsterToDOM(monster) {
-        const monsterList = document.getElementById('monster-list');
-    
-        if (monsterList) {
-            const monsterElement = document.createElement('li');
+        const boardCenter = document.querySelector('.board-center');
+        
+        if (boardCenter) {
+            const monsterElement = document.createElement('div');
             monsterElement.classList.add('enemy-card');
             monsterElement.dataset.monsterId = monster._id;
             monsterElement.innerHTML = `
                 <h4>${monster.name}</h4>
                 <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
-                <form method="POST" class="monster-form" data-monster-id="${monster._id}">
-                    <input type="hidden" name="monster_id" value="${monster._id}">
-                    <label>HP: <input type="number" name="monster_hp" value="${monster.current_hp}" class="hp-input"> / ${monster.hp}</label><br>
-                    <button type="submit">Atualizar</button>
-                </form>
+                <div class="health-bar">
+                    <div class="health-fill" style="width: ${(monster.current_hp / monster.hp) * 100}%"></div>
+                    <div class="health-text">HP: ${monster.current_hp} / ${monster.hp}</div>
+                </div>
                 <p>${monster.resumo}</p>
                 <button class="remove-monster-button" data-monster-id="${monster._id}">Remover</button>
             `;
-            monsterList.appendChild(monsterElement);
-    
-            // Adicionar os listeners para o novo elemento
-            attachMonsterEventListeners(monsterElement);
+            boardCenter.appendChild(monsterElement);
         } else {
-            console.error('Elemento monster-list não encontrado no DOM.');
+            console.error('Elemento board-center não encontrado no DOM.');
         }
     }
-    
-    function attachMonsterEventListeners(monsterElement) {
-        const monsterId = monsterElement.getAttribute('data-monster-id');
-    
-        const hpElement = monsterElement.querySelector(`input[name="monster_hp"]`);
-        const manaElement = monsterElement.querySelector(`input[name="monster_mana"]`);
-        const energiaElement = monsterElement.querySelector(`input[name="monster_energia"]`);
-    
-        if (hpElement) {
-            hpElement.addEventListener('input', function () {
-                updateMonsterStats(monsterId, 'hp', hpElement.value);
-            });
-        }
-    
-        if (manaElement) {
-            manaElement.addEventListener('input', function () {
-                updateMonsterStats(monsterId, 'mana', manaElement.value);
-            });
-        }
-    
-        if (energiaElement) {
-            energiaElement.addEventListener('input', function () {
-                updateMonsterStats(monsterId, 'energia', energiaElement.value);
-            });
-        }
-    
-        const removeButton = monsterElement.querySelector('.remove-monster-button');
-        if (removeButton) {
-            removeButton.addEventListener('click', function () {
-                removeMonster(monsterId);
-            });
-        }
-    }
-    
     
 
     document.getElementById('monster-list').addEventListener('click', function (e) {
@@ -897,3 +845,4 @@ socket.on('player_removed', function(data) {
         if (playerElement) playerElement.remove();
     });
     
+});
