@@ -161,7 +161,10 @@ document.addEventListener("DOMContentLoaded", function() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ monster_id: monsterId })
+            body: JSON.stringify({ 
+                monster_id: monsterId,
+                session_id: sessionId  // Assegure-se de que sessionId está sendo passado
+            })
         })
         .then(response => response.json())
         .then(data => {
@@ -174,8 +177,10 @@ document.addEventListener("DOMContentLoaded", function() {
             } else {
                 console.error('Failed to remove monster');
             }
-        });
+        })
+        .catch(error => console.error('Error:', error));
     }
+    
     document.querySelectorAll('.remove-monster-button').forEach(button => {
         button.addEventListener('click', function() {
             const monsterId = this.getAttribute('data-monster-id');

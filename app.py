@@ -911,7 +911,7 @@ def update_character():
 def remove_monster():
     data = request.get_json()
     monster_id = data.get('monster_id')
-    session_id = data.get('session_id')  # Captura o session_id enviado do cliente
+    session_id = data.get('session_id')
 
     if not session_id:
         app.logger.error("No session ID provided")
