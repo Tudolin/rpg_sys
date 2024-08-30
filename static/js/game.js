@@ -195,8 +195,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     
-    
-    
     function updateManaBar(newMana) {
         const manaBall = document.querySelector('.mana-ball[data-character-id="' + characterId + '"] .mana-fill');
         const maxMana = document.querySelector('.mana-ball[data-character-id="' + characterId + '"]').getAttribute('data-max-mana');
@@ -297,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
             updateManaBar(data.current_mana);
             updateEnergyBar(data.current_energy);
         }
-    });    
+    });
 
     socket.on('session_sync', function(data) {
         const playerList = document.querySelector('.other-players ul');
