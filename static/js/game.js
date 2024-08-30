@@ -169,14 +169,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     
     function updateMonsterHealth(monsterId, newHp) {
-        const healthBar = document.querySelector(`.health-bar[data-monster-id="${monsterId}"] .health-fill`);
-        const maxHp = document.querySelector(`.health-bar[data-monster-id="${monsterId}"]`).getAttribute('data-max-hp');
-        const percentage = (newHp / maxHp) * 100;
-        healthBar.style.width = percentage + '%';
-    
-        const healthText = document.querySelector(`.health-bar[data-monster-id="${monsterId}"] .health-bar`);
-        healthText.textContent = `${newHp} / ${maxHp}`;
+        const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${monsterId}"]`);
+        if (monsterElement) {
+            const healthFill = monsterElement.querySelector('.monster-health-fill');
+            const healthText = monsterElement.querySelector('.monster-health-text');
+            if (healthFill && healthText) {
+                const maxHp = monsterElement.getAttribute('data-max-hp');
+                const percentage = (newHp / maxHp) * 100;
+                healthFill.style.width = `${percentage}%`;
+                healthText.textContent = `HP: ${newHp} / ${maxHp}`;
+            }
+        }
     }
+    
     
     function updateManaBar(newMana) {
         const manaBall = document.querySelector('.mana-ball[data-character-id="' + characterId + '"] .mana-fill');
@@ -406,17 +411,17 @@ document.addEventListener("DOMContentLoaded", function () {
     socket.on('monster_hp_updated', function(data) {
         const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data.monster_id}"]`);
         if (monsterElement) {
-            const healthFill = monsterElement.querySelector('.health-fill');
-            const healthText = monsterElement.querySelector('.health-text');
+            const healthFill = monsterElement.querySelector('.monster-health-fill');
+            const healthText = monsterElement.querySelector('.monster-health-text');
             if (healthFill && healthText) {
-                const newHp = data.new_hp;
                 const maxHp = monsterElement.getAttribute('data-max-hp');
-                const percentage = (newHp / maxHp) * 100;
+                const percentage = (data.new_hp / maxHp) * 100;
                 healthFill.style.width = `${percentage}%`;
-                healthText.textContent = `HP: ${newHp} / ${maxHp}`;
+                healthText.textContent = `HP: ${data.new_hp} / ${maxHp}`;
             }
         }
     });
+    
     // Função para remover monstros da tela dos jogadores
     socket.on('monster_removed', function(data) {
         const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data.monster_id}"]`);
@@ -444,15 +449,15 @@ document.addEventListener("DOMContentLoaded", function () {
             boardCenter.appendChild(monsterElement);
         }
     
-        const healthFill = monsterElement.querySelector('.health-fill');
-        const healthText = monsterElement.querySelector('.health-text');
+        const healthFill = monsterElement.querySelector('.monster-health-fill');
+        const healthText = monsterElement.querySelector('.monster-health-text');
         const healthPercentage = (monster.current_hp / monster.hp) * 100;
     
         if (healthFill) {
             healthFill.style.width = `${healthPercentage}%`;
         } else {
             const fillElement = document.createElement('div');
-            fillElement.classList.add('health-fill');
+            fillElement.classList.add('monster-health-fill');
             fillElement.style.width = `${healthPercentage}%`;
             monsterElement.appendChild(fillElement);
         }
@@ -461,7 +466,7 @@ document.addEventListener("DOMContentLoaded", function () {
             healthText.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
         } else {
             const textElement = document.createElement('div');
-            textElement.classList.add('health-text');
+            textElement.classList.add('monster-health-text');
             textElement.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
             monsterElement.appendChild(textElement);
         }
@@ -472,6 +477,7 @@ document.addEventListener("DOMContentLoaded", function () {
             monsterElement.appendChild(monsterResumo);
         }
     }
+    
     
     
     

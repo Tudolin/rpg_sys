@@ -56,14 +56,6 @@
 }
 
 
-.monster-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-bottom: 10px;
-}
-
 .enemy-card {
     background-color: #444;
     border: 2px solid #222;
@@ -89,43 +81,38 @@
     line-height: 1.4;
 }
 
-.health-bar {
+.monster-health-bar {
     width: 100%;
-    height: 20px;
+    height: 20px; /* Altura da barra de vida */
     background-color: #1a1a1a;
     border-radius: 5px;
     margin-top: 10px;
     position: relative;
     border: 1px solid #660000;
+    overflow: hidden; /* Garante que o preenchimento não transborde */
 }
 
-.health-fill {
-    height: 100%;
-    background: radial-gradient(circle, #ff0000 0%, #990000 100%);
-    border-radius: 5px;
+.monster-health-fill {
+    height: 100%; /* A altura deve ocupar 100% da barra */
+    width: 0; /* Largura inicial */
+    background: linear-gradient(to right, #ff0000, #990000); /* Gradiente para a barra de vida */
     position: absolute;
-    transition: width 0.5s ease-in-out;
+    transition: width 0.5s ease-in-out; /* Animação suave ao atualizar a vida */
+    top: 0;
+    left: 0;
 }
 
-.health-text {
-    position: absolute;
+.monster-health-text {
+    position: relative; /* Mantém o texto no topo do health-fill */
+    z-index: 1;
     width: 100%;
     text-align: center;
     color: #fff;
     font-size: 12px;
     font-weight: bold;
-    line-height: 20px; /* vertically center the text */
-    z-index: 1;
+    line-height: 20px; /* Alinha o texto verticalmente na barra */
 }
 
-.monster-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-bottom: 10px;
-    background-color: #333; /* Placeholder background */
-}
 
 .dice-result {
     position: fixed;
