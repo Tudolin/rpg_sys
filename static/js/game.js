@@ -398,75 +398,70 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     socket.on('monster_added', function(data) {
-        const existingMonster = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
-        if (!existingMonster) {
-            addMonsterToDOM(data);
-        }
-        const boardCenter = document.querySelector('.board-center');
-        
-        if (boardCenter && !document.querySelector(`[data-monster-id="${data._id}"]`)) {
-            const monsterElement = document.createElement('div');
-            monsterElement.classList.add('enemy-card');
-            monsterElement.dataset.monsterId = data._id;
-            monsterElement.innerHTML = `
-                <h4>${data.name}</h4>
-                <img src="${data.img_url}" alt="${data.name}" class="monster-image">
-                <div class="health-bar">
-                    <div class="health-fill" style="width: ${(data.current_hp / data.hp) * 100}%"></div>
-                    <div class="health-text">HP: ${data.current_hp} / ${data.hp}</div>
-                </div>
-                <p>${data.resumo}</p>
-            `;
-            boardCenter.appendChild(monsterElement);
-        }
+        updateMonsterInDOM(data);
     });
-    
 
     
     socket.on('monster_hp_updated', function(data) {
-        const monsterElement = document.querySelector(`div[data-monster-id="${data.monster_id}"]`);
+        const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data.monster_id}"]`);
         if (monsterElement) {
-            const hpElement = monsterElement.querySelector('.monster-hp');
-            hpElement.textContent = `HP: ${data.new_hp}`;
+            const healthFill = monsterElement.querySelector('.health-fill');
+            const healthText = monsterElement.querySelector('.health-text');
+            if (healthFill && healthText) {
+                const newHp = data.new_hp;
+                const maxHp = healthFill.dataset.maxHp;
+                const percentage = (newHp / maxHp) * 100;
+                healthFill.style.width = `${percentage}%`;
+                healthText.textContent = `HP: ${newHp} / ${maxHp}`;
+            }
         }
     });
     // Função para remover monstros da tela dos jogadores
     socket.on('monster_removed', function(data) {
-        const monsterElement = document.querySelector(`div[data-monster-id="${data._id}"]`);
+        const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data.monster_id}"]`);
         if (monsterElement) {
             monsterElement.remove();
         }
     });
 
     function updateMonstersList(monsters) {
-        const boardCenter = document.querySelector('.board-center');
-        boardCenter.innerHTML = ''; // Limpa a lista de monstros existente
-    
         monsters.forEach(monster => {
-            addMonsterToDOM(monster);
+            updateMonsterInDOM(monster);
         });
     }
 
     
-    function addMonsterToDOM(monster) {
-        const monsterList = document.getElementById('monster-list');
-        if (!monsterList) {
-            console.error('monster-list element not found');
-            return;
+    function updateMonsterInDOM(monster) {
+        const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
+    
+        if (monsterElement) {
+            // Atualiza a imagem do monstro
+            const monsterImage = monsterElement.querySelector('.monster-image');
+            if (monsterImage) {
+                monsterImage.src = monster.img_url;
+            }
+    
+            // Atualiza a barra de vida
+            const healthFill = monsterElement.querySelector('.health-fill');
+            if (healthFill) {
+                const healthPercentage = (monster.current_hp / monster.hp) * 100;
+                healthFill.style.width = `${healthPercentage}%`;
+            }
+    
+            // Atualiza o texto de vida
+            const healthText = monsterElement.querySelector('.health-text');
+            if (healthText) {
+                healthText.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
+            }
+    
+            // Atualiza o resumo do monstro
+            const monsterResumo = monsterElement.querySelector('p');
+            if (monsterResumo) {
+                monsterResumo.textContent = monster.resumo;
+            }
+        } else {
+            console.error(`Elemento do monstro com ID ${monster._id} não encontrado no DOM.`);
         }
-        const monsterElement = document.createElement('li');
-        monsterElement.classList.add('enemy-card');
-        monsterElement.dataset.monsterId = monster._id;
-        monsterElement.innerHTML = `
-            <h4>${monster.name}</h4>
-            <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
-            <p>HP: ${monster.current_hp} / ${monster.hp}</p>
-            <p>Mana: ${monster.current_mana} / ${monster.mana}</p>
-            <p>Energia: ${monster.current_energia} / ${monster.energia}</p>
-            <p>${monster.resumo}</p>
-            <button class="remove-monster-button" data-monster-id="${monster._id}">Remover</button>
-        `;
-        monsterList.appendChild(monsterElement);
     }
     
     
