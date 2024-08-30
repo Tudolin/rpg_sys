@@ -173,14 +173,25 @@ document.addEventListener("DOMContentLoaded", function () {
         if (monsterElement) {
             const healthFill = monsterElement.querySelector('.monster-health-fill');
             const healthText = monsterElement.querySelector('.monster-health-text');
-            if (healthFill && healthText) {
-                const maxHp = monsterElement.getAttribute('data-max-hp');
-                const percentage = (newHp / maxHp) * 100;
-                healthFill.style.width = `${percentage}%`;
-                healthText.textContent = `HP: ${newHp} / ${maxHp}`;
+            
+            // Ensure newHp is a valid number
+            if (typeof newHp === 'number' && !isNaN(newHp)) {
+                const maxHp = parseInt(monsterElement.getAttribute('data-max-hp'), 10);
+                if (!isNaN(maxHp) && maxHp > 0) {
+                    const percentage = (newHp / maxHp) * 100;
+                    healthFill.style.width = `${percentage}%`;
+                    healthText.textContent = `HP: ${newHp} / ${maxHp}`;
+                } else {
+                    console.error('Invalid max HP value:', maxHp);
+                    healthText.textContent = `HP: ${newHp} / ???`;  // Fallback display
+                }
+            } else {
+                console.error('Invalid new HP value:', newHp);
+                healthText.textContent = 'HP: 0 / ???';  // Fallback display
             }
         }
     }
+    
     
     
     function updateManaBar(newMana) {
