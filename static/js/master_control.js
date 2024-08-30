@@ -276,6 +276,26 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    function updatePlayerList(players) {
+        const playersContainer = document.querySelector('.characters-container');
+        playersContainer.innerHTML = ''; // Clear existing players list
+        players.forEach(player => {
+            const playerCard = `
+            <div class="character-card" data-player-id="${player._id}">
+                <p><strong>${player.name}</strong></p>
+                <form method="POST" class="character-form" data-char-id="${player._id}">
+                    <input type="hidden" name="char_id" value="${player._id}">
+                    <label>HP: <input type="number" name="hp" value="${player.current_hp}" class="hp-input"> / ${player.hp}</label><br>
+                    <label>Mana: <input type="number" name="mana" value="${player.current_mana}" class="mana-input"> / ${player.mana}</label><br>
+                    <label>Energia: <input type="number" name="energia" value="${player.current_energy}" class="energy-input"> / ${player.energia}</label><br>
+                    <button type="submit">Atualizar</button>
+                </form>
+            </div>`;
+            playersContainer.insertAdjacentHTML('beforeend', playerCard);
+        });
+    }
+
+    
     function updateMonsterStats(monsterId, stat, value) {
         fetch('/update_monster_stats', {
             method: 'POST',
@@ -321,7 +341,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function updateMonstersList(monsters) {
         monsters.forEach(monster => {
-            addMonsterToDOM(monster);
+            let existingMonster = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
+            if (!existingMonster) {
+                addMonsterToDOM(monster);
+            } else {
+                console.log(`Monster with ID ${monster._id} already exists in DOM. Skipping duplicate render.`);
+            }
         });
     }
     
@@ -329,7 +354,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function addMonsterToDOM(monster) {
         const boardCenter = document.querySelector('.board-center');
         
-        if (boardCenter) {  // Verifique se o elemento existe
+        if (boardCenter) {
             const monsterElement = document.createElement('div');
             monsterElement.classList.add('enemy-card');
             monsterElement.dataset.monsterId = monster._id;
