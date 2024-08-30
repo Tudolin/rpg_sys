@@ -80,17 +80,23 @@
 }
 
 .enemy-card {
-    background-color: #444;
-    border: 2px solid #222;
-    border-radius: 10px;
-    padding: 10px;
+    background-color: #333; /* Fundo mais suave */
+    border: 2px solid #555; /* Borda de cor mais suave */
+    border-radius: 15px; /* Borda levemente mais arredondada */
+    padding: 15px; /* Mais espaçamento interno */
     margin: 10px;
-    color: white;
-    width: 150px;
+    color: #e0e0e0; /* Texto mais claro */
+    width: 180px; /* Aumenta a largura dos cards */
     text-align: center;
     position: relative;
     z-index: 2;
     flex: 0 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adiciona sombra */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animação suave */
+}
+.enemy-card:hover {
+    transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* Aumenta a sombra no hover */
 }
 
 .monster-health-bar {
@@ -114,14 +120,14 @@
 }
 
 .monster-health-text {
-    position: relative; /* Keep text on top of the fill */
+    position: relative;
     z-index: 1;
     width: 100%;
     text-align: center;
     color: #fff;
-    font-size: 12px;
+    font-size: 14px; /* Fonte levemente maior */
     font-weight: bold;
-    line-height: 25px; /* Vertically center the text in the bar */
+    line-height: 20px; /* Centraliza verticalmente na barra */
 }
 
 

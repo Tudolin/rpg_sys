@@ -99,11 +99,15 @@ document.addEventListener("DOMContentLoaded", function() {
         updateMonstersList(data.monsters);
     });
 
-    socket.on('monster_added', function(monster) {
-        addMonsterToDOM(monster);
-    });
-
     socket.on('monster_added', function(data) {
+        // Check if the monster already exists in the DOM
+        let existingMonster = document.querySelector(`.enemy-card[data-monster-id="${data._id}"]`);
+        if (existingMonster) {
+            console.log(`Monster with ID ${data._id} already exists. Skipping duplicate render.`);
+            return;
+        }
+    
+        // If not, create and add the monster to the DOM
         const monsterList = document.getElementById('monster-list');
         const monsterElement = document.createElement('li');
         monsterElement.dataset.monsterId = data._id;
@@ -116,21 +120,24 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>
         `;
         monsterList.appendChild(monsterElement);
-
+    
+        // Handle HP form submission (if applicable)
         const form = monsterElement.querySelector('.monster-form');
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const monsterId = form.getAttribute('data-monster-id');
-            const newHp = form.querySelector('.monster-hp-input').value;
-
-            console.log(`Updating HP of monster with ID: ${monsterId} to ${newHp}`);
-
-            socket.emit('update_monster_hp', {
-                monster_id: monsterId,
-                new_hp: newHp,
-                session_id: sessionId
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const monsterId = form.getAttribute('data-monster-id');
+                const newHp = form.querySelector('.monster-hp-input').value;
+    
+                console.log(`Updating HP of monster with ID: ${monsterId} to ${newHp}`);
+    
+                socket.emit('update_monster_hp', {
+                    monster_id: monsterId,
+                    new_hp: newHp,
+                    session_id: sessionId
+                });
             });
-        });
+        }
 
         monsterElement.querySelector('.remove-monster-button').addEventListener('click', function() {
             const monsterId = this.getAttribute('data-monster-id');

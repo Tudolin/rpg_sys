@@ -302,18 +302,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     socket.on('session_sync', function(data) {
         const playerList = document.querySelector('.other-players ul');
-        playerList.innerHTML = ''; // Limpa a lista existente
+        playerList.innerHTML = ''; // Clear existing player list
         
         const boardCenter = document.querySelector('.board-center');
-        boardCenter.innerHTML = ''; // Limpa a lista de monstros
-    
-        // Atualiza a lista de monstros
-        if (data && data.monsters && Array.isArray(data.monsters) && data.monsters.length > 0) {
-            updateMonstersList(data.monsters);  // Usando a função updateMonstersList
-        } else {
-            console.error('Monsters data is undefined or not an array');
-        }
+        boardCenter.innerHTML = ''; // Clear existing monster list
         
+        // Update players list
         if (data.characters && Array.isArray(data.characters)) {
             data.characters.forEach(char => {
                 const newPlayerHTML = `
@@ -337,19 +331,33 @@ document.addEventListener("DOMContentLoaded", function () {
                 attachPlayerClickEvent(playerList.querySelector(`.other-player[data-player-id="${char._id}"]`));
             });
         } else {
-            console.error('characters data is undefined or not an array');
+            console.error('Characters data is undefined or not an array');
         }
-        
-        // Adicionar monstros ao DOM
+    
+        // Update monsters list
         if (data.monsters && Array.isArray(data.monsters)) {
             data.monsters.forEach(monster => {
-                updateMonsterInDOM(monster);  // Usando a função updateMonsterInDOM
+                // Check if the monster is already in the DOM to prevent duplication
+                let existingMonster = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
+                if (!existingMonster) {
+                    updateMonsterInDOM(monster);
+                } else {
+                    console.log(`Monster with ID ${monster._id} already exists in DOM. Skipping duplicate render.`);
+                }
             });
+        } else {
+            console.error('Monsters data is undefined or not an array');
         }
     });
     
     socket.on('monster_added', function(data) {
-        updateMonsterInDOM(data);  // Usando updateMonsterInDOM ao invés de addMonsterToDOM
+        // Check if the monster already exists in the DOM
+        let existingMonster = document.querySelector(`.enemy-card[data-monster-id="${data._id}"]`);
+        if (existingMonster) {
+            console.log(`Monster with ID ${data._id} already exists. Skipping duplicate render.`);
+            return;
+        }
+        updateMonsterInDOM(data);
     });
     
     
@@ -453,21 +461,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     
     function updateMonsterInDOM(monster) {
-        // Select the existing monster element or create a new one if it doesn't exist
-        let monsterElement = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
-    
-        if (!monsterElement) {
-            const boardCenter = document.querySelector('.board-center');
-            monsterElement = document.createElement('div');
-            monsterElement.classList.add('enemy-card');
-            monsterElement.dataset.monsterId = monster._id;
-            monsterElement.setAttribute('data-max-hp', monster.hp); // Set the max HP attribute here
-            boardCenter.appendChild(monsterElement);
-        } else {
-            monsterElement.setAttribute('data-max-hp', monster.hp); // Ensure max HP is always updated
+        // Ensure the monster is not already in the DOM
+        let existingMonster = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
+        if (existingMonster) {
+            console.log(`Monster with ID ${monster._id} already exists. Skipping.`);
+            return;
         }
     
-        // Clear out any existing content to avoid duplication
+        // Create the monster card
+        const boardCenter = document.querySelector('.board-center');
+        let monsterElement = document.createElement('div');
+        monsterElement.classList.add('enemy-card');
+        monsterElement.dataset.monsterId = monster._id;
+        monsterElement.setAttribute('data-max-hp', monster.hp);
+    
         monsterElement.innerHTML = `
             <h4>${monster.name}</h4>
             <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
@@ -477,7 +484,9 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <p>${monster.resumo}</p>
         `;
-    }    
+    
+        boardCenter.appendChild(monsterElement);
+    }
     
     
 
