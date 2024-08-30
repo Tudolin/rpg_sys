@@ -42,7 +42,7 @@
                         <img src="{{ monster.img_url }}" alt="{{ monster.name }}" class="monster-image">
                         <div class="health-bar">
                             <div class="health-fill" style="width: {{ (monster.current_hp / monster.hp) * 100 }}%"></div>
-                            <div class="health-text">HP: {{ monster.current_hp }} / {{ monster.hp }}</div>
+                            <div class="health-fill">HP: {{ monster.current_hp }} / {{ monster.hp }}</div>
                         </div>
                         <p>{{ monster.resumo }}</p>
                     </div>
