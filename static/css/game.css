@@ -73,6 +73,14 @@
     flex: 0 0 auto;
 }
 
+.enemy-card h4 {
+    margin: 0 0 10px;
+}
+
+.enemy-card p {
+    margin: 5px 0;
+}
+
 .health-bar {
     width: 100%;
     height: 20px;
@@ -80,6 +88,7 @@
     border-radius: 5px;
     margin-top: 10px;
     position: relative;
+    border: 1px solid #660000;
 }
 
 .health-bar .health-fill {
@@ -97,38 +106,27 @@
     text-align: center;
     color: #fff;
     font-size: 12px;
-    z-index: 1;
-}
-/* New health bar similar to players for monsters */
-.enemy-card .health-bar {
-    width: 100%;
-    height: 20px;
-    background-color: #1a1a1a;
-    border-radius: 5px;
-    border: 1px solid #660000;
-    position: relative;
-    margin-top: 10px;
-}
-
-.enemy-card .health-bar .health-fill {
-    background: radial-gradient(circle, #ff0000 0%, #990000 100%);
-    height: 100%;
-    width: 100%; /* Default width */
-    position: absolute;
-    bottom: 0;
-    transition: width 0.5s ease-in-out;
-    border-radius: 5px;
-}
-
-.enemy-card .health-bar .health-text {
-    position: absolute;
-    width: 100%;
-    text-align: center;
-    color: #ffffff;
-    font-size: 12px;
     font-weight: bold;
     z-index: 1;
 }
+
+/* Ensure the text and the fill bar stack properly */
+.health-bar .health-fill {
+    z-index: 0;
+}
+
+.health-bar .health-text {
+    z-index: 1;
+}
+
+.monster-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
 
 .monster-image {
     width: 100px;
