@@ -37,7 +37,7 @@
         
                 <div class="board-center">
                     {% for monster in monsters %}
-                    <div class="monster-card" data-monster-id="{{ monster._id }}">
+                    <div class="enemy-card" data-monster-id="{{ monster._id }}" data-max-hp="{{ monster.hp }}">
                         <h4>{{ monster.name }}</h4>
                         <img src="{{ monster.img_url }}" alt="{{ monster.name }}" class="monster-image">
                         <div class="monster-health-bar">
@@ -46,8 +46,7 @@
                         </div>
                         <p>{{ monster.resumo }}</p>
                     </div>
-                    {% endfor %}
-                </div>
+                    
                 
                 
                 <div class="player-info">

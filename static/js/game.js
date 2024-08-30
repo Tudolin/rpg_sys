@@ -173,24 +173,27 @@ document.addEventListener("DOMContentLoaded", function () {
         if (monsterElement) {
             const healthFill = monsterElement.querySelector('.monster-health-fill');
             const healthText = monsterElement.querySelector('.monster-health-text');
+    
+            let maxHp = parseInt(monsterElement.getAttribute('data-max-hp'), 10);
             
-            // Ensure newHp is a valid number
-            if (typeof newHp === 'number' && !isNaN(newHp)) {
-                const maxHp = parseInt(monsterElement.getAttribute('data-max-hp'), 10);
-                if (!isNaN(maxHp) && maxHp > 0) {
-                    const percentage = (newHp / maxHp) * 100;
-                    healthFill.style.width = `${percentage}%`;
-                    healthText.textContent = `HP: ${newHp} / ${maxHp}`;
-                } else {
-                    console.error('Invalid max HP value:', maxHp);
-                    healthText.textContent = `HP: ${newHp} / ???`;  // Fallback display
-                }
+            // Recheck or reset maxHp if it’s not valid
+            if (isNaN(maxHp) || maxHp === null) {
+                // Fetch maxHp from the server-side rendered data or set it directly if available.
+                maxHp = monsterElement.dataset.maxHp = /* Fallback value or new fetch from server */;
+                console.error('maxHp was null or invalid, reset to:', maxHp);
+            }
+    
+            if (typeof newHp === 'number' && !isNaN(newHp) && maxHp > 0) {
+                const percentage = (newHp / maxHp) * 100;
+                healthFill.style.width = `${percentage}%`;
+                healthText.textContent = `HP: ${newHp} / ${maxHp}`;
             } else {
-                console.error('Invalid new HP value:', newHp);
+                console.error('Invalid new HP value or max HP:', newHp, maxHp);
                 healthText.textContent = 'HP: 0 / ???';  // Fallback display
             }
         }
     }
+    
     
     
     
