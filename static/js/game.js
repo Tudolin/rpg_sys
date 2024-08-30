@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const percentage = (newHp / maxHp) * 100;
         healthBar.style.width = percentage + '%';
     
-        const healthText = document.querySelector(`.health-bar[data-monster-id="${monsterId}"] .health-text`);
+        const healthText = document.querySelector(`.health-bar[data-monster-id="${monsterId}"] .health-bar`);
         healthText.textContent = `${newHp} / ${maxHp}`;
     }
     
@@ -407,7 +407,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data.monster_id}"]`);
         if (monsterElement) {
             const healthFill = monsterElement.querySelector('.health-fill');
-            const healthText = monsterElement.querySelector('.health-text');
+            const healthText = monsterElement.querySelector('.health-bar');
             if (healthFill && healthText) {
                 const newHp = data.new_hp;
                 const maxHp = healthFill.dataset.maxHp;
@@ -468,10 +468,10 @@ document.addEventListener("DOMContentLoaded", function () {
         healthFill.style.width = `${healthPercentage}%`;
     
         // Atualiza ou cria o texto de vida
-        let healthText = monsterElement.querySelector('.health-text');
+        let healthText = monsterElement.querySelector('.health-bar');
         if (!healthText) {
             healthText = document.createElement('div');
-            healthText.classList.add('health-text');
+            healthText.classList.add('health-bar');
             monsterElement.appendChild(healthText);
         }
         healthText.textContent = `HP: ${monster.current_hp} / ${monster.hp}`;
