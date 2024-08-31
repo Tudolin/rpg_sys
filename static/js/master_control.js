@@ -278,22 +278,40 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function updatePlayerList(players) {
         const playersContainer = document.querySelector('.characters-container');
+        if (!playersContainer) {
+            console.error("Unable to find the players container element");
+            return;
+        }
+    
         playersContainer.innerHTML = ''; // Clear existing players list
+    
+        if (!Array.isArray(players) || players.length === 0) {
+            console.log("No players data provided or empty players array");
+            return;
+        }
+    
         players.forEach(player => {
+            if (!player) {
+                console.error("Undefined player data found");
+                return;
+            }
+    
             const playerCard = `
-            <div class="character-card" data-player-id="${player._id}">
-                <p><strong>${player.name}</strong></p>
-                <form method="POST" class="character-form" data-char-id="${player._id}">
-                    <input type="hidden" name="char_id" value="${player._id}">
-                    <label>HP: <input type="number" name="hp" value="${player.current_hp}" class="hp-input"> / ${player.hp}</label><br>
-                    <label>Mana: <input type="number" name="mana" value="${player.current_mana}" class="mana-input"> / ${player.mana}</label><br>
-                    <label>Energia: <input type="number" name="energia" value="${player.current_energy}" class="energy-input"> / ${player.energia}</label><br>
+            <div class="character-card" data-player-id="${player._id || ''}">
+                <p><strong>${player.name || 'Unnamed Player'}</strong></p>
+                <form method="POST" class="character-form" data-char-id="${player._id || ''}">
+                    <input type="hidden" name="char_id" value="${player._id || ''}">
+                    <label>HP: <input type="number" name="hp" value="${player.current_hp || 0}" class="hp-input"> / ${player.hp || 0}</label><br>
+                    <label>Mana: <input type="number" name="mana" value="${player.current_mana || 0}" class="mana-input"> / ${player.mana || 0}</label><br>
+                    <label>Energia: <input type="number" name="energia" value="${player.current_energy || 0}" class="energy-input"> / ${player.energia || 0}</label><br>
                     <button type="submit">Atualizar</button>
                 </form>
             </div>`;
+    
             playersContainer.insertAdjacentHTML('beforeend', playerCard);
         });
     }
+    
 
     
     function updateMonsterStats(monsterId, stat, value) {
