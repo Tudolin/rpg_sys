@@ -810,14 +810,12 @@ def master_control(session_id):
             character = db.chars.find_one({"_id": ObjectId(char_id)})
             room = session_id
             if room:
-                # Emitir atualização de HP
                 socketio.emit('health_updated', {
                     'character_id': str(character['_id']),
                     'new_health': character['current_hp'],
                     'max_health': character['hp']
                 }, room=room)
 
-                # Emitir atualização de Mana e Energia
                 socketio.emit('mana_energy_updated', {
                     'character_id': str(character['_id']),
                     'current_mana': character['current_mana'],
@@ -1133,7 +1131,7 @@ def get_current_session_data(session_id):
                     'mana': character['mana'],
                     'current_mana': character.get('current_mana', character['mana']),
                     'energia': character['energia'],
-                    'current_energia': character.get('current_energia', character['energia']),
+                    'current_energia': character.get('current_energy', character['energia']),
                     'img_url': character.get('img_url', '/static/images/default.png')
                 }
                 characters.append(character_info)
