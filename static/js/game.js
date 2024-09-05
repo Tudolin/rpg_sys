@@ -384,7 +384,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <p>Raça: ${data.race_name}</p>
                     <p>HP: ${data.current_hp} / ${data.hp}</p>
                     <p>Mana: ${data.current_mana} / ${data.mana}</p>
-                    <p>Energia: ${data.current_energy} / ${data.energia}</p>
+                    <p>Energia: ${data.current_energia} / ${data.energia}</p>
                 </div>
             </li>
         `;
