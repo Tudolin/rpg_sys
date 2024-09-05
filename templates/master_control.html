@@ -58,6 +58,8 @@
     {% endfor %}
 </ul>
 
+<button id="move-pawn">Move Pawn</button>
+<!-- Add logic for drag and drop functionality -->
 
 
 <h2>Enviar Mídia</h2>
@@ -86,7 +88,21 @@
 
 <div id="media-container"></div>
 
-<!-- Elemento para tocar música -->
+<div class="grid-container">
+    <table id="grid-table">
+        {% for character in characters %}
+            <tr>
+                <td>
+                    <div id="pawn-{{ character._id }}" class="pawn" style="background-image:url('{{ character.img_url }}');">
+                        <!-- Você pode adicionar mais detalhes do personagem aqui se desejar -->
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
+
 <audio id="background-music" loop></audio>
 
 <script>

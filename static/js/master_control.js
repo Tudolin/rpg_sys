@@ -15,7 +15,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const monsterSelect = document.getElementById('monster-select');
     const monsterQuantityInput = document.getElementById('monster-quantity');
     const monsterList = document.getElementById('monster-list');
-
+    const gridContainer = document.querySelector('.grid-container');
+    initializeDragAndDrop(gridContainer);
+    
     if (addMonsterForm) {
         addMonsterForm.addEventListener('submit', function(event) {
             event.preventDefault();
@@ -146,6 +148,77 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
+    function initializeDragAndDrop() {
+        const pawns = document.querySelectorAll('.pawn');
+        const cells = document.querySelectorAll('#grid-table td');
+    
+        pawns.forEach(pawn => {
+            pawn.setAttribute('draggable', true);
+            pawn.addEventListener('dragstart', handleDragStart, false);
+            pawn.addEventListener('dragend', handleDragEnd, false);
+        });
+    
+        cells.forEach(cell => {
+            cell.addEventListener('dragover', handleDragOver, false);
+            cell.addEventListener('drop', handleDrop, false);
+            cell.addEventListener('dragenter', handleDragEnter, false);
+            cell.addEventListener('dragleave', handleDragLeave, false);
+        });
+    }
+    
+    function handleDragStart(e) {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', this.id); // Pass the pawn's ID
+        this.classList.add('dragging');
+    }
+    
+    function handleDragOver(e) {
+        if (e.preventDefault) {
+            e.preventDefault(); // Necessary for allowing drops
+        }
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+    
+    function handleDragEnter(e) {
+        this.classList.add('over');
+    }
+    
+    function handleDragLeave(e) {
+        this.classList.remove('over');
+    }
+    
+    function handleDrop(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation(); // Stop the browser from redirecting
+        }
+    
+        const draggedId = e.dataTransfer.getData('text/plain');
+        const pawn = document.getElementById(draggedId);
+        this.appendChild(pawn); // Append the pawn to the new cell
+    
+        const rowIndex = this.parentNode.rowIndex;
+        const colIndex = this.cellIndex;
+        
+        updatePawnPositionOnServer(draggedId, rowIndex, colIndex);
+    
+        return false;
+    }
+    
+    function handleDragEnd(e) {
+        // Remove dragging styles
+        this.classList.remove('dragging');
+        const cells = document.querySelectorAll('.grid-container td');
+        cells.forEach(cell => {
+            cell.classList.remove('over');
+        });
+    }
+    
+    function updatePawnPositionOnServer(pawnId, x, y) {
+        // Emit socket event to update the position on the server
+        socket.emit('update_pawn_position', { pawnId, x, y });
+    }
+
     function removeMonster(monsterId) {
         fetch('/remove_monster', {
             method: 'POST',
@@ -269,6 +342,22 @@ document.addEventListener("DOMContentLoaded", function() {
         addOrUpdatePlayer(data);
     });
 
+    socket.on('new_player_added', function(playerData) {
+        const gridTable = document.getElementById('grid-table');
+        const newRow = gridTable.insertRow(-1);
+        const newCell = newRow.insertCell(0);
+        newCell.innerHTML = `<div id="pawn-${playerData._id}" class="pawn" style="background-image:url('${playerData.img_url}');"></div>`;
+        initializeDragAndDrop();
+    });
+    
+    socket.on('player_left', function(playerId) {
+        const pawnToRemove = document.getElementById(`pawn-${playerId}`);
+        if (pawnToRemove) {
+            pawnToRemove.parentNode.removeChild(pawnToRemove);
+        }
+    });
+
+    
     socket.on('player_left', function(data) {
         const playerElement = document.querySelector(`div[data-player-id="${data._id}"]`);
         if (playerElement) {
@@ -862,5 +951,6 @@ socket.on('player_removed', function(data) {
         const playerElement = document.querySelector(`.character-form[data-char-id="${data._id}"]`);
         if (playerElement) playerElement.remove();
     });
+    
     
 });

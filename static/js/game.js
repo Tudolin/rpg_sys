@@ -507,4 +507,36 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
+
+    // Function to populate the grid based on data received from the server
+function populateGrid(gridData) {
+    const grid = document.getElementById('grid-table');
+    grid.innerHTML = '';  // Clear previous state
+    gridData.forEach((row, rowIndex) => {
+        let tr = grid.insertRow();
+        row.forEach((cell, colIndex) => {
+            let td = tr.insertCell();
+            if (cell.content) {
+                td.innerHTML = `<img src="${cell.content.image}" alt="${cell.content.type}" style="width: 100%;">`;
+            }
+            td.addEventListener('click', () => {
+                if (isMasterControl) {
+                    // Assuming isMasterControl is a flag set true only in the master control panel
+                    promptEditCell(rowIndex, colIndex);
+                }
+            });
+        });
+    });
+}
+
+socket.on('update_grid', function(gridData) {
+    populateGrid(gridData);
+});
+
+function promptEditCell(rowIndex, colIndex) {
+    const content = { image: 'path_to_image_for_new_content', type: 'monster' }; // Placeholder, should be dynamic
+    socket.emit('edit_grid', { rowIndex, colIndex, content });
+}
+
+
 });

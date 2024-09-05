@@ -1131,7 +1131,7 @@ def get_current_session_data(session_id):
                     'mana': character['mana'],
                     'current_mana': character.get('current_mana', character['mana']),
                     'energia': character['energia'],
-                    'current_energia': character.get('current_energy', character['energia']),
+                    'current_energia': character.get('current_energia', character['energia']),
                     'img_url': character.get('img_url', '/static/images/default.png')
                 }
                 characters.append(character_info)
@@ -1390,6 +1390,42 @@ def handle_remove_monster(data):
         return jsonify({"success": True})
     return jsonify({"success": False}), 400
 
+
+
+@socketio.on('update_grid')
+def handle_update_grid(data):
+    session_id = session.get('game_session_id')
+    if session_id:
+        socketio.emit('update_grid', data, room=session_id)
+
+@socketio.on('edit_grid')
+def handle_edit_grid(data):
+    # Update grid logic in your storage/database
+    update_grid_in_db(data['rowIndex'], data['colIndex'], data['content'])
+    emit('update_grid', get_current_grid(), broadcast=True)
+
+def update_grid_in_db(row, col, content):
+    session_id = session.get('game_session_id')
+    db.sessions.update_one({"_id": session_id}, {"$set": {f"grid.{row}.{col}": content}})
+
+def get_current_grid():
+    session_id = session.get('game_session_id')
+    session_data = db.sessions.find_one({"_id": session_id})
+    return session_data['grid'] if 'grid' in session_data else []
+
+@socketio.on('update_pawn_position')
+def handle_update_pawn_position(data):
+    pawn_id = data['pawnId']
+    x = data['x']
+    y = data['y']
+    
+    # Logic to update pawn position in the database or session management
+    update_pawn_position_in_db(pawn_id, x, y)
+    emit('pawn_position_updated', { 'pawnId': pawn_id, 'x': x, 'y': y }, broadcast=True)
+
+def update_pawn_position_in_db(pawn_id, x, y):
+    session_id = session.get('game_session_id')
+    db.sessions.update_one({"_id": session_id}, {"$set": {f"pawns.{pawn_id}.position": {'x': x, 'y': y}}})
 
 
 pdfmetrics.registerFont(TTFont('MedievalFont', 'static/fonts/Enchanted Land.otf'))
