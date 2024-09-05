@@ -17,7 +17,8 @@
             <input type="hidden" name="char_id" value="{{ character._id }}">
             <label>HP: <input type="number" name="hp" value="{{ character.current_hp }}" class="hp-input"> / {{ character.hp }}</label><br>
             <label>Mana: <input type="number" name="mana" value="{{ character.current_mana }}" class="mana-input"> / {{ character.mana }}</label><br>
-            <label>Energia: <input type="number" name="energia" value="{{ character.current_energy }}" class="energy-input"> / {{ character.energia }}</label><br>
+            <label>Energia: <input type="number" name="energia" value="{{ character['current_energy'] }}" class="energy-input"> / {{ character.energia }}</label><br>
+            <p>{{ character.current_energy }}</p>
             <button type="submit">Atualizar</button>
         </form>
     </div>
