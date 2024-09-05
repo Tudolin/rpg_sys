@@ -752,47 +752,6 @@ socket.on('player_removed', function(data) {
         socket.emit('request_session_sync', { session_id: sessionId });
     });
 
-    socket.on('session_sync', function(data) {
-        console.log('Received session sync:', data);
-            if (data && data.characters && data.characters.length > 0) {
-                updatePlayerList(data.characters);
-            } else {
-                console.warn('No characters found in session sync data.');
-            }
-    
-        data.characters.forEach(char => {
-            const newPlayerHTML = `
-                <div class="character-card">
-                    <form method="POST" class="character-form" data-char-id="${char._id}">
-                        <input type="hidden" name="char_id" value="${char._id}">
-                        <p><strong>${char.name}</strong></p>
-                        <label>HP: <input type="number" name="hp" value="${char.hp}" class="hp-input"></label><br>
-                        <label>HP: <input type="number" name="energia" value="${char.energia}" class="hp-input"></label><br>
-                        <button type="submit">Atualizar</button>
-                    </form>
-                </div>
-            `;
-            playerList.insertAdjacentHTML('beforeend', newPlayerHTML);
-    
-            const newForm = playerList.querySelector(`.character-form[data-char-id="${char._id}"]`);
-            newForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const charId = newForm.getAttribute('data-char-id');
-            const hp = newForm.querySelector('.hp-input').value;
-            const mana = newForm.querySelector('.mana-input').value;
-            const energy = newForm.querySelector('.energy-input').value;
-
-            // Emite o evento de atualização de saúde, mana e energia via socket
-            socket.emit('update_character_status', {
-                character_id: charId,
-                new_health: hp,
-                new_mana: mana,
-                new_energy: energy
-            });
-        });
-    });
-    });
-
     socket.on('mana_energy_updated', function(data) {
         const characterForm = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);
         if (characterForm) {
