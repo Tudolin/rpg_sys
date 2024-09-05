@@ -369,8 +369,6 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log('New player joined:', data);  // Log de depuração
         const playerList = document.querySelector('.other-players ul');
         const existingPlayer = document.querySelector(`.other-player[data-player-id="${data._id}"]`);
-        
-        // Verifica se o jogador já existe na lista para evitar duplicações
         if (existingPlayer) return;
         
         const newPlayerHTML = `

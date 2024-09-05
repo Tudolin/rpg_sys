@@ -476,6 +476,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 <button class="remove-monster-button" data-monster-id="${monster._id}">Remover</button>
             `;
             boardCenter.appendChild(monsterElement);
+            updateMonstersList()
         } else {
             console.error('Elemento board-center não encontrado no DOM.');
         }

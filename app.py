@@ -445,7 +445,12 @@ def join_session(session_id):
             'class_name': class_info['name'] if class_info else "Classe Desconhecida",
             'race_name': race_info['name'] if race_info else "Raça Desconhecida",
             'hp': character['hp'],
-            'img_url': character['img_url']
+            'current_hp': character['current_hp'],
+            'img_url': character['img_url'],
+            'energia': character['energia'],
+            'current_energy': character['current_energy'],
+            'mana': character['mana'],
+            'current_mana': character['current_mana']
         }
 
         socketio.emit('new_player', character_data, room=session_id)
