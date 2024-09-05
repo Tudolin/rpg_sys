@@ -793,8 +793,8 @@ def master_control(session_id):
         if 'char_id' in request.form:  # Atualizando personagens
             char_id = request.form['char_id']
             hp = int(request.form['hp'])
-            mana = int(request.form.get('mana', 0))  # Obtém o valor de mana do formulário
-            energy = int(request.form.get('energia', 0))  # Obtém o valor de energia do formulário
+            mana = int(request.form.get('mana', 0))
+            energy = int(request.form.get('energia', 0))
             
             # Atualizar os valores no banco de dados
             db.chars.update_one(

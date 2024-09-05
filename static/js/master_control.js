@@ -767,6 +767,7 @@ socket.on('player_removed', function(data) {
                         <input type="hidden" name="char_id" value="${char._id}">
                         <p><strong>${char.name}</strong></p>
                         <label>HP: <input type="number" name="hp" value="${char.hp}" class="hp-input"></label><br>
+                        <label>HP: <input type="number" name="energia" value="${char.energia}" class="hp-input"></label><br>
                         <button type="submit">Atualizar</button>
                     </form>
                 </div>
