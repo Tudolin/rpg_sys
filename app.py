@@ -1136,7 +1136,7 @@ def get_current_session_data(session_id):
                     'mana': character['mana'],
                     'current_mana': character.get('current_mana', character['mana']),
                     'energia': character['energia'],
-                    'current_energia': character.get('current_energia', character['energia']),
+                    'current_energia': character.get('current_energy', character['energia']),
                     'img_url': character.get('img_url', '/static/images/default.png')
                 }
                 characters.append(character_info)
