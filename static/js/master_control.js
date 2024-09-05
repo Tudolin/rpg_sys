@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data.monster_id}"]`);
         if (monsterElement) {
             const hpElement = monsterElement.querySelector('.monster-hp');
-            hpElement.textContent = `HP: ${data.new_hp} / ${data.max_hp}`;
+            hpElement.textContent = `HP: ${data.new_hp} / ${data.hp}`;
         }
     });
 
@@ -333,7 +333,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const energyField = playerElement.querySelector('.energy-input');
             
             if (manaField) manaField.value = data.current_mana;
-            if (energyField) energyField.value = data.current_energia;
+            if (energyField) energyField.value = data.current_energy;
         }
     });
     

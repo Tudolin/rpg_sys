@@ -1288,6 +1288,7 @@ def update_monster_stats():
         monsters = session_data.get('monsters', [])
         for monster in monsters:
             if str(monster['_id']) == monster_id:
+                hp = monster['hp']
                 if new_hp is not None:
                     monster['current_hp'] = int(new_hp)
                 if new_mana is not None:
@@ -1301,7 +1302,7 @@ def update_monster_stats():
             {"$set": {"monsters": monsters}}
         )
 
-        socketio.emit('monster_hp_updated', {'monster_id': monster_id, 'new_hp': new_hp}, room=session_id)
+        socketio.emit('monster_hp_updated', {'monster_id': monster_id, 'new_hp': new_hp, 'hp': hp}, room=session_id)
         return jsonify({'success': True})
     return jsonify({'success': False, 'message': 'Session or monster not found'}), 400
 
