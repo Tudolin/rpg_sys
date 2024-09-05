@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${data.monster_id}"]`);
         if (monsterElement) {
             const hpElement = monsterElement.querySelector('.monster-hp');
-            hpElement.textContent = `HP: ${data.new_hp} / ${data.hp}`;
+            hpElement.textContent = `HP: ${data.current_hp} / ${data.hp}`;
         }
     });
 
