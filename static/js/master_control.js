@@ -333,7 +333,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const energyField = playerElement.querySelector('.energy-input');
             
             if (manaField) manaField.value = data.current_mana;
-            if (energyField) energyField.value = data.current_energy;
+            if (energyField) energyField.value = data.current_energia;
         }
     });
     
@@ -392,7 +392,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     <input type="hidden" name="char_id" value="${player._id || ''}">
                     <label>HP: <input type="number" name="hp" value="${player.current_hp || 0}" class="hp-input"> / ${player.hp || 0}</label><br>
                     <label>Mana: <input type="number" name="mana" value="${player.current_mana || 0}" class="mana-input"> / ${player.mana || 0}</label><br>
-                    <label>Energia: <input type="number" name="energia" value="${player.current_energy || 0}" class="energy-input"> / ${player.energia || 0}</label><br>
+                    <label>Energia: <input type="number" name="energia" value="${player.current_energia || 0}" class="energy-input"> / ${player.energia || 0}</label><br>
                     <button type="submit">Atualizar</button>
                 </form>
             </div>`;
@@ -438,7 +438,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     <input type="hidden" name="char_id" value="${player._id}">
                     <label>HP: <input type="number" name="hp" value="${player.current_hp}" class="hp-input"> / ${player.hp}</label><br>
                     <label>Mana: <input type="number" name="mana" value="${player.current_mana}" class="mana-input"> / ${player.mana}</label><br>
-                    <label>Energia: <input type="number" name="energia" value="${player.current_energy}" class="energy-input"> / ${player.energia}</label><br>
+                    <label>Energia: <input type="number" name="energia" value="${player.current_energia}" class="energy-input"> / ${player.energia}</label><br>
                     <button type="submit">Atualizar</button>
                 </form>
             </div>`;
@@ -522,7 +522,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     <p><strong>${char.name}</strong></p>
                     <label>HP: <input type="number" name="hp" value="${char.current_hp}" class="hp-input"></label><br>
                     <label>Mana: <input type="number" name="mana" value="${char.current_mana}" class="mana-input"></label><br>
-                    <label>Energia: <input type="number" name="energia" value="${char.current_energy}" class="energy-input"></label><br>
+                    <label>Energia: <input type="number" name="energia" value="${char.current_energia}" class="energy-input"></label><br>
                     <button type="submit">Atualizar</button>
                 </form>
             </div>
@@ -760,7 +760,7 @@ socket.on('player_removed', function(data) {
             const energyInput = characterForm.querySelector('.energy-input');
             
             if (manaInput) manaInput.value = data.current_mana;
-            if (energyInput) energyInput.value = data.current_energy;
+            if (energyInput) energyInput.value = data.current_energia;
         }
     });
     
