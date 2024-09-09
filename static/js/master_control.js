@@ -21,18 +21,38 @@ document.addEventListener("DOMContentLoaded", function() {
     if (addMonsterForm) {
         addMonsterForm.addEventListener('submit', function(event) {
             event.preventDefault();
-
+    
             const monsterId = document.getElementById('monster-select').value;
             const quantity = parseInt(document.getElementById('monster-quantity').value);
-
+    
             if (monsterId && quantity > 0) {
                 for (let i = 0; i < quantity; i++) {
-                    socket.emit('add_monster', { monster_id: monsterId, session_id: sessionId });
+                    fetch('/add_monster_to_session', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            session_id: sessionId,
+                            monster_id: monsterId,
+                            quantity: 1,
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Directly add the monster to the DOM
+                            addMonsterToDOM(data.monster);
+                        } else {
+                            console.error('Erro ao adicionar monstro:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Erro:', error));
                 }
-                socket.emit('request_session_sync', { session_id: sessionId });
             }
         });
     }
+    
 
     if (monsterList) {
         document.querySelectorAll('.enemy-card').forEach(function (monsterCard) {
@@ -461,6 +481,47 @@ document.addEventListener("DOMContentLoaded", function() {
             monsterElement.remove();
         }
     });
+    
+    function addMonsterToDOM(monster) {
+        const monsterList = document.getElementById('monster-list');
+        
+        // Create the monster list item
+        const monsterElement = document.createElement('li');
+        monsterElement.classList.add('enemy-card');
+        monsterElement.setAttribute('data-monster-id', monster._id);
+    
+        monsterElement.innerHTML = `
+            <h4>${monster.name}</h4>
+            <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
+            <form method="POST" class="monster-form" data-monster-id="${monster._id}">
+                <input type="hidden" name="monster_id" value="${monster._id}">
+                <label>HP: <input type="number" name="monster_hp" value="${monster.current_hp}" class="hp-input"> / ${monster.hp}</label><br>
+                <button type="submit">Atualizar</button>
+            </form>
+            <p>${monster.resumo}</p>
+            <button class="remove-monster-button" data-monster-id="${monster._id}">Remover</button>
+        `;
+    
+        // Append the new monster to the list
+        monsterList.appendChild(monsterElement);
+    
+        // Add event listeners for the newly created monster element
+        const removeButton = monsterElement.querySelector('.remove-monster-button');
+        removeButton.addEventListener('click', function () {
+            removeMonster(monster._id);
+        });
+    
+        const form = monsterElement.querySelector('.monster-form');
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const newHp = form.querySelector('.hp-input').value;
+            socket.emit('update_monster_hp', {
+                monster_id: monster._id,
+                new_hp: newHp,
+                session_id: sessionId
+            });
+        });
+    }
     
 
     function addOrUpdatePlayer(char) {
