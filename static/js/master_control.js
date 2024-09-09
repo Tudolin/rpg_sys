@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (monsterId && quantity > 0) {
                 for (let i = 0; i < quantity; i++) {
                     socket.emit('add_monster', { monster_id: monsterId, session_id: sessionId });
+                    socket.emit('request_session_sync', { session_id: sessionId });
                 }
             }
         });
