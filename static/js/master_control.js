@@ -109,21 +109,6 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log(`Monster with ID ${data._id} already exists. Skipping duplicate render.`);
             return;
         }
-    
-        // If not, create and add the monster to the DOM
-        const monsterList = document.getElementById('monster-list');
-        const monsterElement = document.createElement('li');
-        monsterElement.dataset.monsterId = data._id;
-        monsterElement.innerHTML = `
-            <div class="enemy-card">
-                <img src="${data.img_url}" alt="${data.name}" class="monster-image">
-                <h4>${data.name}</h4>
-                <p>HP: <span class="monster-hp">${data.current_hp}</span> / ${data.hp}</p>
-                <button class="remove-monster-button" onclick="removeMonster('${data._id}')">Remover</button>
-            </div>
-        `;
-        monsterList.appendChild(monsterElement);
-    
         // Handle HP form submission (if applicable)
         const form = monsterElement.querySelector('.monster-form');
         if (form) {
@@ -645,7 +630,6 @@ document.getElementById('add-monster-form').addEventListener('submit', function(
         if (data.success) {
             console.log('Monstro adicionado com sucesso');
 
-            // Depois que o monstro for adicionado com sucesso, sincronize a sessão
             socket.emit('request_session_sync', { session_id: sessionId });
         } else {
             console.error('Erro ao adicionar monstro:', data.message);
