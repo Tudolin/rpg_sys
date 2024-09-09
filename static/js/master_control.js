@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (monsterId && quantity > 0) {
                 for (let i = 0; i < quantity; i++) {
                     socket.emit('add_monster', { monster_id: monsterId, session_id: sessionId });
-                    socket.emit('request_session_sync', { session_id: sessionId });
                 }
+                socket.emit('request_session_sync', { session_id: sessionId });
             }
         });
     }
@@ -109,16 +109,14 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log(`Monster with ID ${data._id} already exists. Skipping duplicate render.`);
             return;
         }
-        // Handle HP form submission (if applicable)
+        
         const form = monsterElement.querySelector('.monster-form');
         if (form) {
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
                 const monsterId = form.getAttribute('data-monster-id');
                 const newHp = form.querySelector('.monster-hp-input').value;
-    
                 console.log(`Updating HP of monster with ID: ${monsterId} to ${newHp}`);
-    
                 socket.emit('update_monster_hp', {
                     monster_id: monsterId,
                     new_hp: newHp,
@@ -126,6 +124,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
             });
         }
+    
 
         monsterElement.querySelector('.remove-monster-button').addEventListener('click', function() {
             const monsterId = this.getAttribute('data-monster-id');
@@ -310,7 +309,12 @@ document.addEventListener("DOMContentLoaded", function() {
         } else {
             console.warn('No characters found in session sync data.');
         }
+    
+        if (data && data.monsters && data.monsters.length > 0) {
+            updateMonstersList(data.monsters);
+        }
     });
+    
 
     socket.on('mana_energy_updated_master', function(data) {
         const playerElement = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);
