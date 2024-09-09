@@ -597,7 +597,6 @@ def add_monster_to_session():
                 {"$push": {"monsters": new_monster}}
             )
 
-            # Emitir o evento para adicionar o monstro a todos os jogadores na sala
             socketio.emit('monster_added', new_monster, room=session_id)
 
     return jsonify({"success": True, "monsters": monsters})

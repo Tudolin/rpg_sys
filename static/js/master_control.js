@@ -627,6 +627,7 @@ document.getElementById('add-monster-form').addEventListener('submit', function(
     const monsterId = document.getElementById('monster-select').value;
     const quantity = document.getElementById('monster-quantity').value;
 
+    // Primeiro, adiciona o monstro
     fetch('/add_monster_to_session', {
         method: 'POST',
         headers: {
@@ -642,6 +643,9 @@ document.getElementById('add-monster-form').addEventListener('submit', function(
     .then(data => {
         if (data.success) {
             console.log('Monstro adicionado com sucesso');
+
+            // Depois que o monstro for adicionado com sucesso, sincronize a sessão
+            socket.emit('request_session_sync', { session_id: sessionId });
         } else {
             console.error('Erro ao adicionar monstro:', data.message);
         }
@@ -650,7 +654,6 @@ document.getElementById('add-monster-form').addEventListener('submit', function(
 });
 
 
-// Recebe notificação de jogador removido e remove da lista
 socket.on('player_removed', function(data) {
     const characterForm = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);
     if (characterForm) {
