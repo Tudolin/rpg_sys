@@ -38,28 +38,28 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
     habilidades = {}
     
     # Adiciona habilidades da raça
-    habilidades_raca = selected_race.get('habilidades_inatas', {})
-    for habilidade_nome, descricao in habilidades_raca.items():
-        habilidade = db['abilities.abilities'].find_one({"name": habilidade_nome})
-        if habilidade:
-            habilidades[str(habilidade['_id'])] = {
-                'name': habilidade['name'],
-                'description': habilidade['description'],
-                'cost': habilidade['cost'],
-                'icon': habilidade['icon']
-            }
+    # habilidades_raca = selected_race.get('habilidades_inatas', {})
+    # for habilidade_nome, descricao in habilidades_raca.items():
+    #     habilidade = db['abilities.abilities'].find_one({"name": habilidade_nome})
+    #     if habilidade:
+    #         habilidades[str(habilidade['_id'])] = {
+    #             'name': habilidade['name'],
+    #             'description': habilidade['description'],
+    #             'cost': habilidade['cost'],
+    #             'icon': habilidade['icon']
+    #         }
 
-    # Adiciona habilidades da classe
-    habilidades_classe = selected_class.get('habilidades_classe', {})
-    for habilidade_nome, descricao in habilidades_classe.items():
-        habilidade = db['abilities.abilities'].find_one({"name": habilidade_nome})
-        if habilidade:
-            habilidades[str(habilidade['_id'])] = {
-                'name': habilidade['name'],
-                'description': habilidade['description'],
-                'cost': habilidade['cost'],
-                'icon': habilidade['icon']
-            }
+    # # Adiciona habilidades da classe
+    # habilidades_classe = selected_class.get('habilidades_classe', {})
+    # for habilidade_nome, descricao in habilidades_classe.items():
+    #     habilidade = db['abilities.abilities'].find_one({"name": habilidade_nome})
+    #     if habilidade:
+    #         habilidades[str(habilidade['_id'])] = {
+    #             'name': habilidade['name'],
+    #             'description': habilidade['description'],
+    #             'cost': habilidade['cost'],
+    #             'icon': habilidade['icon']
+    #         }
 
     # Adiciona habilidades selecionadas manualmente
     for habilidade_nome in habilidades_selecionadas:
