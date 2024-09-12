@@ -2,6 +2,10 @@
     font-family: Enchanted Land;
     src: url(/static/fonts/Seagram\ tfb.ttf);
  }
+@font-face {
+    font-family: Cardo;
+    src: url(/static/fonts/Cardo-Regular.ttf);
+ }
 
  @keyframes fadeInAnimation {
     0% {
@@ -259,6 +263,7 @@ body {
 
 .game-lobby-container {
     display: flex;
+    font-family: Cardo;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
@@ -272,6 +277,7 @@ body {
 
 /* Adiciona a estrutura do layout principal */
 .main-content {
+    font-family: Cardo;
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -281,6 +287,7 @@ body {
 
 /* Seção de informações do jogador */
 .player-info {
+    font-family: Cardo;
     border: 2px solid #660000;
     background-color: rgba(0, 0, 0, 0.85);
     padding: 20px;
@@ -360,6 +367,7 @@ body {
 }
 
 .stats-container h2 {
+    font-family: Cardo;
     font-size: 24px;
     margin-bottom: 10px;
 }
@@ -473,6 +481,7 @@ body {
 
 /* Seção de outros jogadores */
 .other-players {
+    font-family: Cardo;
     border: 2px solid #660000;
     background-color: rgba(0, 0, 0, 0.85);
     padding: 20px;
@@ -518,6 +527,7 @@ body {
 }
 
 .player-stats p {
+    font-family: Cardo;
     color: #fff;
     font-size: 14px;
     margin: 2px 0;

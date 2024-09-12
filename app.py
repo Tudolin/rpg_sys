@@ -36,9 +36,9 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get('SECRET_KEY') or 'a212d3b5e27f9cd2dfb8a9d18587ae51b2f88af9e1e95112'
 app.config['SESSION_PROTECTION'] = 'strong'
-# app.config['SESSION_TYPE'] = 'redis'
-# app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379, db=0, password=None)
-app.config['SESSION_TYPE'] = 'filesystem' #for local host debug
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379, db=0, password=None)
+# app.config['SESSION_TYPE'] = 'filesystem' #for local host debug
 Session(app)
 
 CORS(app)
