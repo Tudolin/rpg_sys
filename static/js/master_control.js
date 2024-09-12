@@ -41,10 +41,15 @@ document.addEventListener("DOMContentLoaded", function() {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Directly add the monster to the DOM
-                            addMonsterToDOM(data.monster);
+                            console.log(data.monster); // Log to verify the monster object
+                            if (data.monster) {
+                                addMonsterToDOM(data.monster); // Correctly pass the received monster
+                            } else {
+                                console.error("No monster data received");
+                            }
+                            socket.emit('request_session_sync', { session_id: sessionId });
                         } else {
-                            console.error('Erro ao adicionar monstro:', data.message);
+                            console.error('Error adding monster:', data.message);
                         }
                     })
                     .catch(error => console.error('Erro:', error));
@@ -225,30 +230,66 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function removeMonster(monsterId) {
+        // Ensure sessionId is defined and valid before making the request
+        if (!sessionId) {
+            console.error('No session ID available');
+            return;
+        }
+    
+        // Perform a single fetch call to remove the monster
         fetch('/remove_monster', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ monster_id: monsterId })
+            body: JSON.stringify({
+                monster_id: monsterId,
+                session_id: sessionId // Ensure session_id is passed
+            })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                console.error(`Failed to remove monster: ${response.statusText}`);
+                throw new Error('Failed to remove monster');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                const monsterElement = document.querySelector(`.enemy-card[data-monster-id="${monsterId}"]`);
+                const monsterElement = document.querySelector(`li[data-monster-id="${monsterId}"]`);
                 if (monsterElement) {
                     monsterElement.remove();
                     console.log(`Monster ${monsterId} removed successfully`);
                 }
             } else {
-                console.error('Failed to remove monster');
+                console.error('Failed to remove monster:', data.message);
             }
-        });
+        })
+        .catch(error => console.error('Error:', error));
     }
+    
+    // Add event listener to remove buttons
     document.querySelectorAll('.remove-monster-button').forEach(button => {
         button.addEventListener('click', function() {
             const monsterId = this.getAttribute('data-monster-id');
     
+            // Check that monsterId and sessionId are valid before calling removeMonster
+            if (monsterId && sessionId) {
+                removeMonster(monsterId);
+            } else {
+                console.error('Invalid monster ID or session ID');
+            }
+        });
+    });
+    
+    document.querySelectorAll('.remove-monster-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const monsterId = this.getAttribute('data-monster-id');
+            
+            // Ensure `sessionId` and `monsterId` are valid before making the request
+            console.log("Removing monster with ID:", monsterId);
+            console.log("Session ID:", sessionId);
+            
             fetch('/remove_monster', {
                 method: 'POST',
                 headers: {
@@ -256,21 +297,24 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 body: JSON.stringify({
                     monster_id: monsterId,
-                    session_id: sessionId // Passando o sessionId
+                    session_id: sessionId // Ensure session_id is valid
                 })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Remover o elemento DOM correspondente ao monstro removido
-                    document.querySelector(`li[data-monster-id="${monsterId}"]`).remove();
+                    // Remove the monster from the DOM if the backend confirms success
+                    const monsterElement = document.querySelector(`li[data-monster-id="${monsterId}"]`);
+                    if (monsterElement) {
+                        monsterElement.remove();
+                    }
                 } else {
                     console.error('Failed to remove monster:', data.message);
                 }
             })
             .catch(error => console.error('Error:', error));
         });
-    });
+    });    
 
     
     document.querySelectorAll('.enemy-card').forEach(function (monsterCard) {
@@ -485,7 +529,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function addMonsterToDOM(monster) {
         const monsterList = document.getElementById('monster-list');
         
-        // Create the monster list item
+        console.log(monster);
         const monsterElement = document.createElement('li');
         monsterElement.classList.add('enemy-card');
         monsterElement.setAttribute('data-monster-id', monster._id);
@@ -647,37 +691,6 @@ document.querySelectorAll('.remove-player-button').forEach(button => {
         removePlayer(charId);
     });
 });
-
-document.getElementById('add-monster-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const monsterId = document.getElementById('monster-select').value;
-    const quantity = document.getElementById('monster-quantity').value;
-
-    // Primeiro, adiciona o monstro
-    fetch('/add_monster_to_session', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            session_id: sessionId,
-            monster_id: monsterId,
-            quantity: quantity
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log('Monstro adicionado com sucesso');
-
-            socket.emit('request_session_sync', { session_id: sessionId });
-        } else {
-            console.error('Erro ao adicionar monstro:', data.message);
-        }
-    })
-    .catch(error => console.error('Erro:', error));
-});
-
 
 socket.on('player_removed', function(data) {
     const characterForm = document.querySelector(`.character-form[data-char-id="${data.character_id}"]`);

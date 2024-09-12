@@ -36,9 +36,9 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get('SECRET_KEY') or 'a212d3b5e27f9cd2dfb8a9d18587ae51b2f88af9e1e95112'
 app.config['SESSION_PROTECTION'] = 'strong'
-app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379, db=0, password=None)
-# app.config['SESSION_TYPE'] = 'filesystem' #for local host debug
+# app.config['SESSION_TYPE'] = 'redis'
+# app.config['SESSION_REDIS'] = Redis(host='localhost', port=6379, db=0, password=None)
+app.config['SESSION_TYPE'] = 'filesystem' #for local host debug
 Session(app)
 
 CORS(app)
@@ -576,7 +576,7 @@ def add_monster_to_session():
         monster = db['enemies.enemies'].find_one({"_id": ObjectId(monster_id)})
         if monster:
             new_monster = {
-                '_id': str(ObjectId()),  # Unique ID for each instance of a monster
+                '_id': str(ObjectId()),
                 'name': monster['name'],
                 'hp': monster['hp'],
                 'current_hp': monster['hp'],
@@ -599,7 +599,7 @@ def add_monster_to_session():
 
             socketio.emit('monster_added', new_monster, room=session_id)
 
-    return jsonify({"success": True, "monsters": monsters})
+    return jsonify({"success": True, "monster": monsters[0]})
 
 
 
@@ -915,6 +915,9 @@ def remove_monster():
     monster_id = data.get('monster_id')
     session_id = data.get('session_id')
 
+    # Log the received IDs for debugging
+    app.logger.debug(f"Received monster_id: {monster_id}, session_id: {session_id}")
+
     if not session_id:
         app.logger.error("No session ID provided")
         return jsonify({'success': False, 'message': 'No session ID provided'}), 400
@@ -947,7 +950,6 @@ def remove_monster():
 
     app.logger.error("Monster ID not provided or invalid")
     return jsonify({'success': False, 'message': 'Invalid monster ID'}), 400
-
 
 
 @app.route('/remove_player/<char_id>', methods=['POST'])
