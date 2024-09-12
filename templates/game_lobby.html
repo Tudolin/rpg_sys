@@ -110,10 +110,13 @@
                     <div class="skill-icon" data-skill-id="{{ habilidade['id'] }}" data-skill-cost-mana="{{ habilidade['cost_mana'] }}" data-skill-cost-energy="{{ habilidade['cost_energy'] }}">
                         <span>{{ habilidade['name'] }}</span>
                         <span style="color: aqua;" class="skill-cost">Mana: {{ habilidade['cost_mana'] }}, Energy: {{ habilidade['cost_energy'] }}</span>
-                        <img src="{{ url_for('static', filename='images/skills/' + habilidade['icon']) }}" alt="{{ habilidade['name'] }}" 
-                         {% if habilidade['icon'] %} style="display:block;" {% else %} style="display:none;" {% endif %}>
+                        {% if habilidade.get('icon') %}
+                            <img src="{{ url_for('static', filename='images/skills/' + habilidade['icon']) }}" alt="{{ habilidade['name'] }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/skills/default_icon.png') }}" alt="Default Icon">
+                        {% endif %}
                     </div>
-                    {% endfor %}
+                {% endfor %}
                 </div>
                 <div class="bottom-bar-icon" id="profile-button">
                     <img src="{{ character['img_url'] }}" alt="Perfil" class="bottom-bar-icon-img">

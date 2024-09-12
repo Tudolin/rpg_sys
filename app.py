@@ -507,7 +507,8 @@ def game_lobby():
                 "name": habilidade_data.get("name"),
                 "description": habilidade_data.get("description"),
                 "cost_mana": habilidade_data.get("cost", {}).get("mana", 0),
-                "cost_energy": habilidade_data.get("cost", {}).get("energy", 0)
+                "cost_energy": habilidade_data.get("cost", {}).get("energy", 0),
+                "icon": habilidade_data.get("icon")
             })
 
     character['habilidades'] = habilidades_formatadas
