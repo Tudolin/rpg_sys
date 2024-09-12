@@ -45,7 +45,8 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
             habilidades[str(habilidade['_id'])] = {
                 'name': habilidade['name'],
                 'description': habilidade['description'],
-                'cost': habilidade['cost']
+                'cost': habilidade['cost'],
+                'icon': habilidade['icon']
             }
 
     # Adiciona habilidades da classe
@@ -56,7 +57,8 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
             habilidades[str(habilidade['_id'])] = {
                 'name': habilidade['name'],
                 'description': habilidade['description'],
-                'cost': habilidade['cost']
+                'cost': habilidade['cost'],
+                'icon': habilidade['icon']
             }
 
     # Adiciona habilidades selecionadas manualmente
@@ -66,7 +68,8 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
             habilidades[str(habilidade['_id'])] = {
                 'name': habilidade['name'],
                 'description': habilidade['description'],
-                'cost': habilidade['cost']
+                'cost': habilidade['cost'],
+                'icon': habilidade['icon']
             }
 
     # Processa as perícias selecionadas
