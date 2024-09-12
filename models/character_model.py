@@ -92,7 +92,10 @@ def create_character(db, user_id, name, class_id, race_id, img_url, forca, destr
         "defesa": defesa,
         "habilidades": habilidades,
         "pericias": pericias,
-        "origem": origem
+        "origem": origem,
+        "current_energy": energia,
+        "current_hp": hp,
+        "current_mana": mana
     }
 
     db.chars.insert_one(character)
