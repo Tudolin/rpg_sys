@@ -5,6 +5,7 @@ import json
 import logging
 import os
 import sys
+from datetime import timedelta
 from io import BytesIO
 
 from bson import ObjectId
@@ -45,6 +46,8 @@ CORS(app)
 sys.path.insert(0, '/home/angellnadalin/rpg_sys')
 db = connection()
 UPLOAD_FOLDER = 'static/uploads/'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
+app.config['SESSION_PERMANENT'] = True
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 socketio = SocketIO(app, cors_allowed_origins="https://familyrpg.servebeer.com")
 MEDIA_FOLDER = 'static/media/'
@@ -94,6 +97,8 @@ def login():
             session['logged_in'] = True
             session['userId'] = str(user['_id'])
             session['username'] = user['username']
+
+            session.permanent = True
             app.logger.info("Login bem-sucedido")
             return redirect(url_for('home'))
         else:
@@ -131,20 +136,25 @@ def register():
 
 @app.route('/logout')
 def logout():
-    # Remover o usuário da sessão de jogo, se estiver em uma
-    if 'game_session_id' in session:
-        session_data = get_session_by_id(db, session['game_session_id'])
-        for character_id in session_data.get('characters', []):
-            character = db.chars.find_one({"_id": ObjectId(character_id)})
-            if character and str(character['user_id']) == session['userId']:
-                remove_character_from_session(db, session['game_session_id'], character_id)
-        session.pop('game_session_id', None)
+    try:
+        # Remover o usuário da sessão de jogo, se estiver em uma
+        game_session_id = session.get('game_session_id')
+        if game_session_id:
+            session_data = get_session_by_id(db, game_session_id)
+            if session_data:
+                for character_id in session_data.get('characters', []):
+                    character = db.chars.find_one({"_id": ObjectId(character_id)})
+                    if character and str(character['user_id']) == session['userId']:
+                        remove_character_from_session(db, game_session_id, character_id)
+            session.pop('game_session_id', None)
+    except Exception as e:
+        app.logger.error(f"Erro ao remover personagem da sessão: {str(e)}")
 
-    # Finalizar a sessão do usuário
-    session.pop('logged_in', None)
-    session.pop('userId', None)
-    session.pop('username', None)
+    # Limpar a sessão do usuário completamente
+    session.clear()
+
     return redirect(url_for('login'))
+
 
 
 @app.route('/create_character', methods=['GET', 'POST'])
