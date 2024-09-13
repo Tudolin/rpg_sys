@@ -206,11 +206,33 @@ def create_default_enemies(db):
     ]
     
     for enemy_data in enemies:
+        enemy_data["spawn_som"] = format_sound_name(enemy_data["name"])  
+        enemy_data["img_url"] = get_icon_for_enemy(enemy_data["name"])
         db.enemies.update_one(
             {"name": enemy_data["name"]},
             {"$set": enemy_data},
             upsert=True
         )
+
+def remove_accents(text):
+    accents_map = str.maketrans(
+        "áàâãäéèêëíìîïóòôõöúùûüçÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ",
+        "aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC"
+    )
+    return text.translate(accents_map)
+
+def format_sound_name(monster_name):
+    monster_name_no_accents = remove_accents(monster_name)
+    monster_sound_name = monster_name_no_accents.lower().replace(' ', '_')
+    return f"{monster_sound_name}.mp3"
+
+def get_icon_for_enemy(monster_name):
+    # Remover acentos
+    monster_name_no_accents = remove_accents(monster_name)
+    monster_icon_name = monster_name_no_accents.lower().replace(' ', '_')
+    
+    return f"{monster_icon_name}.png"
+
 
 def enemy_by_id(db, enemy_id):
     return db.enemies.find_one({"_id": ObjectId(enemy_id)})

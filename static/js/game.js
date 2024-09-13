@@ -351,18 +351,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     
     socket.on('monster_added', function(data) {
-        // Check if the monster already exists in the DOM
+        // Verifique se o monstro já existe no DOM
         let existingMonster = document.querySelector(`.enemy-card[data-monster-id="${data._id}"]`);
         if (existingMonster) {
             console.log(`Monster with ID ${data._id} already exists. Skipping duplicate render.`);
             return;
         }
+    
+        // Atualize a DOM com o novo monstro
         updateMonsterInDOM(data);
+    
+        // Tocar o som de spawn do monstro se existir
+        if (data.spawn_som) {
+            let audio = new Audio(`/static/spawn/${data.spawn_som}`);
+            audio.play().catch(error => {
+                console.error('Failed to play monster spawn sound:', error);
+            });
+        }
     });
-    
-    
-    
-    
     
 
     socket.on('new_player', function(data) {

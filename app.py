@@ -1264,7 +1264,8 @@ def handle_add_monster(data):
             'name': monster['name'],
             'hp': monster['hp'],
             'current_hp': monster['hp'],  # Start with full HP
-            'resumo': monster.get('resumo', '')
+            'resumo': monster.get('resumo', ''),
+            'spawn_som': monster.get('spawn_som', '')  # Include the spawn sound
         }
 
         print(f"Emitting 'monster_added' with data: {monster_data}")
@@ -1273,6 +1274,7 @@ def handle_add_monster(data):
         socketio.emit('monster_added', monster_data, room=session_id)
     else:
         print(f"Failed to add monster. Monster or session not found: monster={monster}, session_id={session_id}")
+
 
 @app.route('/update_monster_stats', methods=['POST'])
 def update_monster_stats():
