@@ -43,7 +43,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         if (data.success) {
                             console.log(data.monster); // Log to verify the monster object
                             if (data.monster) {
-                                addMonsterToDOM(data.monster); // Correctly pass the received monster
+                                addMonsterToDOM(data.monster);
+                                window.location.reload();
                             } else {
                                 console.error("No monster data received");
                             }
