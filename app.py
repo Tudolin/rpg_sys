@@ -599,7 +599,8 @@ def add_monster_to_session():
                 'resumo': monster.get('resumo', ''),
                 'ataque': monster.get('ataque', 0),
                 'defesa': monster.get('defesa', 0),
-                'img_url': monster.get('img_url', '/static/images/monsters/default.png')  # Usar URL de imagem do monstro
+                'img_url': monster.get('img_url', '/static/images/monsters/default.png'),
+                'spawn_som': monster.get('spawn_som', 'default.mp3')  # Adicione esta linha
             }
             monsters.append(new_monster)
 
