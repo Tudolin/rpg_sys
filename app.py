@@ -587,6 +587,7 @@ def add_monster_to_session():
     for _ in range(quantity):
         monster = db['enemies.enemies'].find_one({"_id": ObjectId(monster_id)})
         if monster:
+            monster_image = '/static/images/monsters/' + monster.get('img_url')
             new_monster = {
                 '_id': str(ObjectId()),
                 'name': monster['name'],
@@ -599,7 +600,7 @@ def add_monster_to_session():
                 'resumo': monster.get('resumo', ''),
                 'ataque': monster.get('ataque', 0),
                 'defesa': monster.get('defesa', 0),
-                'img_url': monster.get('img_url', '/static/images/monsters/default.png'),
+                'img_url': monster.get(monster_image, '/static/images/monsters/default.png'),
                 'spawn_som': monster.get('spawn_som', 'default.mp3')  # Adicione esta linha
             }
             monsters.append(new_monster)
