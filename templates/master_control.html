@@ -6,7 +6,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
 <script src="{{ url_for('static', filename='js/master_control.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/master.css') }}">
-
 <h1>Controle do Mestre - {{ session_name }}</h1>
 
 <div class="characters-container">
@@ -16,84 +15,71 @@
         <p><strong>{{ character.name }}</strong></p>
         <form method="POST" class="character-form" data-char-id="{{ character._id }}">
             <input type="hidden" name="char_id" value="{{ character._id }}">
-            <label>HP:
-                <input type="number" name="hp" value="{{ character.current_hp }}" class="hp-input"> / {{ character.hp }}
-            </label>
-            <label>Mana:
-                <input type="number" name="mana" value="{{ character.current_mana }}" class="mana-input"> / {{ character.mana }}
-            </label>
-            <label>Energia:
-                <input type="number" name="energia" value="{{ character['current_energy'] }}" class="energy-input"> / {{ character.energia }}
-            </label>
+            <label>HP: <input type="number" name="hp" value="{{ character.current_hp }}" class="hp-input"> / {{ character.hp }}</label><br>
+            <label>Mana: <input type="number" name="mana" value="{{ character.current_mana }}" class="mana-input"> / {{ character.mana }}</label><br>
+            <label>Energia: <input type="number" name="energia" value="{{ character['current_energy'] }}" class="energy-input"> / {{ character.energia }}</label><br>
             <button type="submit">Atualizar</button>
         </form>
     </div>
     {% endfor %}
 </div>
 
-<div class="monster-section">
-    <h2>Adicionar Monstros</h2>
-    <form id="add-monster-form">
-        <div class="monster-selection">
-            <label for="monster-select">Escolha o Monstro:</label>
-            <select id="monster-select">
-                {% for enemy in enemies %}
-                <option value="{{ enemy._id }}">{{ enemy.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="monster-quantity">
-            <label for="monster-quantity">Quantidade:</label>
-            <input type="number" id="monster-quantity" name="monster_quantity" min="1" value="1">
-        </div>
-        <button type="submit">Adicionar Monstro(s)</button>
-    </form>
-
-    <h2>Monstros na Sessão</h2>
-    <div class="monsters-container">
-        {% for monster in monsters %}
-        <div class="enemy-card" data-monster-id="{{ monster._id }}">
-            <h4>{{ monster.name }}</h4>
-            <img src="{{ monster.img_url }}" alt="{{ monster.name }}" class="monster-image">
-            <p>{{ monster.resumo }}</p>
-            <form method="POST" class="monster-form" data-monster-id="{{ monster._id }}">
-                <input type="hidden" name="monster_id" value="{{ monster._id }}">
-                <label>HP:
-                    <input type="number" name="monster_hp" value="{{ monster.current_hp }}" class="hp-input"> / {{ monster.hp }}
-                </label>
-                <button type="submit">Atualizar</button>
-            </form>
-            <button class="remove-monster-button" data-monster-id="{{ monster._id }}">Remover</button>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-
-<div class="media-section">
-    <h2>Enviar Mídia</h2>
-    <form id="media-form" enctype="multipart/form-data">
-        <input type="file" name="media" id="media-input" required>
-        <label for="display-time">Tempo de exibição (segundos):</label>
-        <input type="number" id="display-time" name="display_time" min="1" required>
-        <button type="submit"><i class="bi bi-send"></i> Enviar</button>
-    </form>
-    <div id="media-preview"></div>
-</div>
-
-<div class="music-player-section">
-    <h2>Music Player</h2>
-    <div class="music-player">
-        <label for="music-select">Selecione uma música:</label>
-        <select id="music-select">
-            <option value="">Selecione uma música</option>
+<h2>Adicionar Monstros</h2>
+<form id="add-monster-form">
+    <div class="monster-selection">
+        <label for="monster-select">Escolha o Monstro:</label>
+        <select id="monster-select">
+            {% for enemy in enemies %}
+            <option value="{{ enemy._id }}">{{ enemy.name }}</option>
+            {% endfor %}
         </select>
-        <button id="play-button"><i class="bi bi-play-circle"></i> Play</button>
-        <button id="stop-button"><i class="bi bi-stop-circle"></i> Stop</button>
     </div>
-    <div id="music-player">
-        <p id="current-track">Nenhuma música em reprodução</p>
-        <audio id="audio-player" controls></audio>
+    <div class="monster-quantity">
+        <label for="monster-quantity">Quantidade:</label>
+        <input type="number" id="monster-quantity" name="monster_quantity" min="1" value="1">
     </div>
+    <button type="submit">Adicionar Monstro(s)</button>
+</form>
+
+<h2>Monstros na Sessão</h2>
+<ul id="monster-list">
+    {% for monster in monsters %}
+    <li class="enemy-card" data-monster-id="{{ monster._id }}">
+        <h4>{{ monster.name }}</h4>
+        <img src="{{ monster.img_url }}" alt="{{ monster.name }}" class="monster-image">
+        <form method="POST" class="monster-form" data-monster-id="{{ monster._id }}">
+            <input type="hidden" name="monster_id" value="{{ monster._id }}">
+            <label>HP: <input type="number" name="monster_hp" value="{{ monster.current_hp }}" class="hp-input"> / {{ monster.hp }}</label><br>
+            <button type="submit">Atualizar</button>
+        </form>
+        <p>{{ monster.resumo }}</p>
+        <button class="remove-monster-button" data-monster-id="{{ monster._id }}">Remover</button>
+    </li>
+    {% endfor %}
+</ul>
+
+<h2>Enviar Mídia</h2>
+<form id="media-form" enctype="multipart/form-data">
+    <input type="file" name="media" id="media-input" required>
+    <label for="display-time">Tempo de exibição (segundos):</label>
+    <input type="number" id="display-time" name="display_time" min="1" required>
+    <button type="submit"><i class="bi bi-send"></i> Enviar</button>
+</form>
+
+<div id="media-preview"></div>
+
+<div class="music-player">
+    <label for="music-select">Music Player</label>
+    <select id="music-select">
+        <option value="">Selecione uma música</option>
+    </select>
+    <button id="play-button"><i class="bi bi-play-circle"></i> Play</button>
+    <button id="stop-button"><i class="bi bi-stop-circle"></i> Stop</button>
+</div>
+
+<div id="music-player">
+    <p id="current-track">Nenhuma musica em reproducao</p>
+    <audio id="audio-player" controls></audio>
 </div>
 
 <div id="media-container"></div>
@@ -101,16 +87,17 @@
 <div class="grid-container">
     <table id="grid-table">
         {% for character in characters %}
-        <tr>
-            <td>
-                <div id="pawn-{{ character._id }}" class="pawn" style="background-image:url('{{ character.img_url }}');">
-                    <!-- Detalhes adicionais do personagem -->
-                </div>
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    <div id="pawn-{{ character._id }}" class="pawn" style="background-image:url('{{ character.img_url }}');">
+                        <!-- Você pode adicionar mais detalhes do personagem aqui se desejar -->
+                    </div>
+                </td>
+            </tr>
         {% endfor %}
     </table>
 </div>
+
 
 <audio id="background-music" loop></audio>
 
