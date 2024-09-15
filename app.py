@@ -587,8 +587,12 @@ def add_monster_to_session():
     for _ in range(quantity):
         monster = db['enemies.enemies'].find_one({"_id": ObjectId(monster_id)})
         if monster:
+            # Obter o nome da imagem ou usar 'default.png' se não existir
             image_name = monster.get('img_url', 'default.png')
-            monster_image = '/static/images/monsters/' + image_name
+
+            # Construir o caminho da imagem usando url_for
+            monster_image = url_for('static', filename='images/monsters/' + image_name)
+
             new_monster = {
                 '_id': str(ObjectId()),
                 'name': monster['name'],
