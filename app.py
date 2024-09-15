@@ -587,7 +587,8 @@ def add_monster_to_session():
     for _ in range(quantity):
         monster = db['enemies.enemies'].find_one({"_id": ObjectId(monster_id)})
         if monster:
-            monster_image = '/static/images/monsters/' + monster.get('img_url')
+            image_name = monster.get('img_url', 'default.png')
+            monster_image = '/static/images/monsters/' + image_name
             new_monster = {
                 '_id': str(ObjectId()),
                 'name': monster['name'],
@@ -600,8 +601,8 @@ def add_monster_to_session():
                 'resumo': monster.get('resumo', ''),
                 'ataque': monster.get('ataque', 0),
                 'defesa': monster.get('defesa', 0),
-                'img_url': monster.get(monster_image, '/static/images/monsters/default.png'),
-                'spawn_som': monster.get('spawn_som', 'default.mp3')  # Adicione esta linha
+                'img_url': monster_image,
+                'spawn_som': monster.get('spawn_som', 'default.mp3')
             }
             monsters.append(new_monster)
 
@@ -614,6 +615,7 @@ def add_monster_to_session():
             socketio.emit('monster_added', new_monster, room=session_id)
 
     return jsonify({"success": True, "monster": monsters[0]})
+
 
 
 
