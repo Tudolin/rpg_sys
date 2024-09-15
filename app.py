@@ -589,10 +589,6 @@ def add_monster_to_session():
         if monster:
             # Obter o nome da imagem ou usar 'default.png' se não existir
             image_name = monster.get('img_url', 'default.png')
-
-            # Construir o caminho da imagem usando url_for
-            monster_image = url_for('static', filename='images/monsters/' + image_name)
-
             new_monster = {
                 '_id': str(ObjectId()),
                 'name': monster['name'],
@@ -605,7 +601,7 @@ def add_monster_to_session():
                 'resumo': monster.get('resumo', ''),
                 'ataque': monster.get('ataque', 0),
                 'defesa': monster.get('defesa', 0),
-                'img_url': monster_image,
+                'img_url': image_name,
                 'spawn_som': monster.get('spawn_som', 'default.mp3')
             }
             monsters.append(new_monster)

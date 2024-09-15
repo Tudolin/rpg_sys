@@ -537,7 +537,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
         monsterElement.innerHTML = `
             <h4>${monster.name}</h4>
-            <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
+            <img src="{{url_for('static, filename='images/monsters/' + ${monster.img_url} }}" alt="${monster.name}" class="monster-image">
             <form method="POST" class="monster-form" data-monster-id="${monster._id}">
                 <input type="hidden" name="monster_id" value="${monster._id}">
                 <label>HP: <input type="number" name="monster_hp" value="${monster.current_hp}" class="hp-input"> / ${monster.hp}</label><br>

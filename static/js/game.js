@@ -482,7 +482,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
         monsterElement.innerHTML = `
             <h4>${monster.name}</h4>
-            <img src="${monster.img_url}" alt="${monster.name}" class="monster-image">
+            <img src="{{url_for('static, filename='images/monsters/' + ${monster.img_url} }}" alt="${monster.name}" class="monster-image">
             <div class="monster-health-bar">
                 <div class="monster-health-fill" style="width: ${(monster.current_hp / monster.hp) * 100}%;"></div>
                 <div class="monster-health-text">HP: ${monster.current_hp} / ${monster.hp}</div>
