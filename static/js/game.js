@@ -161,6 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.success) {
                     updateManaBar(data.current_mana);
                     updateEnergyBar(data.current_energy);
+                    socket.emit('request_session_sync', { session_id: sessionId });
                 } else {
                     alert('Não foi possível usar a habilidade.');
                 }

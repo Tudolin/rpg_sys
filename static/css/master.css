@@ -1,39 +1,171 @@
 @font-face {
-    font-family: Enchanted Land;
+    font-family: 'Enchanted Land';
     src: url(/static/fonts/Seagram\ tfb.ttf);
- }
- @keyframes fadeInAnimation {
+}
+
+@keyframes fadeInAnimation {
     0% {
         opacity: 0.3;
     }
     100% {
         opacity: 1;
-     }
+    }
 }
- body {
-    font-family: Enchanted Land;
-    color: #e0e0e0;
-    background-color: #202020;
+
+/* Variáveis de cor para facilitar ajustes */
+:root {
+    --background-color: #202020;
+    --primary-color: #660000;
+    --secondary-color: #990000;
+    --text-color: #e0e0e0;
+    --card-background: #222;
+    --card-border: #660000;
+    --input-background: #333;
+    --input-text-color: #fff;
+    --button-background: #660000;
+    --button-hover-background: #990000;
+    --border-color: #ddd;
+}
+
+body {
+    font-family: 'Enchanted Land', 'Times New Roman', serif;
+    color: var(--text-color);
+    background-color: var(--background-color);
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     animation: fadeInAnimation ease 2s;
-    animation-iteration-count: 1;
     animation-fill-mode: forwards;
 }
 
-.grid-container {
+h1, h2 {
+    text-align: center;
+    color: #fff;
+    margin-top: 20px;
+}
+
+h1 {
+    font-size: 36px;
+}
+
+h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.characters-container, .monsters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.character-card, .enemy-card {
+    background-color: var(--card-background);
+    border: 2px solid var(--card-border);
+    border-radius: 10px;
+    padding: 15px;
+    width: 280px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    color: var(--text-color);
+    text-align: center;
+}
+
+.character-card p, .enemy-card h4 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.character-form, .monster-form {
+    margin-top: 10px;
+}
+
+.character-form label, .monster-form label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--text-color);
+    text-align: left;
+}
+
+.character-form input[type="number"], .monster-form input[type="number"],
+#add-monster-form select, #add-monster-form input[type="number"],
+#media-form input[type="file"], #media-form input[type="number"],
+.music-player select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--input-background);
+    color: var(--input-text-color);
+}
+
+.character-form button, .monster-form button, #add-monster-form button,
+#media-form button, .remove-monster-button, .music-player button {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--button-background);
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.character-form button:hover, .monster-form button:hover, #add-monster-form button:hover,
+#media-form button:hover, .remove-monster-button:hover, .music-player button:hover {
+    background-color: var(--button-hover-background);
+}
+
+.enemy-card .monster-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.enemy-card p {
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+#add-monster-form, #media-form, .music-player {
+    background-color: var(--card-background);
+    border: 2px solid var(--card-border);
+    padding: 20px;
+    border-radius: 10px;
+    width: 500px;
+    margin: 20px auto;
+    color: var(--text-color);
+    text-align: center;
+}
+
+#add-monster-form label, #media-form label, .music-player label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.media-section, .music-player-section {
+    margin: 40px 0;
+}
+
+#media-preview, #media-container {
     display: flex;
     justify-content: center;
     margin-top: 20px;
 }
 
-.pawn {
-    width: 50px; /* ou o tamanho que se ajustar melhor ao seu layout */
-    height: 50px;
-    background-size: cover;
-    cursor: pointer; /* opcional, para indicar que é arrastável */
-    border: 2px solid #ccc; /* opcional, para melhor visualização dos peões */
+.grid-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
 }
 
 #grid-table {
@@ -43,129 +175,27 @@
 #grid-table td {
     width: 50px;
     height: 50px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     text-align: center;
     position: relative;
 }
 
-.enemy-card {
-    background-color: #444;
-    border: 2px solid #222;
-    border-radius: 10px;
-    padding: 10px;
-    margin: 10px 0;
-    color: white;
-    width: 200px;
-    text-align: center;
-}
-
-.enemy-card h4 {
-    margin: 0 0 10px;
-}
-
-.remove-monster-button {
-    margin-top: 10px;
-    padding: 5px 10px;
-    background-color: #d9534f;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
+.pawn {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
     cursor: pointer;
-}
-
-.enemy-card p {
-    margin: 5px 0;
-}
-
-.monster-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
+    border: 2px solid #ccc;
     border-radius: 50%;
 }
 
+@media (max-width: 768px) {
+    .character-card, .enemy-card {
+        width: 100%;
+    }
 
-.media-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 10px;
-    border-radius: 8px;
-}
-
-.media-content img, .media-content video {
-    max-width: 100%;
-    max-height: 100%;
-    display: block;
-}
-
-
-.characters-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.character-card {
-    background-color: #222;
-    border: 2px solid #660000;
-    padding: 15px;
-    border-radius: 10px;
-    width: 300px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    color: #e0e0e0;
-}
-
-.character-card p {
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-}
-
-.character-form label {
-    display: block;
-    margin-bottom: 10px;
-}
-
-.character-form input[type="number"], .character-form input[type="text"] {
-    width: 100%;
-    padding: 5px;
-    margin-top: 5px;
-    border: none;
-    border-radius: 5px;
-    background-color: #333;
-    color: #fff;
-}
-
-.character-form button {
-    width: 100%;
-    padding: 10px;
-    background-color: #660000;
-    border: none;
-    border-radius: 5px;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.character-form button:hover {
-    background-color: #990000;
-}
-
-.media-upload-container {
-    margin-top: 30px;
-}
-
-.media-upload-container form {
-    background-color: #222;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #e0e0e0;
+    #add-monster-form, #media-form, .music-player {
+        width: 90%;
+    }
 }
