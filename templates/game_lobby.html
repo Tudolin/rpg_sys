@@ -183,11 +183,11 @@
             </div>
             
             
-
-<script src="{{ url_for('static', filename='js/game.js') }}"></script>
 <script type="text/javascript">
     const characterId = "{{ character['_id'] }}";
     const staticBaseUrl = "{{ url_for('static', filename='images/monsters/') }}";
     const sessionId = "{{ session_id }}";
 </script>
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+
 {% endblock %}
