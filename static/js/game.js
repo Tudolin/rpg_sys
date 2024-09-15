@@ -466,23 +466,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
     
     function updateMonsterInDOM(monster) {
-        // Ensure the monster is not already in the DOM
+        // Verifica se o monstro já está no DOM
         let existingMonster = document.querySelector(`.enemy-card[data-monster-id="${monster._id}"]`);
         if (existingMonster) {
             console.log(`Monster with ID ${monster._id} already exists. Skipping.`);
             return;
         }
     
-        // Create the monster card
+        // Cria o card do monstro
         const boardCenter = document.querySelector('.board-center');
         let monsterElement = document.createElement('div');
         monsterElement.classList.add('enemy-card');
         monsterElement.dataset.monsterId = monster._id;
         monsterElement.setAttribute('data-max-hp', monster.hp);
     
+        // Constrói a URL da imagem no JavaScript
+        const imageUrl = staticBaseUrl + monster.img_url;
+    
         monsterElement.innerHTML = `
             <h4>${monster.name}</h4>
-            <img src="{{url_for('static, filename='images/monsters/' + ${monster.img_url} }}" alt="${monster.name}" class="monster-image">
+            <img src="${imageUrl}" alt="${monster.name}" class="monster-image">
             <div class="monster-health-bar">
                 <div class="monster-health-fill" style="width: ${(monster.current_hp / monster.hp) * 100}%;"></div>
                 <div class="monster-health-text">HP: ${monster.current_hp} / ${monster.hp}</div>
