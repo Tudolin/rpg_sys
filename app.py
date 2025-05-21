@@ -36,7 +36,7 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get('SECRET_KEY') or 'a212d3b5e27f9cd2dfb8a9d18587ae51b2f88af9e1e95112'
 app.config['SESSION_PROTECTION'] = 'strong'
-app.config['SESSION_TYPE'] = 'securecookie'
+app.config['SESSION_TYPE'] = ''
 Session(app)
 
 CORS(app)
