@@ -13,7 +13,6 @@ from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    send_file, session, url_for)
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room
-from redis import Redis
 from reportlab.lib import colors, enums
 from reportlab.lib.pagesizes import A4, letter
 from reportlab.lib.units import inch
@@ -37,9 +36,7 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get('SECRET_KEY') or 'a212d3b5e27f9cd2dfb8a9d18587ae51b2f88af9e1e95112'
 app.config['SESSION_PROTECTION'] = 'strong'
-app.config['SESSION_TYPE'] = 'redis'
-app.config['SESSION_REDIS'] = Redis(host='0.0.0.0', port=6379, db=0, password=None)
-# app.config['SESSION_TYPE'] = 'filesystem' #for local host debug
+app.config['SESSION_TYPE'] = 'securecookie'
 Session(app)
 
 CORS(app)
