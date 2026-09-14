@@ -27,3 +27,7 @@ static/uploads/*
 # Virtualenv
 .venv/
 venv/
+
+# Frontend (Vue/Vite): dependências e bundle gerado pelo build
+frontend/node_modules/
+frontend/dist/

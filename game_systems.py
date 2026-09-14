@@ -19,6 +19,8 @@ def _attr(key, label, abbr=None):
 
 
 def _resource(key, label, color, governing_attribute=None):
+    """`color` usa os nomes das escolas de magia (fire/ice/storm/myth/life/
+    death/balance/gold) — o frontend mapeia cada um para a cor correspondente."""
     return {"key": key, "label": label, "color": color, "governing_attribute": governing_attribute}
 
 
@@ -33,6 +35,7 @@ SYSTEMS = {
         "tagline": "Espadas, magia e dragões — no estilo D&D / Tormenta.",
         "icon": "🗡️",
         "theme": "medieval",
+        "tone": "gold",
         "uses_class": True,
         "class_label": "Classe",
         "uses_race": True,
@@ -46,9 +49,9 @@ SYSTEMS = {
             _attr("carisma", "Carisma"),
         ],
         "resources": [
-            _resource("hp", "Vida", "red", governing_attribute="constituicao"),
-            _resource("mana", "Mana", "blue", governing_attribute="inteligencia"),
-            _resource("energia", "Energia", "yellow", governing_attribute="destreza"),
+            _resource("hp", "Vida", "fire", governing_attribute="constituicao"),
+            _resource("mana", "Mana", "ice", governing_attribute="inteligencia"),
+            _resource("energia", "Energia", "myth", governing_attribute="destreza"),
         ],
         "combat_stats": [
             _combat_stat("ataque", "Ataque", governing_attribute="forca"),
@@ -64,6 +67,7 @@ SYSTEMS = {
         "tagline": "Segredos que a mente humana não deveria conhecer.",
         "icon": "🐙",
         "theme": "cthulhu",
+        "tone": "storm",
         "uses_class": True,
         "class_label": "Ocupação",
         "uses_race": False,
@@ -77,9 +81,9 @@ SYSTEMS = {
             _attr("poder", "Poder"),
         ],
         "resources": [
-            _resource("hp", "Vida", "red", governing_attribute="constituicao"),
-            _resource("sanidade", "Sanidade", "purple", governing_attribute="poder"),
-            _resource("sorte", "Sorte", "yellow", governing_attribute="poder"),
+            _resource("hp", "Vida", "fire", governing_attribute="constituicao"),
+            _resource("sanidade", "Sanidade", "storm", governing_attribute="poder"),
+            _resource("sorte", "Sorte", "balance", governing_attribute="poder"),
         ],
         "combat_stats": [],
         "skill_label": "Perícias",
@@ -92,6 +96,7 @@ SYSTEMS = {
         "tagline": "Pó, pólvora e pistoleiros numa terra sem lei.",
         "icon": "🤠",
         "theme": "western",
+        "tone": "balance",
         "uses_class": True,
         "class_label": "Arquétipo",
         "uses_race": False,
@@ -104,8 +109,8 @@ SYSTEMS = {
             _attr("carisma", "Carisma"),
         ],
         "resources": [
-            _resource("hp", "Vida", "red", governing_attribute="constituicao"),
-            _resource("determinacao", "Determinação", "yellow", governing_attribute="carisma"),
+            _resource("hp", "Vida", "fire", governing_attribute="constituicao"),
+            _resource("determinacao", "Determinação", "balance", governing_attribute="carisma"),
         ],
         "combat_stats": [
             _combat_stat("pontaria", "Pontaria", governing_attribute="destreza"),
@@ -120,6 +125,7 @@ SYSTEMS = {
         "tagline": "Neon, implantes e corporações numa metrópole sombria.",
         "icon": "🤖",
         "theme": "cyberpunk",
+        "tone": "ice",
         "uses_class": True,
         "class_label": "Papel",
         "uses_race": False,
@@ -133,9 +139,9 @@ SYSTEMS = {
             _attr("frieza", "Frieza"),
         ],
         "resources": [
-            _resource("hp", "Vida", "red", governing_attribute="vontade"),
-            _resource("humanidade", "Humanidade", "purple", governing_attribute="vontade"),
-            _resource("energia", "Energia Cibernética", "blue", governing_attribute="tecnica"),
+            _resource("hp", "Vida", "fire", governing_attribute="vontade"),
+            _resource("humanidade", "Humanidade", "storm", governing_attribute="vontade"),
+            _resource("energia", "Energia Cibernética", "ice", governing_attribute="tecnica"),
         ],
         "combat_stats": [
             _combat_stat("ataque", "Ataque", governing_attribute="reflexos"),

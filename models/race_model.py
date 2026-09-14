@@ -1,3 +1,6 @@
+import os
+import unicodedata
+
 from local_db import ObjectId
 
 # Fixed ids for the built-in medieval races, matching the ids that
@@ -235,6 +238,7 @@ def create_default_races(db):
         }
         race_data.pop("hp_bonus", None)
         race_data["system_id"] = "medieval"
+        race_data["img_url"] = get_art_for_race(race_data["name"])
         if index < len(_LEGACY_RACE_IDS):
             db.races.update_one(
                 {"_id": ObjectId(_LEGACY_RACE_IDS[index])},
@@ -247,6 +251,26 @@ def create_default_races(db):
                 {"$set": race_data},
                 upsert=True,
             )
+
+
+def get_art_for_race(race_name):
+    """Arte da raça em static/images/races/, com fallback para default.png.
+
+    Nem toda raça tem ilustração no repositório; resolver isso aqui evita
+    que o frontend peça um arquivo inexistente e tome 404.
+    """
+    slug = "".join(
+        c for c in unicodedata.normalize("NFD", race_name.lower())
+        if unicodedata.category(c) != "Mn"
+    ).replace(" ", "_")
+    folder = os.path.join("static", "images", "races")
+
+    for candidate in (race_name.lower(), slug):
+        for extension in ("png", "jpg", "jpeg", "webp"):
+            if os.path.exists(os.path.join(folder, f"{candidate}.{extension}")):
+                return f"/static/images/races/{candidate}.{extension}"
+
+    return "/static/images/races/default.png"
 
 
 def get_races_by_system(db, system_id):

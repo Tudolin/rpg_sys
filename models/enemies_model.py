@@ -1,3 +1,5 @@
+import os
+
 from local_db import ObjectId
 
 
@@ -223,16 +225,33 @@ def remove_accents(text):
     return text.translate(accents_map)
 
 def format_sound_name(monster_name):
-    monster_name_no_accents = remove_accents(monster_name)
-    monster_sound_name = monster_name_no_accents.lower().replace(' ', '_')
-    return f"{monster_sound_name}.mp3"
+    """Som de invocação em static/spawn/, ou "" quando não houver arquivo.
+
+    Nem toda criatura tem áudio (os sistemas não-medievais não têm nenhum);
+    devolver um nome fixo fazia o navegador pedir um arquivo inexistente.
+    O frontend só toca o som quando este campo vem preenchido.
+    """
+    slug = remove_accents(monster_name).lower().replace(" ", "_")
+    filename = f"{slug}.mp3"
+    if os.path.exists(os.path.join("static", "spawn", filename)):
+        return filename
+    return ""
 
 def get_icon_for_enemy(monster_name):
-    # Remover acentos
-    monster_name_no_accents = remove_accents(monster_name)
-    monster_icon_name = monster_name_no_accents.lower().replace(' ', '_')
-    
-    return f"{monster_icon_name}.png"
+    """Nome do arquivo de arte do monstro dentro de static/images/monsters/.
+
+    A arte que acompanha o projeto é .jpg, mas esta função devolvia .png
+    fixo — ou seja, nenhuma imagem de monstro carregava. Agora procura a
+    extensão que realmente existe no disco e cai para default.png.
+    """
+    slug = remove_accents(monster_name).lower().replace(" ", "_")
+    folder = os.path.join("static", "images", "monsters")
+
+    for extension in ("jpg", "png", "jpeg", "webp"):
+        if os.path.exists(os.path.join(folder, f"{slug}.{extension}")):
+            return f"{slug}.{extension}"
+
+    return "default.png"
 
 
 def enemy_by_id(db, enemy_id):

@@ -29,6 +29,7 @@ from flask_socketio import emit, join_room, leave_room
 
 from models.character_model import normalize_character
 from models.session_model import get_session_by_id, remove_character_from_session
+from serializers import serialize_character, serialize_monster
 
 logger = logging.getLogger(__name__)
 
@@ -48,20 +49,13 @@ def _find_users_character_in_session(db, session_data, user_id):
     return None
 
 
-def _character_payload(character, class_name, race_name):
-    return {
-        "_id": str(character["_id"]),
-        "name": character["name"],
-        "system_id": character.get("system_id", "medieval"),
-        "class_name": class_name,
-        "race_name": race_name,
-        "resources": character.get("resources", {}),
-        "img_url": character.get("img_url") or "/static/images/default.png",
-    }
-
-
 def build_session_snapshot(db, session_id):
-    """The single source of truth sent to clients on join/reconnect/resync."""
+    """The single source of truth sent to clients on join/reconnect/resync.
+
+    Carries the *full* character sheet (attributes, abilities, skills), the
+    same shape `GET /api/characters` returns, so the SPA can render a
+    player's sheet straight from a live snapshot.
+    """
     session_data = get_session_by_id(db, session_id)
     if not session_data:
         return {"session_id": session_id, "characters": [], "monsters": []}
@@ -72,21 +66,9 @@ def build_session_snapshot(db, session_id):
         if not character:
             continue
         normalize_character(character)
-        class_info = db.classes.find_one({"_id": ObjectId(character["class_id"])}) if character.get("class_id") else None
-        race_info = db.races.find_one({"_id": ObjectId(character["race_id"])}) if character.get("race_id") else None
-        characters.append(_character_payload(
-            character,
-            class_info["name"] if class_info else "Desconhecido",
-            race_info["name"] if race_info else None,
-        ))
+        characters.append(serialize_character(db, character))
 
-    monsters = []
-    for monster in session_data.get("monsters", []):
-        monster = dict(monster)
-        monster["current_hp"] = monster.get("current_hp", monster.get("hp", 0))
-        monster["current_mana"] = monster.get("current_mana", monster.get("mana", 0))
-        monster["current_energia"] = monster.get("current_energia", monster.get("energia", 0))
-        monsters.append(monster)
+    monsters = [serialize_monster(monster) for monster in session_data.get("monsters", [])]
 
     return {"session_id": session_id, "characters": characters, "monsters": monsters}
 

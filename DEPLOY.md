@@ -7,10 +7,20 @@ later want to run more than one worker process.
 
 ## 1. System packages
 
+O backend é Flask + Socket.IO; o frontend é uma SPA em Vue 3 + TypeScript
+compilada pelo Vite. O Node é necessário **apenas para compilar** o
+frontend — em produção o Flask serve os arquivos estáticos gerados, sem
+nenhum processo Node rodando.
+
 ```bash
 sudo apt update
 sudo apt install -y python3 python3-venv python3-pip nginx git
-# Optional, only if you want Redis (see "Scaling beyond one process" below):
+
+# Node 20+ para compilar o frontend (uma vez, e a cada atualização):
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Opcional, só se quiser Redis (ver "Escalando além de um processo"):
 # sudo apt install -y redis-server
 ```
 
@@ -30,6 +40,18 @@ cd /opt/rpg_sys
 sudo -u rpgsys python3 -m venv /opt/rpg_sys/.venv
 sudo -u rpgsys /opt/rpg_sys/.venv/bin/pip install -r requirements.txt
 ```
+
+## 3b. Compile o frontend
+
+```bash
+cd /opt/rpg_sys/frontend
+sudo -u rpgsys npm ci
+sudo -u rpgsys npm run build      # gera frontend/dist, servido pelo Flask
+cd /opt/rpg_sys
+```
+
+Se você abrir o site sem ter rodado esse passo, a aplicação responde com
+uma página explicando que o frontend não foi compilado.
 
 ## 4. Configure
 
@@ -117,6 +139,7 @@ friends'-table game:
 cd /opt/rpg_sys
 sudo -u rpgsys git pull
 sudo -u rpgsys .venv/bin/pip install -r requirements.txt
+sudo -u rpgsys sh -c 'cd frontend && npm ci && npm run build'
 sudo -u rpgsys .venv/bin/python init_db.py   # picks up any new seed data
 sudo systemctl restart rpg-sys
 ```
@@ -148,3 +171,19 @@ your git history. If that Atlas cluster still exists and is reachable
 with those credentials, **rotate/delete it** from the MongoDB Atlas
 dashboard — being no longer *used* by the code doesn't make it any less
 *exposed* in history.
+
+## Desenvolvendo o frontend
+
+Durante o desenvolvimento, rode os dois lados separadamente — o Vite faz
+hot-reload e encaminha `/api`, `/static` e `/socket.io` para o Flask:
+
+```bash
+# terminal 1
+python app.py
+
+# terminal 2
+cd frontend && npm run dev     # http://localhost:5173
+```
+
+`npm run build` roda `vue-tsc` antes do bundle, então erros de tipo
+quebram o build em vez de virarem bug em produção.
