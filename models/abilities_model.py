@@ -1,4 +1,4 @@
-from bson import ObjectId
+from local_db import ObjectId
 
 
 def create_default_abilities(db): 
@@ -1593,11 +1593,130 @@ def create_default_abilities(db):
 
     for ability in abilities:
         ability["icon"] = get_icon_for_ability(ability["name"], ability["description"])
-        
+        ability.setdefault("system_id", "medieval")
+
+        # The seed data below uses "energy" (English); every resource key
+        # elsewhere in the medieval system (character resources, the
+        # /use_skill cost check, ...) uses "energia" (see game_systems.py).
+        # Normalize here so a skill's mana/energia cost actually matches
+        # against the character's resources dict.
+        cost = ability.get("cost")
+        if cost and "energy" in cost:
+            cost["energia"] = cost.pop("energy")
+
         db.abilities.update_one(
-            {"name": ability["name"]},
+            {"name": ability["name"], "system_id": ability["system_id"]},
             {"$set": ability},
             upsert=True
+        )
+
+
+def get_abilities_by_system(db, system_id):
+    return list(db.abilities.find({"system_id": system_id}))
+
+
+def create_default_abilities_other_systems(db):
+    """A modest, freely-selectable ability pool for each non-medieval system."""
+    other_abilities = [
+        # --- Call of Cthulhu ---
+        {"system_id": "cthulhu", "name": "Leitura Rápida", "description": "Absorve o essencial de um texto em uma fração do tempo normal.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 5}},
+        {"system_id": "cthulhu", "name": "Nervos de Aço", "description": "Resiste um pouco melhor a visões perturbadoras antes de perder a sanidade.",
+         "related_to": {"race_ids": []}, "cost": {"sanidade": 0}},
+        {"system_id": "cthulhu", "name": "Golpe de Sorte", "description": "Força um resultado ligeiramente melhor num momento crítico.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 10}},
+        {"system_id": "cthulhu", "name": "Memória Eidética", "description": "Recorda detalhes exatos de algo visto ou lido uma única vez.",
+         "related_to": {"race_ids": []}, "cost": {"sanidade": 5}},
+        {"system_id": "cthulhu", "name": "Faro Investigativo", "description": "Nota uma pista que outros passariam direto.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 5}},
+        {"system_id": "cthulhu", "name": "Sangue Frio", "description": "Mantém a compostura por mais um instante diante do inominável.",
+         "related_to": {"race_ids": []}, "cost": {"sanidade": 5}},
+        {"system_id": "cthulhu", "name": "Contatos na Imprensa", "description": "Consegue informações através de um conhecido jornalista ou editor.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 5}},
+        {"system_id": "cthulhu", "name": "Instinto de Sobrevivência", "description": "Pressente o perigo um instante antes que ele se manifeste.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 10}},
+        {"system_id": "cthulhu", "name": "Conhecimento Proibido", "description": "Recorda um fragmento de um texto oculto lido há muito tempo — ao custo da própria sanidade.",
+         "related_to": {"race_ids": []}, "cost": {"sanidade": 10}},
+        {"system_id": "cthulhu", "name": "Mão Firme", "description": "Estabiliza um ferimento grave sob pressão extrema.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 5}},
+        {"system_id": "cthulhu", "name": "Vislumbre Além do Véu", "description": "Enxerga por um instante algo que não deveria ser visto — a um custo terrível.",
+         "related_to": {"race_ids": []}, "cost": {"sanidade": 15}},
+        {"system_id": "cthulhu", "name": "Rede de Informantes", "description": "Tem um contato disposto a compartilhar um segredo por um preço.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 10}},
+        {"system_id": "cthulhu", "name": "Determinação Inabalável", "description": "Resiste a um teste de sanidade através de pura força de vontade.",
+         "related_to": {"race_ids": []}, "cost": {"sanidade": 0}},
+        {"system_id": "cthulhu", "name": "Primeiros Socorros Avançados", "description": "Trata ferimentos graves com o que tiver em mãos.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 5}},
+
+        # --- Western ---
+        {"system_id": "western", "name": "Saque Relâmpago", "description": "Desembainha e atira antes que o oponente perceba.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Olho de Águia", "description": "Acerta alvos distantes com precisão incomum.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Fôlego de Ferro", "description": "Continua de pé mesmo gravemente ferido.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 10}},
+        {"system_id": "western", "name": "Lábia de Cartola", "description": "Convence quase qualquer um numa negociação de boteco.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Cavaleiro Nato", "description": "Manobra sua montaria com perfeição mesmo em terreno difícil.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Faro para Problemas", "description": "Pressente uma emboscada antes que ela aconteça.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Tiro Certeiro", "description": "Mira com calma para garantir um golpe decisivo.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 10}},
+        {"system_id": "western", "name": "Blefe de Aço", "description": "Convence o oponente de que está em desvantagem, mesmo sem estar.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Rastreador Nato", "description": "Segue uma pista antiga que qualquer outro já teria perdido.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Coração de Ferro", "description": "Permanece firme diante de ameaças e intimidação.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Duelista Experiente", "description": "Ganha vantagem no primeiro confronto direto do dia.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 10}},
+        {"system_id": "western", "name": "Amigo dos Animais", "description": "Acalma e comanda animais assustados ou hostis.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Reviravolta na Mesa", "description": "Vira uma negociação a seu favor no último momento.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 10}},
+        {"system_id": "western", "name": "Sangue-Frio sob Fogo", "description": "Mantém a pontaria mesmo debaixo de tiroteio intenso.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 10}},
+
+        # --- Cyberpunk ---
+        {"system_id": "cyberpunk", "name": "Overclock Neural", "description": "Acelera reflexos por alguns instantes, à custa de energia cibernética.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 15}},
+        {"system_id": "cyberpunk", "name": "Invasão Silenciosa", "description": "Invade um sistema sem disparar alarmes.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 20}},
+        {"system_id": "cyberpunk", "name": "Firewall Mental", "description": "Reforça a mente contra ataques de intrusão neural.",
+         "related_to": {"race_ids": []}, "cost": {"humanidade": 5}},
+        {"system_id": "cyberpunk", "name": "Braço Cibernético", "description": "Golpe amplificado por um implante mecânico.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 10}},
+        {"system_id": "cyberpunk", "name": "Camuflagem Óptica", "description": "Um implante dobra a luz ao redor do usuário por um instante.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 20}},
+        {"system_id": "cyberpunk", "name": "Âncora Humana", "description": "Resiste à erosão da própria humanidade num momento crítico.",
+         "related_to": {"race_ids": []}, "cost": {"humanidade": 0}},
+        {"system_id": "cyberpunk", "name": "Reflexos Sintéticos", "description": "Implantes neurais aceleram uma esquiva quase impossível.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 15}},
+        {"system_id": "cyberpunk", "name": "Quebra de Criptografia", "description": "Força a entrada em um sistema fortemente protegido.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 25}},
+        {"system_id": "cyberpunk", "name": "Contato na Rede", "description": "Um fixer ou informante paga uma dívida antiga na hora certa.",
+         "related_to": {"race_ids": []}, "cost": {"humanidade": 5}},
+        {"system_id": "cyberpunk", "name": "Adrenalina Sintética", "description": "Um implante libera estimulantes que ignoram a dor por um instante.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 15}},
+        {"system_id": "cyberpunk", "name": "Rastreamento Digital", "description": "Localiza um alvo através de suas pegadas digitais.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 15}},
+        {"system_id": "cyberpunk", "name": "Encanto Corporativo", "description": "Usa etiqueta e status para abrir portas fechadas para os outros.",
+         "related_to": {"race_ids": []}, "cost": {"humanidade": 5}},
+        {"system_id": "cyberpunk", "name": "Redundância Neural", "description": "Um backup mental reduz o dano de um ataque de intrusão neural.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 20}},
+        {"system_id": "cyberpunk", "name": "Faro de Fixer", "description": "Sempre sabe onde conseguir algo — por um preço.",
+         "related_to": {"race_ids": []}, "cost": {"humanidade": 0}},
+        {"system_id": "cyberpunk", "name": "Overdrive Muscular", "description": "Implantes musculares entregam um golpe muito acima do normal.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 20}},
+    ]
+
+    for ability in other_abilities:
+        ability["icon"] = None
+        db.abilities.update_one(
+            {"name": ability["name"], "system_id": ability["system_id"]},
+            {"$set": ability},
+            upsert=True,
         )
 
 
@@ -1750,9 +1869,3 @@ def get_icon_for_ability(ability_name, ability_description):
 
 def get_ability_by_id(db, ability_id):
     return db.abilities.find_one({"_id": ObjectId(ability_id)})
-
-def get_abilities_by_race(db, race_id):
-    return list(db.abilities.find({"related_to.race_ids": ObjectId(race_id)}))
-
-def get_abilities_by_class(db, class_id):
-    return list(db.abilities.find({"related_to.class_ids": ObjectId(class_id)}))

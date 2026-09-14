@@ -1,4 +1,6 @@
-from bson import ObjectId
+import os
+
+from local_db import ObjectId
 
 
 def create_default_enemies(db):
@@ -206,10 +208,11 @@ def create_default_enemies(db):
     ]
     
     for enemy_data in enemies:
-        enemy_data["spawn_som"] = format_sound_name(enemy_data["name"])  
+        enemy_data["spawn_som"] = format_sound_name(enemy_data["name"])
         enemy_data["img_url"] = get_icon_for_enemy(enemy_data["name"])
+        enemy_data.setdefault("system_id", "medieval")
         db.enemies.update_one(
-            {"name": enemy_data["name"]},
+            {"name": enemy_data["name"], "system_id": enemy_data["system_id"]},
             {"$set": enemy_data},
             upsert=True
         )
@@ -222,17 +225,100 @@ def remove_accents(text):
     return text.translate(accents_map)
 
 def format_sound_name(monster_name):
-    monster_name_no_accents = remove_accents(monster_name)
-    monster_sound_name = monster_name_no_accents.lower().replace(' ', '_')
-    return f"{monster_sound_name}.mp3"
+    """Som de invocação em static/spawn/, ou "" quando não houver arquivo.
+
+    Nem toda criatura tem áudio (os sistemas não-medievais não têm nenhum);
+    devolver um nome fixo fazia o navegador pedir um arquivo inexistente.
+    O frontend só toca o som quando este campo vem preenchido.
+    """
+    slug = remove_accents(monster_name).lower().replace(" ", "_")
+    filename = f"{slug}.mp3"
+    if os.path.exists(os.path.join("static", "spawn", filename)):
+        return filename
+    return ""
 
 def get_icon_for_enemy(monster_name):
-    # Remover acentos
-    monster_name_no_accents = remove_accents(monster_name)
-    monster_icon_name = monster_name_no_accents.lower().replace(' ', '_')
-    
-    return f"{monster_icon_name}.png"
+    """Nome do arquivo de arte do monstro dentro de static/images/monsters/.
+
+    A arte que acompanha o projeto é .jpg, mas esta função devolvia .png
+    fixo — ou seja, nenhuma imagem de monstro carregava. Agora procura a
+    extensão que realmente existe no disco e cai para default.png.
+    """
+    slug = remove_accents(monster_name).lower().replace(" ", "_")
+    folder = os.path.join("static", "images", "monsters")
+
+    for extension in ("jpg", "png", "jpeg", "webp"):
+        if os.path.exists(os.path.join(folder, f"{slug}.{extension}")):
+            return f"{slug}.{extension}"
+
+    return "default.png"
 
 
 def enemy_by_id(db, enemy_id):
     return db.enemies.find_one({"_id": ObjectId(enemy_id)})
+
+
+def get_enemies_by_system(db, system_id):
+    return list(db.enemies.find({"system_id": system_id}))
+
+
+def create_default_enemies_other_systems(db):
+    other_enemies = [
+        # --- Call of Cthulhu ---
+        {"system_id": "cthulhu", "name": "Culto Fanático", "hp": 12, "ataque": 8, "defesa": 2, "mana": 0, "energia": 10,
+         "resumo": "Um seguidor decidido de um culto obscuro, disposto a tudo por sua entidade."},
+        {"system_id": "cthulhu", "name": "Profundo", "hp": 25, "ataque": 14, "defesa": 6, "mana": 5, "energia": 15,
+         "resumo": "Um híbrido anfíbio de aparência perturbadora, forte na água e traiçoeiro em terra."},
+        {"system_id": "cthulhu", "name": "Shoggoth", "hp": 120, "ataque": 30, "defesa": 10, "mana": 0, "energia": 40,
+         "resumo": "Uma massa protoplasmática amorfa de horror indescritível. Encontrá-la é quase sempre fatal."},
+        {"system_id": "cthulhu", "name": "Cão de Tíndalos", "hp": 30, "ataque": 18, "defesa": 8, "mana": 10, "energia": 25,
+         "resumo": "Uma criatura extradimensional que caça através dos ângulos do tempo. Evite cantos afiados."},
+        {"system_id": "cthulhu", "name": "Ghoul", "hp": 22, "ataque": 13, "defesa": 5, "mana": 0, "energia": 20,
+         "resumo": "Um necrófago humanoide que vive em cemitérios e túneis, ágil e surpreendentemente forte."},
+        {"system_id": "cthulhu", "name": "Byakhee", "hp": 28, "ataque": 15, "defesa": 6, "mana": 5, "energia": 25,
+         "resumo": "Uma criatura alada que cruza o vácuo do espaço, invocada para carregar viajantes indesejados."},
+        {"system_id": "cthulhu", "name": "Sacerdote do Culto", "hp": 16, "ataque": 10, "defesa": 4, "mana": 20, "energia": 15,
+         "resumo": "Um líder cultista com acesso a rituais menores e uma devoção fanática à sua entidade."},
+
+        # --- Western ---
+        {"system_id": "western", "name": "Bandido de Estrada", "hp": 14, "ataque": 9, "defesa": 3, "mana": 0, "energia": 10,
+         "resumo": "Um fora-da-lei oportunista à espreita de viajantes desavisados."},
+        {"system_id": "western", "name": "Pistoleiro Rival", "hp": 20, "ataque": 15, "defesa": 5, "mana": 0, "energia": 15,
+         "resumo": "Um atirador experiente com uma reputação a zelar."},
+        {"system_id": "western", "name": "Urso Pardo", "hp": 35, "ataque": 18, "defesa": 6, "mana": 0, "energia": 20,
+         "resumo": "Uma fera selvagem territorial, perigosa quando encurralada."},
+        {"system_id": "western", "name": "Cobra Cascavel", "hp": 6, "ataque": 8, "defesa": 2, "mana": 0, "energia": 10,
+         "resumo": "Pequena mas letal — seu veneno é mais perigoso que suas presas."},
+        {"system_id": "western", "name": "Quadrilha de Assaltantes", "hp": 24, "ataque": 13, "defesa": 4, "mana": 0, "energia": 18,
+         "resumo": "Um bando organizado de assaltantes de trem, coordenados e bem armados."},
+        {"system_id": "western", "name": "Xerife Corrupto", "hp": 22, "ataque": 14, "defesa": 6, "mana": 0, "energia": 15,
+         "resumo": "Usa o distintivo para proteger seus próprios interesses, não a lei."},
+        {"system_id": "western", "name": "Caçador de Recompensas Rival", "hp": 26, "ataque": 16, "defesa": 5, "mana": 0, "energia": 18,
+         "resumo": "Está atrás do mesmo alvo que você — e não pretende dividir a recompensa."},
+
+        # --- Cyberpunk ---
+        {"system_id": "cyberpunk", "name": "Capanga Corporativo", "hp": 16, "ataque": 10, "defesa": 5, "mana": 0, "energia": 10,
+         "resumo": "Segurança armado de uma megacorporação, equipado com implantes básicos."},
+        {"system_id": "cyberpunk", "name": "Drone de Combate", "hp": 18, "ataque": 12, "defesa": 8, "mana": 0, "energia": 20,
+         "resumo": "Uma unidade autônoma armada, resistente a dano físico convencional."},
+        {"system_id": "cyberpunk", "name": "Solo Cibernético", "hp": 40, "ataque": 22, "defesa": 10, "mana": 0, "energia": 25,
+         "resumo": "Um mercenário fortemente modificado, contratado para eliminar alvos específicos."},
+        {"system_id": "cyberpunk", "name": "Netrunner Hostil", "hp": 12, "ataque": 8, "defesa": 4, "mana": 0, "energia": 30,
+         "resumo": "Ataca por trás de uma tela, tentando fritar sua mente antes que você o alcance fisicamente."},
+        {"system_id": "cyberpunk", "name": "Gangue de Rua", "hp": 20, "ataque": 11, "defesa": 5, "mana": 0, "energia": 15,
+         "resumo": "Um grupo territorial armado com o que conseguiram roubar ou modificar."},
+        {"system_id": "cyberpunk", "name": "Cyberpsico", "hp": 45, "ataque": 25, "defesa": 12, "mana": 0, "energia": 30,
+         "resumo": "Alguém que perdeu a própria humanidade para os implantes. Extremamente perigoso e imprevisível."},
+        {"system_id": "cyberpunk", "name": "MAX-Tac", "hp": 30, "ataque": 20, "defesa": 15, "mana": 0, "energia": 25,
+         "resumo": "Unidade policial de elite enviada para conter ameaças de alto risco — incluindo você."},
+    ]
+
+    for enemy_data in other_enemies:
+        enemy_data["current_hp"] = enemy_data["hp"]
+        enemy_data["spawn_som"] = format_sound_name(enemy_data["name"])
+        enemy_data["img_url"] = get_icon_for_enemy(enemy_data["name"])
+        db.enemies.update_one(
+            {"name": enemy_data["name"], "system_id": enemy_data["system_id"]},
+            {"$set": enemy_data},
+            upsert=True,
+        )

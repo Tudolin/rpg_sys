@@ -1,4 +1,26 @@
-from bson import ObjectId
+import os
+import unicodedata
+
+from local_db import ObjectId
+
+# Fixed ids for the built-in medieval races, matching the ids that
+# abilities_model.py's racial ability grants (`related_to.race_ids`)
+# already reference. Without pinning these, a fresh database would assign
+# random ids on first seed and every racial ability grant would silently
+# match nothing.
+_LEGACY_RACE_IDS = [
+    "66bf65924681d1641b7a7235",  # Aggelus
+    "66bf65924681d1641b7a7236",  # Elfo
+    "66bf65924681d1641b7a7237",  # Humano
+    "66bf65924681d1641b7a7238",  # Goblin
+    "66bf65924681d1641b7a7239",  # Anão
+    "66bf65924681d1641b7a723a",  # Minotauro
+    "66bf65924681d1641b7a723b",  # Lefou
+    "66bf65924681d1641b7a723c",  # Meio-Orc
+    "66bf65924681d1641b7a723d",  # Gnomo
+    "66bf65924681d1641b7a723e",  # Tiefling
+    "66bf65924681d1641b7a723f",  # Halfling
+]
 
 
 def create_default_races(db):
@@ -201,13 +223,59 @@ def create_default_races(db):
         "resumo": "Os halflings, também chamados de hobbits ou apenas pequeninos, são uma espécie pacata e bonachona, alegre e acolhedora, baixa (ainda menores que os anões e rechonchuda, fraca, mas muito ágil e resistente a magia. Têm pés grandes e peludos, e nunca usam sapatos. Os halflings vivem em comunidades isoladas dentro do Reinado, mas nunca participam de política ou das grandes decisões dos reinos. Apreciam boa comida, conforto e paz, raramente deixando suas casas."
     }
 ]
-    for race_data in races:
-        db.races.update_one(
-            {"name": race_data["name"]},
-            {"$set": race_data},
-            upsert=True  # Isso garante que o documento seja inserido se não existir
-        )
-    # db.races.insert_many(races)
+    for index, race_data in enumerate(races):
+        race_data["attribute_bonuses"] = {
+            "forca": race_data.pop("forca_bonus", 0),
+            "destreza": race_data.pop("destreza_bonus", 0),
+            "constituicao": race_data.pop("constituicao_bonus", 0),
+            "inteligencia": race_data.pop("inteligencia_bonus", 0),
+            "sabedoria": race_data.pop("sabedoria_bonus", 0),
+            "carisma": race_data.pop("carisma_bonus", 0),
+        }
+        race_data["resource_bonuses"] = {
+            "mana": race_data.pop("mana_bonus", 0),
+            "energia": race_data.pop("energia_bonus", 0),
+        }
+        race_data.pop("hp_bonus", None)
+        race_data["system_id"] = "medieval"
+        race_data["img_url"] = get_art_for_race(race_data["name"])
+        if index < len(_LEGACY_RACE_IDS):
+            db.races.update_one(
+                {"_id": ObjectId(_LEGACY_RACE_IDS[index])},
+                {"$set": race_data},
+                upsert=True,
+            )
+        else:
+            db.races.update_one(
+                {"name": race_data["name"], "system_id": "medieval"},
+                {"$set": race_data},
+                upsert=True,
+            )
+
+
+def get_art_for_race(race_name):
+    """Arte da raça em static/images/races/, com fallback para default.png.
+
+    Nem toda raça tem ilustração no repositório; resolver isso aqui evita
+    que o frontend peça um arquivo inexistente e tome 404.
+    """
+    slug = "".join(
+        c for c in unicodedata.normalize("NFD", race_name.lower())
+        if unicodedata.category(c) != "Mn"
+    ).replace(" ", "_")
+    folder = os.path.join("static", "images", "races")
+
+    for candidate in (race_name.lower(), slug):
+        for extension in ("png", "jpg", "jpeg", "webp"):
+            if os.path.exists(os.path.join(folder, f"{candidate}.{extension}")):
+                return f"/static/images/races/{candidate}.{extension}"
+
+    return "/static/images/races/default.png"
+
+
+def get_races_by_system(db, system_id):
+    return list(db.races.find({"system_id": system_id}))
+
 
 def get_race_by_id(db, race_id):
     return db.races.find_one({"_id": ObjectId(race_id)})

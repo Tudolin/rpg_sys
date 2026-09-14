@@ -1,0 +1,24 @@
+[Unit]
+Description=RPG Sys — self-hosted tabletop RPG session manager
+After=network.target redis-server.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=rpgsys
+Group=rpgsys
+WorkingDirectory=/opt/rpg_sys
+EnvironmentFile=/opt/rpg_sys/.env
+ExecStart=/opt/rpg_sys/.venv/bin/python /opt/rpg_sys/app.py
+Restart=on-failure
+RestartSec=3
+
+# Basic sandboxing — tighten further if you know your deployment doesn't
+# need any of these.
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/rpg_sys/data /opt/rpg_sys/static/uploads /opt/rpg_sys/static/media /opt/rpg_sys/.flask_session
+
+[Install]
+WantedBy=multi-user.target

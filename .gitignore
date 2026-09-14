@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Local data (the SQLite database and its WAL/SHM files, sessions)
+/data/
+*.db
+*.db-wal
+*.db-shm
+.flask_session/
+
+# User uploads created at runtime after this commit (pre-existing sample
+# uploads already tracked in git are unaffected by this pattern)
+static/uploads/*
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Virtualenv
+.venv/
+venv/
+
+# Frontend (Vue/Vite): dependências e bundle gerado pelo build
+frontend/node_modules/
+frontend/dist/

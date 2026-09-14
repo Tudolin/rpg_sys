@@ -1,0 +1,189 @@
+@import "@fontsource/baloo-2/latin-400.css";
+@import "@fontsource/baloo-2/latin-600.css";
+@import "@fontsource/baloo-2/latin-800.css";
+@import "./tokens.css";
+
+/* Fonte de display fantasia que já acompanha o projeto (servida por /static). */
+@font-face {
+  font-family: "Enchanted Land";
+  src: url("/static/fonts/Enchanted Land.otf") format("opentype");
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  color: var(--ink-onDark);
+  background: var(--void-900);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  margin: 0 0 0.4em;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--gold-200);
+  text-shadow:
+    0 2px 0 var(--gold-700),
+    0 4px 18px rgba(240, 181, 55, 0.45);
+}
+
+h2 {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  color: var(--gold-200);
+  text-shadow: 0 2px 0 var(--gold-700);
+}
+
+h3 {
+  font-size: 1.15rem;
+  color: var(--gold-300);
+}
+
+p {
+  margin: 0 0 0.8em;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--school-ice);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ---- Formulários ------------------------------------------------------- */
+
+label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--ink-700);
+  margin-bottom: 6px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--scroll-300);
+  background: #fffdf8;
+  color: var(--ink-900);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--school-ice);
+  box-shadow: 0 0 0 3px rgba(79, 191, 232, 0.3);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* Campos sobre fundo escuro (fora dos painéis de pergaminho). */
+.on-dark label {
+  color: var(--ink-onDark-muted);
+}
+
+/* ---- Utilitários -------------------------------------------------------- */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.row-center {
+  justify-content: center;
+}
+
+.grow {
+  flex: 1;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.muted {
+  color: var(--ink-500);
+  font-size: 0.9rem;
+}
+
+.muted-on-dark {
+  color: var(--ink-onDark-muted);
+  font-size: 0.9rem;
+}
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 26px 18px 64px;
+}
+
+.page-narrow {
+  max-width: 560px;
+}
+
+/* Scrollbar temática (WebKit). */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--void-800);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold-600);
+  border-radius: var(--radius-pill);
+  border: 3px solid var(--void-800);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

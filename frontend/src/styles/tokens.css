@@ -1,0 +1,115 @@
+/* ==========================================================================
+   RPG Sys — "Academia Arcana"
+   Identidade visual: fantasia mística cartunesca.
+   Fundo de céu arcano (índigo/violeta com estrelas), painéis de pergaminho
+   com moldura de ouro entalhado, e acentos nas cores das escolas de magia.
+   ========================================================================== */
+
+:root {
+  /* ---- Ouro / metal (moldura principal da interface) ---- */
+  --gold-100: #fff3cd;
+  --gold-200: #ffe29a;
+  --gold-300: #fbcf62;
+  --gold-400: #f0b537;
+  --gold-500: #d99722;
+  --gold-600: #b3761a;
+  --gold-700: #8a5713;
+  --gold-800: #5e3a0c;
+
+  /* ---- Escolas de magia (acentos) ---- */
+  --school-fire: #ef5b45;
+  --school-fire-deep: #b8301e;
+  --school-ice: #4fbfe8;
+  --school-ice-deep: #1f7fa8;
+  --school-storm: #9169e6;
+  --school-storm-deep: #5d3bab;
+  --school-myth: #f2c832;
+  --school-myth-deep: #b8901a;
+  --school-life: #5fc96f;
+  --school-life-deep: #2d8c45;
+  --school-death: #8d7bb3;
+  --school-death-deep: #4a3b6e;
+  --school-balance: #dd9f4e;
+  --school-balance-deep: #a36b26;
+
+  /* ---- Céu arcano (fundo) ---- */
+  --void-900: #100a26;
+  --void-800: #19113a;
+  --void-700: #241a52;
+  --void-600: #32266e;
+  --nebula-violet: #5b3fa8;
+  --nebula-blue: #2a5ba8;
+
+  /* ---- Pergaminho (superfícies) ---- */
+  --scroll-50: #fffaef;
+  --scroll-100: #fdf1da;
+  --scroll-200: #f6e3c0;
+  --scroll-300: #e9cf9f;
+
+  /* ---- Tinta (texto) ---- */
+  --ink-900: #3a2410;
+  --ink-700: #5c4223;
+  --ink-500: #8a6c44;
+  --ink-onDark: #f7ecd4;
+  --ink-onDark-muted: #bcaee0;
+
+  /* ---- Semântico ---- */
+  --accent: var(--gold-400);
+  --danger: var(--school-fire);
+  --success: var(--school-life);
+
+  /* ---- Tipografia ---- */
+  --font-display: "Enchanted Land", "Baloo 2", system-ui, sans-serif;
+  --font-ui: "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+
+  /* ---- Formas ---- */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  /* ---- Profundidade cartunesca (sombra sólida + difusa) ---- */
+  --lift-1: 0 3px 0 rgba(58, 36, 16, 0.35), 0 6px 12px rgba(10, 6, 25, 0.35);
+  --lift-2: 0 6px 0 rgba(58, 36, 16, 0.35), 0 12px 24px rgba(10, 6, 25, 0.45);
+  --gloss: inset 0 2px 0 rgba(255, 255, 255, 0.55);
+
+  color-scheme: dark;
+}
+
+/* Moldura de ouro em camadas — o "quadro entalhado" que dá o ar cartunesco.
+   Usada por painéis e cartões via .frame-gold. */
+.frame-gold {
+  box-shadow:
+    0 0 0 3px var(--gold-600),
+    0 0 0 6px var(--gold-300),
+    0 0 0 9px var(--gold-700),
+    var(--lift-2);
+}
+
+.frame-gold-thin {
+  box-shadow:
+    0 0 0 2px var(--gold-600),
+    0 0 0 4px var(--gold-300),
+    0 0 0 6px var(--gold-700),
+    var(--lift-1);
+}
+
+/* Rebites nos cantos, desenhados como gradientes radiais no fundo. */
+.rivets {
+  background-image:
+    radial-gradient(circle at 10px 10px, var(--gold-300) 0 3px, var(--gold-600) 3px 4.5px, transparent 4.6px),
+    radial-gradient(circle at calc(100% - 10px) 10px, var(--gold-300) 0 3px, var(--gold-600) 3px 4.5px, transparent 4.6px),
+    radial-gradient(circle at 10px calc(100% - 10px), var(--gold-300) 0 3px, var(--gold-600) 3px 4.5px, transparent 4.6px),
+    radial-gradient(circle at calc(100% - 10px) calc(100% - 10px), var(--gold-300) 0 3px, var(--gold-600) 3px 4.5px, transparent 4.6px);
+  background-repeat: no-repeat;
+}
+
+/* Cores por escola, aplicáveis a qualquer componente que use --tone. */
+.tone-fire { --tone: var(--school-fire); --tone-deep: var(--school-fire-deep); }
+.tone-ice { --tone: var(--school-ice); --tone-deep: var(--school-ice-deep); }
+.tone-storm { --tone: var(--school-storm); --tone-deep: var(--school-storm-deep); }
+.tone-myth { --tone: var(--school-myth); --tone-deep: var(--school-myth-deep); }
+.tone-life { --tone: var(--school-life); --tone-deep: var(--school-life-deep); }
+.tone-death { --tone: var(--school-death); --tone-deep: var(--school-death-deep); }
+.tone-balance { --tone: var(--school-balance); --tone-deep: var(--school-balance-deep); }
+.tone-gold { --tone: var(--gold-400); --tone-deep: var(--gold-600); }
