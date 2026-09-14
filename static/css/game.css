@@ -1,751 +1,332 @@
-@font-face {
-    font-family: Enchanted Land;
-    src: url(/static/fonts/Seagram\ tfb.ttf);
- }
-@font-face {
-    font-family: Cardo;
-    src: url(/static/fonts/Cardo-Regular.ttf);
- }
+/* Game lobby (player view) — layout specific to game_lobby.html.
+   Shared tokens/components (buttons, popups, forms) live in style.css. */
 
- @keyframes fadeInAnimation {
-    0% {
-        opacity: 0.3;
-    }
-    100% {
-        opacity: 1;
-     }
-}
-
-.board-center {
-    flex: 1;
+.game-lobby-container {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 16px 16px 120px;
+    box-sizing: border-box;
 }
 
-.monster-image {
-    width: 60px; /* Define a largura da imagem */
-    height: 60px; /* Define a altura da imagem */
-    object-fit: cover; /* Garante que a imagem preencha o container mantendo a proporção */
-    border-radius: 50%; /* Define as bordas arredondadas */
-    margin-bottom: 10px; /* Espaçamento inferior entre a imagem e o próximo elemento */
-    display: block; /* Garante que a imagem seja exibida como um bloco */
-    margin-left: auto; /* Centraliza horizontalmente */
-    margin-right: auto; /* Centraliza horizontalmente */
+.music-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
 }
 
-
-.monster-selection {
-    margin-bottom: 10px;
-}
-
-.monster-quantity {
-    margin-bottom: 10px;
-}
-
-#added-monsters {
-    margin-top: 20px;
-}
-
-#monster-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-#monster-list li {
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.remove-monster-button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    background-color: #d9534f;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-
-.monster-image {
-    width: 60px; /* Define the width of the image */
-    height: 60px; /* Define the height of the image */
-    object-fit: cover; /* Ensure the image fills the container while maintaining aspect ratio */
-    border-radius: 50%; /* Round the image corners */
-    margin-bottom: 10px; /* Space between the image and the following element */
-    display: block; /* Display the image as a block-level element */
-    margin-left: auto; /* Center the image horizontally */
-    margin-right: auto; /* Center the image horizontally */
-}
-
-.enemy-card {
-    background-color: #333; /* Fundo mais suave */
-    border: 2px solid #555; /* Borda de cor mais suave */
-    border-radius: 15px; /* Borda levemente mais arredondada */
-    padding: 15px; /* Mais espaçamento interno */
-    margin: 10px;
-    color: #e0e0e0; /* Texto mais claro */
-    width: 180px; /* Aumenta a largura dos cards */
-    text-align: center;
-    position: relative;
-    z-index: 2;
-    flex: 0 0 auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adiciona sombra */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animação suave */
-}
-.enemy-card:hover {
-    transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* Aumenta a sombra no hover */
-}
-
-.grid-container {
+.main-content {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
-}
-
-.pawn {
-    width: 50px; /* ou o tamanho que se ajustar melhor ao seu layout */
-    height: 50px;
-    background-size: cover;
-    cursor: pointer; /* opcional, para indicar que é arrastável */
-    border: 2px solid #ccc; /* opcional, para melhor visualização dos peões */
-}
-
-#grid-table {
-    border-collapse: collapse;
-}
-
-#grid-table td {
-    width: 50px;
-    height: 50px;
-    border: 1px solid #ddd;
-    text-align: center;
-    position: relative;
-}
-
-
-.monster-health-bar {
+    align-items: flex-start;
+    gap: 20px;
     width: 100%;
-    height: 25px; /* Height of the health bar */
-    background-color: #1a1a1a;
-    border-radius: 5px;
-    margin-top: 10px;
-    position: relative;
-    border: 1px solid #660000;
-    overflow: hidden; /* Ensure the fill doesn't overflow */
+    max-width: 1200px;
+    flex-wrap: wrap;
 }
 
-.monster-health-fill {
-    height: 100%; /* Fill height should occupy 100% of the bar */
-    background: linear-gradient(to right, #ff0000, #990000); /* Gradient for health fill */
-    position: absolute;
-    transition: width 0.5s ease-in-out; /* Smooth width transition */
-    top: 0;
-    left: 0;
+.other-players,
+.player-info {
+    border: 1px solid rgba(212, 164, 55, 0.4);
+    background: linear-gradient(180deg, rgba(31, 23, 18, 0.92), rgba(22, 17, 12, 0.92));
+    box-shadow: var(--shadow-soft);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.monster-health-text {
-    position: relative;
-    z-index: 1;
+.other-players {
+    width: 260px;
+    flex-shrink: 0;
+}
+
+.other-players h3 {
+    font-family: var(--font-display);
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin: 0 0 12px;
+}
+
+.other-players ul { list-style: none; margin: 0; padding: 0; }
+
+.other-player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.other-player:hover { background: rgba(212, 164, 55, 0.1); }
+
+.player-stats p { margin: 2px 0; font-size: 0.85rem; color: var(--text); }
+.player-stats p:first-child { font-weight: bold; color: var(--accent); }
+
+.character-frame,
+.character-frame-small {
+    border-radius: 50%;
+    border: 2px solid var(--border-accent);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--surface);
+}
+
+.character-frame { width: 130px; height: 130px; margin: 0 auto 12px; border-width: 3px; }
+.character-frame-small { width: 42px; height: 42px; }
+
+.character-portrait,
+.character-portrait-small,
+.character-portrait-popup {
     width: 100%;
-    text-align: center;
-    color: #fff;
-    font-size: 10px; /* Fonte levemente maior */
-    font-weight: bold;
-    line-height: 20px; /* Centraliza verticalmente na barra */
+    height: 100%;
+    object-fit: cover;
 }
 
+.player-info { width: 340px; text-align: center; }
+.player-info h2 { margin: 4px 0 2px; }
+.player-info p { margin: 2px 0; color: var(--text-muted); font-size: 0.9rem; }
 
+/* ---- Resource orbs (HP / Mana / Energia / Sanidade / ... — whatever the
+   active game system defines) ------------------------------------------ */
 
-.dice-result {
-    position: fixed;
-    bottom: 20%;  /* Ajuste para centralizar o dado verticalmente */
-    left: 50%;
-    transform: translate(-50%, 0);
-    font-size: 3rem;  /* Aumenta o tamanho da fonte para maior visibilidade */
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 15px 30px;
-    border-radius: 10px;
+.resource-orbs {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin: 18px 0 8px;
+    flex-wrap: wrap;
+}
+
+.resource-orbs-compact { gap: 8px; margin: 6px 0 0; justify-content: flex-start; }
+
+.resource-orb {
+    --orb-color: var(--gold-500);
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: var(--ink-950);
+    border: 4px solid var(--orb-color);
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.3s ease;
-    opacity: 1;
-    z-index: 100;  /* Garante que fique acima de outros elementos */
+    overflow: hidden;
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6);
 }
+
+.resource-orbs-compact .resource-orb { width: 44px; height: 44px; border-width: 3px; }
+
+.resource-orb.resource-red { --orb-color: var(--ember-500); }
+.resource-orb.resource-blue { --orb-color: var(--arcane-500); }
+.resource-orb.resource-yellow { --orb-color: var(--gold-400); }
+.resource-orb.resource-purple { --orb-color: #7b5aa6; }
+
+.resource-fill {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 0%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--orb-color) 70%, white 10%), var(--orb-color) 90%);
+    transition: height 0.4s ease-in-out;
+}
+
+.resource-text {
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.resource-orbs-compact .resource-text { font-size: 0.62rem; }
+
+/* ---- Dice ---------------------------------------------------------- */
+
+.dice-result {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid var(--border-accent);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: var(--radius-md);
+    z-index: 60;
+}
+
+.dice-result.rolling { animation: diceRoll 1.5s ease-in-out; }
+
+@keyframes diceRoll {
+    0% { transform: translateX(-50%) rotate(0); }
+    50% { transform: translateX(-50%) rotate(360deg); }
+    100% { transform: translateX(-50%) rotate(720deg); }
+}
+
+/* ---- Monsters / board ----------------------------------------------- */
+
+.board-center {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.enemy-card {
+    background: linear-gradient(180deg, rgba(31, 23, 18, 0.95), rgba(14, 11, 8, 0.95));
+    border: 2px solid var(--ember-600);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    width: 170px;
+    text-align: center;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.2s ease;
+    list-style: none;
+}
+
+.enemy-card:hover { transform: translateY(-4px); }
+
+.enemy-card h4 { margin: 4px 0; color: var(--accent); font-family: var(--font-display); font-size: 1rem; }
+.enemy-card p { font-size: 0.78rem; color: var(--text-muted); }
+
+.monster-image {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--ember-500);
+    margin: 4px auto;
+    display: block;
+}
+
+.monster-health-bar {
+    width: 100%;
+    height: 18px;
+    background: var(--ink-950);
+    border: 1px solid var(--ember-600);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+    margin-top: 8px;
+}
+
+.monster-health-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--ember-500), var(--ember-600));
+    transition: width 0.4s ease-in-out;
+}
+
+.monster-health-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ---- Bottom skill bar ------------------------------------------------- */
 
 .bottom-bar {
     position: fixed;
     bottom: 0;
-    width: 100%;
-    height: 80px; /* Increase height to accommodate skills */
-    background-color: rgba(0, 0, 0, 0.9);
+    left: 0;
+    right: 0;
+    background: linear-gradient(0deg, rgba(6, 4, 3, 0.97), rgba(6, 4, 3, 0.85));
+    border-top: 1px solid rgba(212, 164, 55, 0.35);
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    z-index: 10;
-    padding: 10px;
-    box-sizing: border-box;
+    gap: 10px;
+    padding: 8px 14px;
+    z-index: 40;
+    overflow-x: auto;
 }
 
 .skills-bar {
     display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 70%; /* Adjust width according to the number of skills */
+    gap: 10px;
+    flex: 1;
+    overflow-x: auto;
+    padding-bottom: 2px;
 }
 
 .skill-icon {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 2px;
+    min-width: 64px;
+    padding: 6px 8px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background 0.15s ease;
     text-align: center;
-    margin: 0 5px;
 }
 
-.skill-icon img {
-    width: 40px;
-    margin-bottom: 5px;
-}
-
-.skill-cost {
-    font-size: 12px;
-    color: white;
-}
+.skill-icon:hover { background: rgba(212, 164, 55, 0.15); }
+.skill-icon img { width: 32px; height: 32px; border-radius: 50%; }
+.skill-icon span { font-size: 0.72rem; color: var(--text); }
+.skill-cost { font-size: 0.62rem !important; color: var(--gold-400) !important; }
 
 .bottom-bar-icon {
-    margin: 0 10px;
-    text-align: center;
-    color: white;
-    cursor: pointer;
-}
-
-
-
-.dice-result.rolling {
-    animation: diceRoll 1.5s ease-in-out;
-}
-
-
-@keyframes diceRoll {
-    0% { transform: translateX(-50%) rotate(0); }
-    25% { transform: translateX(-50%) rotate(180deg); }
-    50% { transform: translateX(-50%) rotate(360deg); }
-    75% { transform: translateX(-50%) rotate(540deg); }
-    100% { transform: translateX(-50%) rotate(720deg); }
-}
-
-
-
-body {
-    font-family: Enchanted Land;
-    color: #e0e0e0;
-    background-color: #202020;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    animation: fadeInAnimation ease 2s;
-    animation-iteration-count: 1;
-    animation-fill-mode: forwards;
-}
-.navbar-toggler {
-    background-color: #c25757; /* Cor de fundo do botão */
-    border-color: #c25757; /* Cor da borda do botão */
-    transition: background-color 0.3s ease; /* Animação de transição */
-}
-
-.game-lobby-container {
     display: flex;
-    font-family: Cardo;
     flex-direction: column;
-    justify-content: flex-start;
     align-items: center;
-    width: 100%;
-    min-height: 100vh;
-    background-image: url('/static/images/rpg_background.jpg');
-    background-size: cover;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-/* Adiciona a estrutura do layout principal */
-.main-content {
-    font-family: Cardo;
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 1200px;
-    flex-wrap: wrap;
-}
-
-/* Seção de informações do jogador */
-.player-info {
-    font-family: Cardo;
-    border: 2px solid #660000;
-    background-color: rgba(0, 0, 0, 0.85);
-    padding: 20px;
-    border-radius: 15px;
-    width: 45%;
-    max-width: 600px;
-    box-sizing: border-box;
-    text-align: center;
-    margin: 20px auto;
-}
-
-.character-frame {
-    width: 150px;
-    height: 150px;
-    margin: 0 auto 15px;
-    background: url('/static/images/character_frame.png') no-repeat center center;
-    background-size: contain;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.character-frame-small {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-    background: url('/static/images/character_frame_small.png') no-repeat center center;
-    background-size: contain;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.profile-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.profile-image {
-    border-radius: 50%;
-    overflow: hidden;
-    width: 50px; /* Tamanho desejado para a imagem */
-    height: 50px; /* Tamanho desejado para a imagem */
-    margin-right: 10px; /* Espaço entre a imagem e o nome */
-    flex-shrink: 0;
-}
-
-.character-portrait-popup {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Garante que a imagem seja redimensionada corretamente */
-}
-
-.profile-header h2 {
-    margin: 0;
-    font-size: 1.5rem; /* Ajuste o tamanho da fonte conforme necessário */
-}
-
-
-.character-portrait {
-    width: 85%;  /* Ajuste o tamanho da imagem para caber na moldura */
-    height: 85%; /* Ajuste o tamanho da imagem para caber na moldura */
-    border-radius: 50%;
-    object-fit: cover; /* Garante que a imagem seja redimensionada corretamente */
-}
-
-.character-portrait-small {
-    width: 85%; /* Ajuste o tamanho da imagem para caber na moldura */
-    height: 85%; /* Ajuste o tamanho da imagem para caber na moldura */
-    border-radius: 50%;
-    object-fit: cover; /* Garante que a imagem seja redimensionada corretamente */
-}
-
-.stats-container h2 {
-    font-family: Cardo;
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-
-.stats-container p {
-    font-size: 16px;
-    margin: 5px 0;
-}
-
-.health-ball {
-    width: 100px;
-    height: 100px;
-    background-color: #1a1a1a;
-    border-radius: 50%;
-    border: 5px solid #660000;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    margin: 20px auto;
-}
-
-.mana-ball {
-    width: 100px;
-    height: 100px;
-    background-color: #1a1a1a;
-    border-radius: 50%;
-    border: 5px solid #000066; /* Borda azul */
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    margin: 20px auto;
-}
-
-.mana-fill {
-    background: radial-gradient(circle, #0000ff 0%, #000099 100%); /* Preenchimento azul */
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    transition: height 0.5s ease-in-out;
-    border-radius: 50%;
-}
-
-.mana-text {
-    position: absolute;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 1;
-}
-
-.energy-ball {
-    width: 100px;
-    height: 100px;
-    background-color: #1a1a1a;
-    border-radius: 50%;
-    border: 5px solid #666600; /* Borda amarela */
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    margin: 20px auto;
-}
-
-.energy-fill {
-    background: radial-gradient(circle, #ffff00 0%, #999900 100%); /* Preenchimento amarelo */
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    transition: height 0.5s ease-in-out;
-    border-radius: 50%;
-}
-
-.energy-text {
-    position: absolute;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 1;
-}
-
-.health-mana-energy-bars {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin-top: 20px;
-}
-
-
-.health-fill {
-    background: radial-gradient(circle, #ff0000 0%, #990000 100%);
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    transition: height 0.5s ease-in-out;
-    border-radius: 50%;
-}
-
-.health-text {
-    position: absolute;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 1;
-}
-
-/* Seção de outros jogadores */
-.other-players {
-    font-family: Cardo;
-    border: 2px solid #660000;
-    background-color: rgba(0, 0, 0, 0.85);
-    padding: 20px;
-    border-radius: 15px;
-    width: 25%;
-    margin-right: 20px;
-    max-width: 300px;
-    box-sizing: border-box;
-    margin: 20px;
-    text-align: left;
-}
-
-.other-players h3 {
-    font-size: 18px;
-    margin-bottom: 15px;
-}
-
-.other-players ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.other-players li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    transition: transform 0.2s ease-in-out;
-}
-
-.character-frame-small {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
-    background: url('/static/images/character_frame_small.png') no-repeat center center;
-    background-size: contain;
-}
-
-.character-portrait-small {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-}
-
-.player-stats p {
-    font-family: Cardo;
-    color: #fff;
-    font-size: 14px;
-    margin: 2px 0;
-}
-
-.bottom-bar-icon {
-    margin: 0 10px;
-    text-align: center;
-    color: white;
+    gap: 2px;
+    color: var(--text);
     cursor: pointer;
-    flex: 1;
+    flex-shrink: 0;
+    font-size: 0.72rem;
 }
 
 .bottom-bar-icon-img {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    margin-bottom: 5px;
+    border: 2px solid var(--border-accent);
 }
 
-/* Popups */
-.popup {
-    display: none;
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
+/* ---- Tabletop pawn row ------------------------------------------------ */
+
+.grid-container { display: flex; justify-content: center; margin: 24px 0; overflow-x: auto; }
+#grid-table { border-collapse: collapse; }
+#grid-table td { width: 56px; height: 56px; border: 1px solid rgba(212, 164, 55, 0.25); }
+.pawn {
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    overflow: auto;
+    background-size: cover;
+    background-position: center;
+    cursor: grab;
+    border-radius: 50%;
 }
+.pawn.dragging { opacity: 0.5; }
 
-.popup-content {
-    background-color: #1a1a1a;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #660000;
-    width: 80%;
-    max-width: 400px;
-    color: white;
-    border-radius: 10px;
-    box-sizing: border-box;
-}
+/* ---- Media popup ------------------------------------------------------ */
 
-.close-button {
-    color: #aaa;
-    float: right;
-    font-size: 24px;
-    font-weight: bold;
-}
+.media-popup .popup-content { max-width: 720px; }
+#media-container img,
+#media-container video { max-width: 100%; border-radius: var(--radius-md); display: block; margin: 0 auto; }
 
-.close-button:hover,
-.close-button:focus {
-    color: white;
-    text-decoration: none;
-    cursor: pointer;
-}
+/* ---- Mobile --------------------------------------------------------- */
 
-.close-button:hover,
-.close-button:focus {
-    color: white;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.media-popup .media-content img,
-.media-popup .media-content video {
-    max-width: 100%;
-    max-height: 80vh; /* Limit height to 80% of viewport height */
-    display: block;
-    margin: 0 auto;
-}
-
-
-@media (max-width: 768px) {
-    .dice-result {
-        font-size: 2rem;  /* Adjust font size for smaller screens */
-    }
-
-    .skills-bar {
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .skill-icon img {
-        width: 35px;  /* Adjust for smaller screens */
-    }
-
-    .skill-icon span {
-        font-size: 12px;
-    }
-
-    .skill-cost {
-        font-size: 10px;
-    }
-
-    .main-content {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .player-info {
-        width: 90%;
-        max-width: 100%;
-    }
-
-    .enemy-card {
-        width: 120px; /* Adjust width for smaller screens */
-    }
-
-    .other-players {
-        width: 90%;
-        max-width: 100%;
-        margin: 20px auto;
-    }
-
-    .character-frame {
-        width: 100px;
-        height: 100px;
-    }
-
-    .character-frame-small {
-        width: 35px;
-        height: 35px;
-    }
-
-    .health-ball {
-        width: 80px;
-        height: 80px;
-    }
-
-    .health-text {
-        font-size: 12px;
-    }
-
-    .popup-content {
-        width: 90%;
-        margin: 20% auto;
-    }
-}
-
-@media (max-width: 480px) {
-    .dice-result {
-        font-size: 1.5rem;
-    }
-
-    .skill-icon img {
-        width: 30px;
-    }
-
-    .skill-icon span {
-        font-size: 10px;
-    }
-
-    .skill-cost {
-        font-size: 8px;
-    }
-
-    .character-frame {
-        width: 80px;
-        height: 80px;
-    }
-
-    .character-frame-small {
-        width: 30px;
-        height: 30px;
-    }
-
-    .bottom-bar-icon {
-        margin: 0 5px;
-    }
-
-    .popup-content {
-        padding: 10px;
-        width: 90%;
-    }
-
-    .stats-container h2 {
-        font-size: 18px;
-    }
-
-    .stats-container p {
-        font-size: 14px;
-    }
-
-    .other-players h3 {
-        font-size: 16px;
-    }
-
-    .player-stats p {
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 768px) {
-    .mana-ball,
-    .energy-ball {
-        width: 80px;
-        height: 80px;
-    }
-
-    .mana-text,
-    .energy-text {
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .mana-ball,
-    .energy-ball {
-        width: 60px;
-        height: 60px;
-    }
-
-    .mana-text,
-    .energy-text {
-        font-size: 10px;
-    }
+@media (max-width: 760px) {
+    .main-content { flex-direction: column; align-items: center; }
+    .other-players, .player-info { width: 100%; max-width: 420px; }
+    .resource-orb { width: 68px; height: 68px; }
+    .bottom-bar { padding: 6px 8px; }
+    .skill-icon { min-width: 54px; }
 }

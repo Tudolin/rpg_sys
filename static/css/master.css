@@ -1,201 +1,129 @@
-@font-face {
-    font-family: 'Enchanted Land';
-    src: url(/static/fonts/Seagram\ tfb.ttf);
+/* Master control panel — layout specific to master_control.html.
+   Shared tokens/components (buttons, popups, forms) live in style.css. */
+
+.master-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
 }
 
-@keyframes fadeInAnimation {
-    0% {
-        opacity: 0.3;
-    }
-    100% {
-        opacity: 1;
-    }
+.master-section h2 {
+    text-align: left;
+    border-bottom: 1px solid rgba(212, 164, 55, 0.3);
+    padding-bottom: 8px;
 }
 
-/* Variáveis de cor para facilitar ajustes */
-:root {
-    --background-color: #202020;
-    --primary-color: #660000;
-    --secondary-color: #990000;
-    --text-color: #e0e0e0;
-    --card-background: #222;
-    --card-border: #660000;
-    --input-background: #333;
-    --input-text-color: #fff;
-    --button-background: #660000;
-    --button-hover-background: #990000;
-    --border-color: #ddd;
-}
-
-body {
-    font-family: 'Enchanted Land', 'Times New Roman', serif;
-    color: var(--text-color);
-    background-color: var(--background-color);
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    animation: fadeInAnimation ease 2s;
-    animation-fill-mode: forwards;
-}
-
-h1, h2 {
-    text-align: center;
-    color: #fff;
-    margin-top: 20px;
-}
-
-h1 {
-    font-size: 36px;
-}
-
-h2 {
-    font-size: 28px;
-    margin-bottom: 20px;
-}
-
-.characters-container, .monsters-container {
+.characters-container,
+.monsters-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    margin: 20px 0;
+    gap: 16px;
 }
 
-.character-card, .enemy-card {
-    background-color: var(--card-background);
-    border: 2px solid var(--card-border);
-    border-radius: 10px;
-    padding: 15px;
-    width: 280px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    color: var(--text-color);
+.character-card,
+.enemy-card {
+    background: linear-gradient(180deg, rgba(31, 23, 18, 0.95), rgba(14, 11, 8, 0.95));
+    border: 1px solid var(--border-accent);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    width: 240px;
+    box-shadow: var(--shadow-soft);
+    color: var(--text);
     text-align: center;
+    list-style: none;
 }
 
 .character-card p, .enemy-card h4 {
-    font-size: 20px;
-    font-weight: bold;
-    color: #fff;
-    margin-bottom: 10px;
+    font-family: var(--font-display);
+    color: var(--accent);
+    font-size: 1.05rem;
+    margin: 0 0 10px;
 }
 
-.character-form, .monster-form {
-    margin-top: 10px;
-}
-
-.character-form label, .monster-form label {
+.character-form label,
+.monster-form label {
     display: block;
-    margin-bottom: 10px;
-    color: var(--text-color);
     text-align: left;
+    font-size: 0.82rem;
+    margin-bottom: 6px;
 }
 
-.character-form input[type="number"], .monster-form input[type="number"],
-#add-monster-form select, #add-monster-form input[type="number"],
-#media-form input[type="file"], #media-form input[type="number"],
-.music-player select {
+.character-form input,
+.monster-form input {
+    margin-bottom: 8px;
+    padding: 6px 8px;
+}
+
+.character-form button,
+.monster-form button {
     width: 100%;
     padding: 8px;
-    margin-top: 5px;
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    background-color: var(--input-background);
-    color: var(--input-text-color);
+    margin-top: 4px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-accent);
+    background: var(--surface-raised);
+    color: var(--text);
+    font-weight: bold;
+    cursor: pointer;
 }
 
-.character-form button, .monster-form button, #add-monster-form button,
-#media-form button, .remove-monster-button, .music-player button {
+.character-form button:hover,
+.monster-form button:hover { background: var(--gold-600); }
+
+.remove-player-button,
+.remove-monster-button {
     width: 100%;
-    padding: 10px;
-    background-color: var(--button-background);
-    border: none;
-    border-radius: 5px;
-    color: #fff;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--ember-500);
+    background: rgba(177, 51, 42, 0.2);
+    color: #ffe0dc;
     cursor: pointer;
     font-weight: bold;
-    transition: background-color 0.3s ease;
+}
+
+.remove-player-button:hover,
+.remove-monster-button:hover { background: var(--ember-600); }
+
+.enemy-card .monster-image {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--ember-500);
+    margin-bottom: 8px;
+}
+
+#monster-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 16px; }
+
+#add-monster-form,
+#media-form,
+.music-player {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.media-section, .music-player-section { margin: 0; }
+
+#media-container { margin-top: 16px; }
+#media-container img, #media-container video { max-width: 100%; border-radius: var(--radius-md); }
+
+#music-player {
+    text-align: center;
+    color: var(--text-muted);
     margin-top: 10px;
 }
 
-.character-form button:hover, .monster-form button:hover, #add-monster-form button:hover,
-#media-form button:hover, .remove-monster-button:hover, .music-player button:hover {
-    background-color: var(--button-hover-background);
-}
+.grid-container { display: flex; justify-content: center; margin-top: 10px; overflow-x: auto; }
+#grid-table { border-collapse: collapse; }
+#grid-table td { width: 56px; height: 56px; border: 1px solid rgba(212, 164, 55, 0.25); }
+.pawn { width: 100%; height: 100%; background-size: cover; background-position: center; cursor: grab; border-radius: 50%; }
+.pawn.dragging { opacity: 0.5; }
 
-.enemy-card .monster-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-bottom: 10px;
-}
-
-.enemy-card p {
-    font-size: 14px;
-    margin: 10px 0;
-}
-
-#add-monster-form, #media-form, .music-player {
-    background-color: var(--card-background);
-    border: 2px solid var(--card-border);
-    padding: 20px;
-    border-radius: 10px;
-    width: 500px;
-    margin: 20px auto;
-    color: var(--text-color);
-    text-align: center;
-}
-
-#add-monster-form label, #media-form label, .music-player label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
-}
-
-.media-section, .music-player-section {
-    margin: 40px 0;
-}
-
-#media-preview, #media-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.grid-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 40px;
-}
-
-#grid-table {
-    border-collapse: collapse;
-}
-
-#grid-table td {
-    width: 50px;
-    height: 50px;
-    border: 1px solid var(--border-color);
-    text-align: center;
-    position: relative;
-}
-
-.pawn {
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    cursor: pointer;
-    border: 2px solid #ccc;
-    border-radius: 50%;
-}
-
-@media (max-width: 768px) {
-    .character-card, .enemy-card {
-        width: 100%;
-    }
-
-    #add-monster-form, #media-form, .music-player {
-        width: 90%;
-    }
+@media (max-width: 760px) {
+    .character-card, .enemy-card { width: 100%; max-width: 320px; }
 }

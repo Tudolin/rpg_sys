@@ -1,4 +1,4 @@
-from bson import ObjectId
+from local_db import ObjectId
 
 
 def create_default_enemies(db):
@@ -206,10 +206,11 @@ def create_default_enemies(db):
     ]
     
     for enemy_data in enemies:
-        enemy_data["spawn_som"] = format_sound_name(enemy_data["name"])  
+        enemy_data["spawn_som"] = format_sound_name(enemy_data["name"])
         enemy_data["img_url"] = get_icon_for_enemy(enemy_data["name"])
+        enemy_data.setdefault("system_id", "medieval")
         db.enemies.update_one(
-            {"name": enemy_data["name"]},
+            {"name": enemy_data["name"], "system_id": enemy_data["system_id"]},
             {"$set": enemy_data},
             upsert=True
         )
@@ -236,3 +237,45 @@ def get_icon_for_enemy(monster_name):
 
 def enemy_by_id(db, enemy_id):
     return db.enemies.find_one({"_id": ObjectId(enemy_id)})
+
+
+def get_enemies_by_system(db, system_id):
+    return list(db.enemies.find({"system_id": system_id}))
+
+
+def create_default_enemies_other_systems(db):
+    other_enemies = [
+        # --- Call of Cthulhu ---
+        {"system_id": "cthulhu", "name": "Culto Fanático", "hp": 12, "ataque": 8, "defesa": 2, "mana": 0, "energia": 10,
+         "resumo": "Um seguidor decidido de um culto obscuro, disposto a tudo por sua entidade."},
+        {"system_id": "cthulhu", "name": "Profundo", "hp": 25, "ataque": 14, "defesa": 6, "mana": 5, "energia": 15,
+         "resumo": "Um híbrido anfíbio de aparência perturbadora, forte na água e traiçoeiro em terra."},
+        {"system_id": "cthulhu", "name": "Shoggoth", "hp": 120, "ataque": 30, "defesa": 10, "mana": 0, "energia": 40,
+         "resumo": "Uma massa protoplasmática amorfa de horror indescritível. Encontrá-la é quase sempre fatal."},
+
+        # --- Western ---
+        {"system_id": "western", "name": "Bandido de Estrada", "hp": 14, "ataque": 9, "defesa": 3, "mana": 0, "energia": 10,
+         "resumo": "Um fora-da-lei oportunista à espreita de viajantes desavisados."},
+        {"system_id": "western", "name": "Pistoleiro Rival", "hp": 20, "ataque": 15, "defesa": 5, "mana": 0, "energia": 15,
+         "resumo": "Um atirador experiente com uma reputação a zelar."},
+        {"system_id": "western", "name": "Urso Pardo", "hp": 35, "ataque": 18, "defesa": 6, "mana": 0, "energia": 20,
+         "resumo": "Uma fera selvagem territorial, perigosa quando encurralada."},
+
+        # --- Cyberpunk ---
+        {"system_id": "cyberpunk", "name": "Capanga Corporativo", "hp": 16, "ataque": 10, "defesa": 5, "mana": 0, "energia": 10,
+         "resumo": "Segurança armado de uma megacorporação, equipado com implantes básicos."},
+        {"system_id": "cyberpunk", "name": "Drone de Combate", "hp": 18, "ataque": 12, "defesa": 8, "mana": 0, "energia": 20,
+         "resumo": "Uma unidade autônoma armada, resistente a dano físico convencional."},
+        {"system_id": "cyberpunk", "name": "Solo Cibernético", "hp": 40, "ataque": 22, "defesa": 10, "mana": 0, "energia": 25,
+         "resumo": "Um mercenário fortemente modificado, contratado para eliminar alvos específicos."},
+    ]
+
+    for enemy_data in other_enemies:
+        enemy_data["current_hp"] = enemy_data["hp"]
+        enemy_data["spawn_som"] = format_sound_name(enemy_data["name"])
+        enemy_data["img_url"] = get_icon_for_enemy(enemy_data["name"])
+        db.enemies.update_one(
+            {"name": enemy_data["name"], "system_id": enemy_data["system_id"]},
+            {"$set": enemy_data},
+            upsert=True,
+        )

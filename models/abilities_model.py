@@ -1,4 +1,4 @@
-from bson import ObjectId
+from local_db import ObjectId
 
 
 def create_default_abilities(db): 
@@ -1593,11 +1593,80 @@ def create_default_abilities(db):
 
     for ability in abilities:
         ability["icon"] = get_icon_for_ability(ability["name"], ability["description"])
-        
+        ability.setdefault("system_id", "medieval")
+
+        # The seed data below uses "energy" (English); every resource key
+        # elsewhere in the medieval system (character resources, the
+        # /use_skill cost check, ...) uses "energia" (see game_systems.py).
+        # Normalize here so a skill's mana/energia cost actually matches
+        # against the character's resources dict.
+        cost = ability.get("cost")
+        if cost and "energy" in cost:
+            cost["energia"] = cost.pop("energy")
+
         db.abilities.update_one(
-            {"name": ability["name"]},
+            {"name": ability["name"], "system_id": ability["system_id"]},
             {"$set": ability},
             upsert=True
+        )
+
+
+def get_abilities_by_system(db, system_id):
+    return list(db.abilities.find({"system_id": system_id}))
+
+
+def create_default_abilities_other_systems(db):
+    """A modest, freely-selectable ability pool for each non-medieval system."""
+    other_abilities = [
+        # --- Call of Cthulhu ---
+        {"system_id": "cthulhu", "name": "Leitura Rápida", "description": "Absorve o essencial de um texto em uma fração do tempo normal.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 5}},
+        {"system_id": "cthulhu", "name": "Nervos de Aço", "description": "Resiste um pouco melhor a visões perturbadoras antes de perder a sanidade.",
+         "related_to": {"race_ids": []}, "cost": {"sanidade": 0}},
+        {"system_id": "cthulhu", "name": "Golpe de Sorte", "description": "Força um resultado ligeiramente melhor num momento crítico.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 10}},
+        {"system_id": "cthulhu", "name": "Memória Eidética", "description": "Recorda detalhes exatos de algo visto ou lido uma única vez.",
+         "related_to": {"race_ids": []}, "cost": {"sanidade": 5}},
+        {"system_id": "cthulhu", "name": "Faro Investigativo", "description": "Nota uma pista que outros passariam direto.",
+         "related_to": {"race_ids": []}, "cost": {"sorte": 5}},
+        {"system_id": "cthulhu", "name": "Sangue Frio", "description": "Mantém a compostura por mais um instante diante do inominável.",
+         "related_to": {"race_ids": []}, "cost": {"sanidade": 5}},
+
+        # --- Western ---
+        {"system_id": "western", "name": "Saque Relâmpago", "description": "Desembainha e atira antes que o oponente perceba.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Olho de Águia", "description": "Acerta alvos distantes com precisão incomum.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Fôlego de Ferro", "description": "Continua de pé mesmo gravemente ferido.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 10}},
+        {"system_id": "western", "name": "Lábia de Cartola", "description": "Convence quase qualquer um numa negociação de boteco.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Cavaleiro Nato", "description": "Manobra sua montaria com perfeição mesmo em terreno difícil.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+        {"system_id": "western", "name": "Faro para Problemas", "description": "Pressente uma emboscada antes que ela aconteça.",
+         "related_to": {"race_ids": []}, "cost": {"determinacao": 5}},
+
+        # --- Cyberpunk ---
+        {"system_id": "cyberpunk", "name": "Overclock Neural", "description": "Acelera reflexos por alguns instantes, à custa de energia cibernética.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 15}},
+        {"system_id": "cyberpunk", "name": "Invasão Silenciosa", "description": "Invade um sistema sem disparar alarmes.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 20}},
+        {"system_id": "cyberpunk", "name": "Firewall Mental", "description": "Reforça a mente contra ataques de intrusão neural.",
+         "related_to": {"race_ids": []}, "cost": {"humanidade": 5}},
+        {"system_id": "cyberpunk", "name": "Braço Cibernético", "description": "Golpe amplificado por um implante mecânico.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 10}},
+        {"system_id": "cyberpunk", "name": "Camuflagem Óptica", "description": "Um implante dobra a luz ao redor do usuário por um instante.",
+         "related_to": {"race_ids": []}, "cost": {"energia": 20}},
+        {"system_id": "cyberpunk", "name": "Âncora Humana", "description": "Resiste à erosão da própria humanidade num momento crítico.",
+         "related_to": {"race_ids": []}, "cost": {"humanidade": 0}},
+    ]
+
+    for ability in other_abilities:
+        ability["icon"] = None
+        db.abilities.update_one(
+            {"name": ability["name"], "system_id": ability["system_id"]},
+            {"$set": ability},
+            upsert=True,
         )
 
 
@@ -1750,9 +1819,3 @@ def get_icon_for_ability(ability_name, ability_description):
 
 def get_ability_by_id(db, ability_id):
     return db.abilities.find_one({"_id": ObjectId(ability_id)})
-
-def get_abilities_by_race(db, race_id):
-    return list(db.abilities.find({"related_to.race_ids": ObjectId(race_id)}))
-
-def get_abilities_by_class(db, class_id):
-    return list(db.abilities.find({"related_to.class_ids": ObjectId(class_id)}))

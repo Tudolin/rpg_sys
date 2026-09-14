@@ -3,30 +3,51 @@
 {% block title %}Sessões{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
-    <h1>Lobby das Sessões</h1>
+<h1>Sessões</h1>
+
+<div class="panel" style="max-width:700px;margin:0 auto 30px;">
+    <h2>Criar Nova Sessão</h2>
     <form method="POST">
-        <input type="text" name="session_name" placeholder="Nome da Sessão" required>
-        <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i>  Criar Sessão</button>
+        <label for="session_name">Nome da Sessão</label>
+        <input type="text" id="session_name" name="session_name" placeholder="Ex: A Torre Esquecida" required>
+
+        <label>Sistema de Jogo</label>
+        <div class="system-picker">
+            {% for sys in system_choices %}
+            <input type="radio" name="system_id" id="system-{{ sys.id }}" value="{{ sys.id }}" {% if loop.first %}checked{% endif %}>
+            <label for="system-{{ sys.id }}">
+                <span class="system-icon">{{ sys.icon }}</span>
+                <span class="system-name">{{ sys.name }}</span>
+                <span class="system-tagline">{{ sys.tagline }}</span>
+            </label>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">🎲 Criar Sessão</button>
     </form>
+</div>
 
-    <h2 class="mt-4">Sessões Disponíveis</h2>
-    <ul class="list-unstyled">
-        {% for session in sessions %}
-            <li class="media my-4">
-                <div class="media-body">
-                    <h5 class="mt-0 mb-1">{{ session['name'] }}</h5>
-                    <p>Criada por: {{ session['creator_name'] }} (ID Criador: {{ session['created_by'] }} | ID Usuário: {{ session['userId'] }})</p>
-                    <a href="{{ url_for('join_session', session_id=session['_id']) }}" class="btn btn-primary btn-sm"><i class="bi bi-controller"></i>  Entrar na Sessão</a>
+<h2>Sessões Disponíveis</h2>
+{% if sessions %}
+<ul class="card-list" style="flex-direction:column; align-items:stretch;">
+    {% for sess in sessions %}
+    <li class="panel">
+        <h3 style="text-align:left; margin:0 0 4px;">{{ sess.system.icon }} {{ sess.name }}</h3>
+        <span class="badge">{{ sess.system.name }}</span>
+        <p style="color:var(--text-muted); font-size:0.85rem;">Criada por {{ sess.creator_name }}</p>
 
-                    {% if session['created_by'] == session['userId'] %}
-                        <form method="POST" action="{{ url_for('delete_session', session_id=session['_id']) }}" class="d-inline">
-                            <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i>  Excluir Sessão</button>
-                        </form>
-                        <a href="{{ url_for('master_control', session_id=session['_id']) }}" class="btn btn-warning btn-sm"><i class="bi bi-dice-6"></i>  Entrar como Mestre</a>
-                    {% endif %}
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
+        <a href="{{ url_for('join_session', session_id=sess._id) }}" class="btn btn-primary btn-sm">🚪 Entrar na Sessão</a>
+
+        {% if sess.created_by == sess.userId %}
+            <form method="POST" action="{{ url_for('delete_session', session_id=sess._id) }}" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Excluir esta sessão?');">🗑️ Excluir</button>
+            </form>
+            <a href="{{ url_for('master_control', session_id=sess._id) }}" class="btn btn-warning btn-sm">👑 Entrar como Mestre</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p class="text-center">Nenhuma sessão criada ainda.</p>
+{% endif %}
 {% endblock %}

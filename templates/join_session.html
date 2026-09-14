@@ -3,29 +3,35 @@
 {% block title %}Entrar na Sessão{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
-    <h1 class="text-center mb-4">Entrar na Sessão: {{ session_name }}</h1>
+<h1>{{ system.icon }} {{ session_name }}</h1>
+<p class="text-center" style="color:var(--text-muted);">{{ system.name }} — {{ system.tagline }}</p>
 
-    <div class="text-center mb-4">
-        {% if session_data.created_by == session['userId'] %}
-            <form method="POST" action="{{ url_for('delete_session', session_id=session_data['_id']) }}" class="d-inline">
-                <button type="submit" class="btn btn-danger">Excluir Sessão</button>
-            </form>
-            <a href="{{ url_for('master_control', session_id=session_data['_id']) }}" class="btn btn-warning">Entrar como Mestre</a>
-        {% endif %}
-    </div>
-
-    <form method="POST" class="mx-auto" style="max-width: 600px;">
-        <div class="form-group">
-            <label for="character_id"><strong>Selecione um Personagem:</strong></label>
-            <select name="character_id" id="character_id" class="form-control custom-select">
-                {% for char in characters %}
-                    <option value="{{ char['_id'] }}">
-                        {{ char['name'] }} - Classe: {{ char['class_name'] }} - Raça: {{ char['race_name'] }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn btn-success btn-lg btn-block mt-4"><i class="bi bi-controller"></i>  Entrar na Sessão</button>
+{% if is_master %}
+<div class="text-center mb-4">
+    <a href="{{ url_for('master_control', session_id=session_data._id) }}" class="btn btn-warning">👑 Entrar como Mestre</a>
+    <form method="POST" action="{{ url_for('delete_session', session_id=session_data._id) }}" style="display:inline;">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Excluir esta sessão?');">🗑️ Excluir Sessão</button>
     </form>
+</div>
+{% endif %}
+
+{% if characters %}
+<form method="POST" class="panel form-panel">
+    <label for="character_id"><strong>Selecione um Personagem ({{ system.name }})</strong></label>
+    <select name="character_id" id="character_id" required>
+        {% for char in characters %}
+            <option value="{{ char._id }}">
+                {{ char.name }} — {{ char.class_name }}{% if char.race_name %} · {{ char.race_name }}{% endif %}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-success btn-lg btn-block mt-4">🚪 Entrar na Sessão</button>
+</form>
+{% else %}
+<p class="text-center">
+    Você não tem nenhum personagem de <strong>{{ system.name }}</strong> ainda.
+    <br>
+    <a href="{{ url_for('create_character_route', system=system.id) }}" class="btn btn-primary mt-3">✨ Criar um personagem para este sistema</a>
+</p>
+{% endif %}
 {% endblock %}

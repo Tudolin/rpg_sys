@@ -1,4 +1,27 @@
-from bson import ObjectId
+from local_db import ObjectId
+
+# Fixed ids for the built-in medieval classes, matching the ids that
+# abilities_model.py's class ability grants already reference (see the
+# matching comment in race_model.py for why this matters).
+_LEGACY_CLASS_IDS = [
+    "66bf65914681d1641b7a7222",  # Guerreiro
+    "66bf65914681d1641b7a7223",  # Mago
+    "66bf65914681d1641b7a7224",  # Ladino
+    "66bf65914681d1641b7a7225",  # Clérigo
+    "66bf65914681d1641b7a7226",  # Paladino
+    "66bf65914681d1641b7a7227",  # Bardo
+    "66bf65914681d1641b7a7228",  # Druida
+    "66bf65914681d1641b7a7229",  # Monge
+    "66bf65914681d1641b7a722a",  # Patrulheiro
+    "66bf65914681d1641b7a722b",  # Bruxo
+    "66bf65914681d1641b7a722c",  # Feiticeiro
+    "66bf65914681d1641b7a722d",  # Bárbaro
+    "66bf65914681d1641b7a722e",  # Cavaleiro
+    "66bf65914681d1641b7a722f",  # Xamã
+    "66bf65914681d1641b7a7230",  # Alquimista
+    "66bf65914681d1641b7a7231",  # Samurai
+    "66bf65914681d1641b7a7232",  # Metamorfo
+]
 
 
 def create_default_classes(db):
@@ -409,13 +432,108 @@ def create_default_classes(db):
         }
     }
 ]
-    for class_data in classes:
+    for index, class_data in enumerate(classes):
+        # Recast the old flat baseline fields into the generic shape used
+        # by the character sheet engine (see game_systems.py / character_model.py).
+        class_data["resource_bases"] = {
+            "hp": class_data.pop("hp", 0),
+            "mana": class_data.pop("mana", 0),
+            "energia": class_data.pop("energia", 0),
+        }
+        class_data["combat_bases"] = {
+            "ataque": class_data.pop("forca", 0),
+            "defesa": class_data.pop("defense", 0),
+        }
+        class_data.pop("destreza", None)
+        class_data["system_id"] = "medieval"
+        if index < len(_LEGACY_CLASS_IDS):
+            db.classes.update_one(
+                {"_id": ObjectId(_LEGACY_CLASS_IDS[index])},
+                {"$set": class_data},
+                upsert=True,
+            )
+        else:
+            db.classes.update_one(
+                {"name": class_data["name"], "system_id": "medieval"},
+                {"$set": class_data},
+                upsert=True,
+            )
+
+
+def create_default_classes_other_systems(db):
+    """Seed a modest set of classes/archetypes for the non-medieval systems."""
+    other_classes = [
+        # --- Call of Cthulhu: occupations ---
+        {"system_id": "cthulhu", "name": "Detetive Particular", "resource_bases": {"hp": 12, "sanidade": 50, "sorte": 50},
+         "pericias": {"Investigação": "Inteligência", "Persuasão": "Educação", "Lei": "Educação", "Arrombamento": "Destreza"},
+         "habilidades_classe": {"Instinto Aguçado": "Percebe detalhes que passariam despercebidos."}},
+        {"system_id": "cthulhu", "name": "Acadêmico", "resource_bases": {"hp": 9, "sanidade": 55, "sorte": 45},
+         "pericias": {"Biblioteca": "Educação", "Ocultismo": "Educação", "Línguas": "Educação", "História": "Educação"},
+         "habilidades_classe": {"Erudição": "Bônus ao pesquisar em bibliotecas e arquivos."}},
+        {"system_id": "cthulhu", "name": "Jornalista", "resource_bases": {"hp": 10, "sanidade": 50, "sorte": 50},
+         "pericias": {"Persuasão": "Educação", "Investigação": "Inteligência", "Furtividade": "Destreza"},
+         "habilidades_classe": {"Faro para Notícias": "Encontra pistas com mais facilidade em locais públicos."}},
+        {"system_id": "cthulhu", "name": "Médico", "resource_bases": {"hp": 11, "sanidade": 45, "sorte": 45},
+         "pericias": {"Medicina": "Educação", "Primeiros Socorros": "Educação", "Psicologia": "Educação"},
+         "habilidades_classe": {"Mãos Firmes": "Bônus ao estabilizar feridos em combate."}},
+        {"system_id": "cthulhu", "name": "Criminoso", "resource_bases": {"hp": 12, "sanidade": 40, "sorte": 55},
+         "pericias": {"Arrombamento": "Destreza", "Intimidação": "Força", "Furtividade": "Destreza"},
+         "habilidades_classe": {"Contatos do Submundo": "Conhece alguém em quase todo lugar."}},
+        {"system_id": "cthulhu", "name": "Antiquário", "resource_bases": {"hp": 9, "sanidade": 50, "sorte": 50},
+         "pericias": {"Avaliação": "Inteligência", "Ocultismo": "Educação", "Persuasão": "Educação"},
+         "habilidades_classe": {"Olho Clínico": "Reconhece artefatos e falsificações com facilidade."}},
+
+        # --- Western: archetypes ---
+        {"system_id": "western", "name": "Pistoleiro", "resource_bases": {"hp": 18, "determinacao": 10}, "combat_bases": {"pontaria": 15},
+         "pericias": {"Pontaria": "Destreza", "Intimidação": "Carisma", "Reflexos": "Destreza"},
+         "habilidades_classe": {"Saque Rápido": "Atira primeiro em confrontos diretos."}},
+        {"system_id": "western", "name": "Xerife", "resource_bases": {"hp": 20, "determinacao": 14}, "combat_bases": {"pontaria": 10},
+         "pericias": {"Autoridade": "Carisma", "Investigação": "Sagacidade", "Pontaria": "Destreza"},
+         "habilidades_classe": {"Mão da Lei": "Aliados próximos recebem bônus para resistir à intimidação."}},
+        {"system_id": "western", "name": "Fora-da-Lei", "resource_bases": {"hp": 16, "determinacao": 12}, "combat_bases": {"pontaria": 12},
+         "pericias": {"Furtividade": "Destreza", "Cavalgar": "Destreza", "Sobrevivência": "Sagacidade"},
+         "habilidades_classe": {"Fuga Ágil": "Bônus para escapar de perseguições a cavalo."}},
+        {"system_id": "western", "name": "Caçador de Recompensas", "resource_bases": {"hp": 18, "determinacao": 10}, "combat_bases": {"pontaria": 14},
+         "pericias": {"Rastrear": "Sagacidade", "Pontaria": "Destreza", "Intimidação": "Força"},
+         "habilidades_classe": {"Nunca Erra o Alvo": "Bônus ao perseguir um alvo marcado."}},
+        {"system_id": "western", "name": "Cartola", "resource_bases": {"hp": 12, "determinacao": 16}, "combat_bases": {"pontaria": 8},
+         "pericias": {"Enganação": "Carisma", "Percepção": "Sagacidade", "Persuasão": "Carisma"},
+         "habilidades_classe": {"Cartas Marcadas": "Vantagem em jogos de azar e leitura de blefes."}},
+        {"system_id": "western", "name": "Curandeira do Oeste", "resource_bases": {"hp": 14, "determinacao": 14}, "combat_bases": {"pontaria": 6},
+         "pericias": {"Medicina": "Sagacidade", "Sobrevivência": "Sagacidade", "Persuasão": "Carisma"},
+         "habilidades_classe": {"Remédios da Terra": "Cura ferimentos leves sem precisar de suprimentos."}},
+
+        # --- Cyberpunk: roles ---
+        {"system_id": "cyberpunk", "name": "Solo", "resource_bases": {"hp": 20, "humanidade": 40, "energia": 15}, "combat_bases": {"ataque": 16},
+         "pericias": {"Combate": "Reflexos", "Táticas": "Inteligência", "Intimidação": "Frieza"},
+         "habilidades_classe": {"Reflexos de Combate": "Age primeiro em situações de perigo."}},
+        {"system_id": "cyberpunk", "name": "Netrunner", "resource_bases": {"hp": 12, "humanidade": 35, "energia": 25}, "combat_bases": {"ataque": 6},
+         "pericias": {"Hacking": "Técnica", "Eletrônica": "Técnica", "Interface": "Inteligência"},
+         "habilidades_classe": {"Mergulho Profundo": "Acessa sistemas protegidos com mais facilidade."}},
+        {"system_id": "cyberpunk", "name": "Fixer", "resource_bases": {"hp": 14, "humanidade": 45, "energia": 15}, "combat_bases": {"ataque": 8},
+         "pericias": {"Persuasão": "Frieza", "Streetwise": "Inteligência", "Negociação": "Frieza"},
+         "habilidades_classe": {"Rede de Contatos": "Sempre conhece alguém que pode ajudar."}},
+        {"system_id": "cyberpunk", "name": "Rockerboy", "resource_bases": {"hp": 14, "humanidade": 50, "energia": 15}, "combat_bases": {"ataque": 8},
+         "pericias": {"Performance": "Frieza", "Persuasão": "Frieza", "Percepção": "Inteligência"},
+         "habilidades_classe": {"Voz do Povo": "Inspira e mobiliza multidões."}},
+        {"system_id": "cyberpunk", "name": "Nômade", "resource_bases": {"hp": 18, "humanidade": 45, "energia": 15}, "combat_bases": {"ataque": 12},
+         "pericias": {"Pilotagem": "Reflexos", "Mecânica": "Técnica", "Sobrevivência": "Vontade"},
+         "habilidades_classe": {"Família de Estrada": "Conta com apoio do seu clã nômade."}},
+        {"system_id": "cyberpunk", "name": "Corpo", "resource_bases": {"hp": 14, "humanidade": 35, "energia": 15}, "combat_bases": {"ataque": 10},
+         "pericias": {"Negociação": "Frieza", "Liderança": "Vontade", "Etiqueta": "Frieza"},
+         "habilidades_classe": {"Imunidade Corporativa": "Recursos e proteção legal de uma megacorporação."}},
+    ]
+
+    for class_data in other_classes:
         db.classes.update_one(
-            {"name": class_data["name"]},
+            {"name": class_data["name"], "system_id": class_data["system_id"]},
             {"$set": class_data},
-            upsert=True  # Isso garante que o documento seja inserido se não existir
+            upsert=True,
         )
-    # db.classes.insert_many(classes)
+
+
+def get_classes_by_system(db, system_id):
+    return list(db.classes.find({"system_id": system_id}))
 
 
 def get_class_by_id(db, class_id):
