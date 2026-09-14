@@ -32,8 +32,8 @@
 
 .other-players,
 .player-info {
-    border: 1px solid rgba(212, 164, 55, 0.4);
-    background: linear-gradient(180deg, rgba(31, 23, 18, 0.92), rgba(22, 17, 12, 0.92));
+    border: 3px solid var(--border-accent);
+    background: var(--surface);
     box-shadow: var(--shadow-soft);
     border-radius: var(--radius-lg);
     padding: 20px;
@@ -155,11 +155,13 @@
     left: 50%;
     transform: translateX(-50%);
     font-size: 2rem;
-    background: rgba(0, 0, 0, 0.85);
-    border: 1px solid var(--border-accent);
-    color: #fff;
-    padding: 10px 22px;
-    border-radius: var(--radius-md);
+    font-weight: 700;
+    background: var(--surface);
+    border: 3px solid var(--gold-500);
+    box-shadow: var(--shadow-soft);
+    color: var(--myth-purple);
+    padding: 10px 24px;
+    border-radius: 999px;
     z-index: 60;
 }
 
@@ -184,13 +186,13 @@
 }
 
 .enemy-card {
-    background: linear-gradient(180deg, rgba(31, 23, 18, 0.95), rgba(14, 11, 8, 0.95));
-    border: 2px solid var(--ember-600);
+    background: linear-gradient(180deg, #fff3ee, #ffe4da);
+    border: 3px solid var(--ember-600);
     border-radius: var(--radius-lg);
     padding: 14px;
     width: 170px;
     text-align: center;
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 6px 0 rgba(240, 73, 47, 0.25), 0 10px 18px rgba(74, 47, 20, 0.15);
     transition: transform 0.2s ease;
     list-style: none;
 }
@@ -246,8 +248,9 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(0deg, rgba(6, 4, 3, 0.97), rgba(6, 4, 3, 0.85));
-    border-top: 1px solid rgba(212, 164, 55, 0.35);
+    background: linear-gradient(180deg, var(--wood-600), var(--wood-700));
+    border-top: 4px solid var(--gold-500);
+    box-shadow: 0 -4px 14px rgba(74, 47, 20, 0.25);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -277,9 +280,9 @@
     text-align: center;
 }
 
-.skill-icon:hover { background: rgba(212, 164, 55, 0.15); }
-.skill-icon img { width: 32px; height: 32px; border-radius: 50%; }
-.skill-icon span { font-size: 0.72rem; color: var(--text); }
+.skill-icon:hover { background: rgba(255, 255, 255, 0.18); }
+.skill-icon img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--gold-400); background: #fff; }
+.skill-icon span { font-size: 0.72rem; color: #fff6df; font-weight: 600; }
 .skill-cost { font-size: 0.62rem !important; color: var(--gold-400) !important; }
 
 .bottom-bar-icon {
@@ -291,13 +294,17 @@
     cursor: pointer;
     flex-shrink: 0;
     font-size: 0.72rem;
+    font-weight: 600;
 }
+
+.bottom-bar .bottom-bar-icon { color: #fff6df; }
 
 .bottom-bar-icon-img {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 2px solid var(--border-accent);
+    border: 2px solid var(--gold-400);
+    background: #fff;
 }
 
 /* ---- Tabletop pawn row ------------------------------------------------ */

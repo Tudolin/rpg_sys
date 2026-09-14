@@ -252,6 +252,14 @@ def create_default_enemies_other_systems(db):
          "resumo": "Um híbrido anfíbio de aparência perturbadora, forte na água e traiçoeiro em terra."},
         {"system_id": "cthulhu", "name": "Shoggoth", "hp": 120, "ataque": 30, "defesa": 10, "mana": 0, "energia": 40,
          "resumo": "Uma massa protoplasmática amorfa de horror indescritível. Encontrá-la é quase sempre fatal."},
+        {"system_id": "cthulhu", "name": "Cão de Tíndalos", "hp": 30, "ataque": 18, "defesa": 8, "mana": 10, "energia": 25,
+         "resumo": "Uma criatura extradimensional que caça através dos ângulos do tempo. Evite cantos afiados."},
+        {"system_id": "cthulhu", "name": "Ghoul", "hp": 22, "ataque": 13, "defesa": 5, "mana": 0, "energia": 20,
+         "resumo": "Um necrófago humanoide que vive em cemitérios e túneis, ágil e surpreendentemente forte."},
+        {"system_id": "cthulhu", "name": "Byakhee", "hp": 28, "ataque": 15, "defesa": 6, "mana": 5, "energia": 25,
+         "resumo": "Uma criatura alada que cruza o vácuo do espaço, invocada para carregar viajantes indesejados."},
+        {"system_id": "cthulhu", "name": "Sacerdote do Culto", "hp": 16, "ataque": 10, "defesa": 4, "mana": 20, "energia": 15,
+         "resumo": "Um líder cultista com acesso a rituais menores e uma devoção fanática à sua entidade."},
 
         # --- Western ---
         {"system_id": "western", "name": "Bandido de Estrada", "hp": 14, "ataque": 9, "defesa": 3, "mana": 0, "energia": 10,
@@ -260,6 +268,14 @@ def create_default_enemies_other_systems(db):
          "resumo": "Um atirador experiente com uma reputação a zelar."},
         {"system_id": "western", "name": "Urso Pardo", "hp": 35, "ataque": 18, "defesa": 6, "mana": 0, "energia": 20,
          "resumo": "Uma fera selvagem territorial, perigosa quando encurralada."},
+        {"system_id": "western", "name": "Cobra Cascavel", "hp": 6, "ataque": 8, "defesa": 2, "mana": 0, "energia": 10,
+         "resumo": "Pequena mas letal — seu veneno é mais perigoso que suas presas."},
+        {"system_id": "western", "name": "Quadrilha de Assaltantes", "hp": 24, "ataque": 13, "defesa": 4, "mana": 0, "energia": 18,
+         "resumo": "Um bando organizado de assaltantes de trem, coordenados e bem armados."},
+        {"system_id": "western", "name": "Xerife Corrupto", "hp": 22, "ataque": 14, "defesa": 6, "mana": 0, "energia": 15,
+         "resumo": "Usa o distintivo para proteger seus próprios interesses, não a lei."},
+        {"system_id": "western", "name": "Caçador de Recompensas Rival", "hp": 26, "ataque": 16, "defesa": 5, "mana": 0, "energia": 18,
+         "resumo": "Está atrás do mesmo alvo que você — e não pretende dividir a recompensa."},
 
         # --- Cyberpunk ---
         {"system_id": "cyberpunk", "name": "Capanga Corporativo", "hp": 16, "ataque": 10, "defesa": 5, "mana": 0, "energia": 10,
@@ -268,6 +284,14 @@ def create_default_enemies_other_systems(db):
          "resumo": "Uma unidade autônoma armada, resistente a dano físico convencional."},
         {"system_id": "cyberpunk", "name": "Solo Cibernético", "hp": 40, "ataque": 22, "defesa": 10, "mana": 0, "energia": 25,
          "resumo": "Um mercenário fortemente modificado, contratado para eliminar alvos específicos."},
+        {"system_id": "cyberpunk", "name": "Netrunner Hostil", "hp": 12, "ataque": 8, "defesa": 4, "mana": 0, "energia": 30,
+         "resumo": "Ataca por trás de uma tela, tentando fritar sua mente antes que você o alcance fisicamente."},
+        {"system_id": "cyberpunk", "name": "Gangue de Rua", "hp": 20, "ataque": 11, "defesa": 5, "mana": 0, "energia": 15,
+         "resumo": "Um grupo territorial armado com o que conseguiram roubar ou modificar."},
+        {"system_id": "cyberpunk", "name": "Cyberpsico", "hp": 45, "ataque": 25, "defesa": 12, "mana": 0, "energia": 30,
+         "resumo": "Alguém que perdeu a própria humanidade para os implantes. Extremamente perigoso e imprevisível."},
+        {"system_id": "cyberpunk", "name": "MAX-Tac", "hp": 30, "ataque": 20, "defesa": 15, "mana": 0, "energia": 25,
+         "resumo": "Unidade policial de elite enviada para conter ameaças de alto risco — incluindo você."},
     ]
 
     for enemy_data in other_enemies:

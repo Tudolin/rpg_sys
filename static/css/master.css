@@ -12,7 +12,7 @@
 
 .master-section h2 {
     text-align: left;
-    border-bottom: 1px solid rgba(212, 164, 55, 0.3);
+    border-bottom: 3px solid var(--gold-400);
     padding-bottom: 8px;
 }
 
@@ -25,8 +25,8 @@
 
 .character-card,
 .enemy-card {
-    background: linear-gradient(180deg, rgba(31, 23, 18, 0.95), rgba(14, 11, 8, 0.95));
-    border: 1px solid var(--border-accent);
+    background: var(--surface);
+    border: 3px solid var(--border-accent);
     border-radius: var(--radius-lg);
     padding: 16px;
     width: 240px;
@@ -79,9 +79,9 @@
     margin-top: 8px;
     padding: 8px;
     border-radius: var(--radius-md);
-    border: 1px solid var(--ember-500);
-    background: rgba(177, 51, 42, 0.2);
-    color: #ffe0dc;
+    border: none;
+    background: var(--ember-500);
+    color: #fff;
     cursor: pointer;
     font-weight: bold;
 }
